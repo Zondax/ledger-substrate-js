@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "JSNode API for Polkadot apps running in Ledger Nano S/X",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zondax/ledger-polkadot-js.git"
@@ -58,6 +59,7 @@
   },
   "scripts": {
     "build": "babel src --out-dir dist",
+    "build:ci": "yarn build && cp -f src/index.d.ts dist",
     "test:unit": "jest -c jest.config.unit.js",
     "test:integration": "jest -c jest.config.integration.js --runInBand --detectOpenHandles",
     "serve": "vue-cli-service serve vue_example/main.js"
