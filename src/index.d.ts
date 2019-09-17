@@ -19,7 +19,7 @@ export interface ResponseVersion extends ResponseBase {
 }
 
 export interface ResponseSign extends ResponseBase {
-  signature: string;
+  signature: Buffer;
 }
 
 declare class LedgerApp {
