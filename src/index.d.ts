@@ -28,7 +28,7 @@ declare class LedgerApp {
   getVersion (): Promise<ResponseVersion>;
   getAddress (account: number, change: number, addressIndex: number, requireConfirmation?: boolean): Promise<ResponseAddress>;
   signSendChunk (chunkIdx: number, chunkNum: number, chunk: Buffer): Promise<ResponseSign>;
-  sign (account: number, change: number, addressIndex: number, message: Uint8Array): Promise<ResponseSign>;
+  sign (account: number, change: number, addressIndex: number, message: Buffer): Promise<ResponseSign>;
 }
 
 export default LedgerApp;
