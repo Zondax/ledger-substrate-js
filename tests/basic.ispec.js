@@ -1,7 +1,7 @@
 import LedgerApp from "index.js";
 import TransportNodeHid from "@ledgerhq/hw-transport-node-hid";
 import { expect, test } from "jest";
-import { sha512 } from "js-sha512";
+import { blake2bInit, blake2bUpdate, blake2bFinal } from "blakejs";
 
 var ed25519 = require('ed25519');
 
@@ -96,7 +96,12 @@ test("sign2_and_verify", async () => {
   console.log(responseSign);
 
   // Check signature is valid
-  const prehash = Buffer.from(sha512(txBlob), "hex");
+  let prehash = txBlob;
+  if (txBlob.length > 256) {
+    const context = blake2bInit(64, null);
+    blake2bUpdate(context, txBlob);
+    prehash = Buffer.from(blake2bFinal(context));
+  }
 
   const valid = ed25519.Verify(prehash, responseSign.signature, pubkey);
   expect(valid).toEqual(true);
