@@ -76,9 +76,10 @@ test("sign2_and_verify", async () => {
   const transport = await TransportNodeHid.create(1000);
 
   const txBlobStr =
-    "0400ff8d16d62802ca55326ec52bf76a8543b90e2aba5bcf6cd195c0d6fc1ef38fa1b3000600ae11030000c" +
-    "80100003fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf3fd7b9eb6a00376e" +
-    "5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf";
+    "0400ff96def717e304ef5c2859bbbd077a415d56b77a2ad0babc1305335031c3bf65" +
+    "17070010a5d4e82502000b00204aa9d101e90300003fd7b9eb6a00376e5be61f01ab" +
+    "b429ffb0b104be05eaff4d458da48fcd425baf608f0a14489664cb1df80103d32f4a" +
+    "f3ba1efc172ce02837f0b1c233482e0f86";
 
   const txBlob = Buffer.from(txBlobStr, "hex");
 
