@@ -42,9 +42,9 @@ import TransportU2F from "@ledgerhq/hw-transport-u2f";
 import LedgerApp from "../../src";
 
 const txBlobStr =
-  "0400ff8d16d62802ca55326ec52bf76a8543b90e2aba5bcf6cd195c0d6fc1ef38fa1b3000600ae11030000c" +
-  "80100003fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf3fd7b9eb6a00376e" +
-  "5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf";
+  "0400ff8d16d62802ca55326ec52bf76a8543b90e2aba5bcf6cd195c0d6fc1ef38fa1b333158139ae28a3df" +
+  "aac5fe1560a5e9e05c31000000c80100003fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458d" +
+  "a48fcd425baf3fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf";
 
 export default {
   name: "LedgerExample",
