@@ -119,14 +119,23 @@ export default class LedgerApp {
       const errorCodeData = response.slice(-2);
       const errorCode = errorCodeData[0] * 256 + errorCodeData[1];
 
+      let targetId = 0;
+      if (response.length >= 9) {
+        /* eslint-disable no-bitwise */
+        targetId = (response[5] << 24) + (response[6] << 16) + (response[7] << 8) + (response[8] << 0);
+        /* eslint-enable no-bitwise */
+      }
+
       return {
+        return_code: errorCode,
+        error_message: errorCodeToString(errorCode),
+        //
         test_mode: response[0] !== 0,
         major: response[1],
         minor: response[2],
         patch: response[3],
         device_locked: response[4] === 1,
-        return_code: errorCode,
-        error_message: errorCodeToString(errorCode),
+        target_id: targetId.toString(16),
       };
     }, LedgerApp.processErrorResponse);
   }
