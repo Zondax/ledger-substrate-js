@@ -3,7 +3,7 @@ import TransportNodeHid from "@ledgerhq/hw-transport-node-hid";
 import { expect, test } from "jest";
 import { blake2bInit, blake2bUpdate, blake2bFinal } from "blakejs";
 
-var ed25519 = require('ed25519');
+const ed25519 = require("ed25519");
 
 test("get version", async () => {
   const transport = await TransportNodeHid.create(1000);
