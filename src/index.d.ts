@@ -5,7 +5,7 @@ export interface ResponseBase {
   return_code: number;
 }
 
-export interface ReponseAddress extends ResponseBase {
+export interface ResponseAddress extends ResponseBase {
   address: string;
   pubKey: string;
 }
