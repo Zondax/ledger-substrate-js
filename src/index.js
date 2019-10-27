@@ -78,7 +78,7 @@ export default class LedgerApp {
 
     const buf = Buffer.alloc(20);
     buf.writeUInt32LE(0x8000002c, 0);
-    buf.writeUInt32LE(0x80000162, 4);
+    buf.writeUInt32LE(0x800001b2, 4);
     // eslint-disable-next-line no-bitwise
     buf.writeUInt32LE(account, 8);
     // eslint-disable-next-line no-bitwise

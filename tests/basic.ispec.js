@@ -25,8 +25,8 @@ test("get address", async () => {
   const response = await app.getAddress(pathAccount, pathChange, pathIndex);
   console.log(response);
 
-  expect(response.pubKey).toEqual("8d16d62802ca55326ec52bf76a8543b90e2aba5bcf6cd195c0d6fc1ef38fa1b3");
-  expect(response.address).toEqual("FmK43tjzFGT9F68Sj9EvW6rwBQUAVuA9wNQaYxGLvfcCAxS");
+  expect(response.pubKey).toEqual("1d07175b57f9d73de246035dd1f91c806b03ae5bead5f9e59692c9b82d337cc0");
+  expect(response.address).toEqual("DEP1hv6bkuhZdvgBdzKYwvPKnA6Quadsta7L74n3S4V9S9Z");
 });
 
 test("show address", async () => {
@@ -44,8 +44,8 @@ test("show address", async () => {
   console.log(response);
 
   // FIXME: Address
-  expect(response.pubKey).toEqual("a9fc4cb6f5ad1ae3fbfa69f252eaa495ae658f7af33f24ce195396813641ec4a");
-  expect(response.address).toEqual("GRCZNaoU2hS5Zjc3gyy34yyrV2Qbmqem8G6qbbG6Uy7938z");
+  expect(response.pubKey).toEqual("51f412e4c0b84d911751df1352ce9b6e7404dd37b5cbc04e79b4710c938ce8ca");
+  expect(response.address).toEqual("ERmuEwD1LJaBrMsivMXpukWXR7ZQkF55VzfbrpgnhVmMpFH");
 });
 
 test("sign1", async () => {
@@ -76,9 +76,7 @@ test("sign2_and_verify", async () => {
   const transport = await TransportNodeHid.create(1000);
 
   const txBlobStr =
-    "0400ff8d16d62802ca55326ec52bf76a8543b90e2aba5bcf6cd195c0d6fc1ef38fa1b333158139ae28a3df" +
-    "aac5fe1560a5e9e05c31000000c80100003fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458d" +
-    "a48fcd425baf3fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf";
+    "0400fff27d305943815cdbefa6aabbeeb9dec0cd17591bdaf412ed6bce8f9e93708c6c0b63ce64c10c05d503ae1103006d0fef030000e3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f6361578af1cc2dfbd5393020eb7ab87e7d784ddd525f68e82cb4192af352713fd85";
 
   const txBlob = Buffer.from(txBlobStr, "hex");
 
@@ -103,6 +101,6 @@ test("sign2_and_verify", async () => {
     prehash = Buffer.from(blake2bFinal(context));
   }
 
-  const valid = ed25519.Verify(prehash, responseSign.signature, pubkey);
+  const valid = ed25519.Verify(prehash, responseSign.signature.slice(1), pubkey);
   expect(valid).toEqual(true);
 });

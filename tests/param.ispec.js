@@ -30,7 +30,7 @@ async function signAndVerify(txBlob) {
     prehash = Buffer.from(blake2bFinal(context));
   }
 
-  const valid = ed25519.Verify(prehash, responseSign.signature, pubkey);
+  const valid = ed25519.Verify(prehash, responseSign.signature.slice(1), pubkey);
   expect(valid).toEqual(true);
 }
 
