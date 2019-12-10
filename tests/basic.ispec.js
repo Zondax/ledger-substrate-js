@@ -3,19 +3,26 @@ import TransportNodeHid from "@ledgerhq/hw-transport-node-hid";
 import { expect, test } from "jest";
 import { blake2bInit, blake2bUpdate, blake2bFinal } from "blakejs";
 
-const ed25519 = require("ed25519");
+const ed25519 = require("ed25519-supercop");
 
 test("get version", async () => {
   const transport = await TransportNodeHid.create(1000);
 
   const app = new LedgerApp(transport);
-  const version = await app.getVersion();
-  console.log(version);
+  const resp = await app.getVersion();
+  console.log(resp);
+
+  expect(resp.return_code).toEqual(0x9000);
+  expect(resp.error_message).toEqual("No errors");
+  expect(resp).toHaveProperty("test_mode");
+  expect(resp).toHaveProperty("major");
+  expect(resp).toHaveProperty("minor");
+  expect(resp).toHaveProperty("patch");
+  expect(resp.test_mode).toEqual(false);
 });
 
 test("get address", async () => {
   const transport = await TransportNodeHid.create(1000);
-
   const app = new LedgerApp(transport);
 
   const pathAccount = 0x80000000;
@@ -25,6 +32,9 @@ test("get address", async () => {
   const response = await app.getAddress(pathAccount, pathChange, pathIndex);
   console.log(response);
 
+  expect(response.return_code).toEqual(0x9000);
+  expect(response.error_message).toEqual("No errors");
+  expect(response).toHaveProperty("pubKey");
   expect(response.pubKey).toEqual("1d07175b57f9d73de246035dd1f91c806b03ae5bead5f9e59692c9b82d337cc0");
   expect(response.address).toEqual("DEP1hv6bkuhZdvgBdzKYwvPKnA6Quadsta7L74n3S4V9S9Z");
 });
@@ -33,7 +43,6 @@ test("show address", async () => {
   jest.setTimeout(60000);
 
   const transport = await TransportNodeHid.create(1000);
-
   const app = new LedgerApp(transport);
 
   const pathAccount = 0x80000000;
@@ -43,7 +52,12 @@ test("show address", async () => {
 
   console.log(response);
 
-  // FIXME: Address
+  expect(response.return_code).toEqual(0x9000);
+  expect(response.error_message).toEqual("No errors");
+
+  expect(response).toHaveProperty("address");
+  expect(response).toHaveProperty("pubKey");
+
   expect(response.pubKey).toEqual("51f412e4c0b84d911751df1352ce9b6e7404dd37b5cbc04e79b4710c938ce8ca");
   expect(response.address).toEqual("ERmuEwD1LJaBrMsivMXpukWXR7ZQkF55VzfbrpgnhVmMpFH");
 });
@@ -73,13 +87,12 @@ test("sign1", async () => {
 test("sign2_and_verify", async () => {
   jest.setTimeout(60000);
 
-  const transport = await TransportNodeHid.create(1000);
-
   const txBlobStr =
     "0400fff27d305943815cdbefa6aabbeeb9dec0cd17591bdaf412ed6bce8f9e93708c6c0b63ce64c10c05d503ae1103006d0fef030000e3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f6361578af1cc2dfbd5393020eb7ab87e7d784ddd525f68e82cb4192af352713fd85";
 
   const txBlob = Buffer.from(txBlobStr, "hex");
 
+  const transport = await TransportNodeHid.create(1000);
   const app = new LedgerApp(transport);
   const pathAccount = 0x80000000;
   const pathChange = 0x80000000;
@@ -100,7 +113,6 @@ test("sign2_and_verify", async () => {
     blake2bUpdate(context, txBlob);
     prehash = Buffer.from(blake2bFinal(context));
   }
-
-  const valid = ed25519.Verify(prehash, responseSign.signature.slice(1), pubkey);
+  const valid = ed25519.verify(responseSign.signature.slice(1), prehash, pubkey);
   expect(valid).toEqual(true);
 });

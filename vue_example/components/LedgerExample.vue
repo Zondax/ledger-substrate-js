@@ -1,31 +1,31 @@
 <template>
-  <div class="ledgerExample">
-    <input id="webusb" v-model="transportChoice" type="radio" value="WebUSB" />
-    <label for="webusb">WebUSB</label>
-    <input id="u2f" v-model="transportChoice" type="radio" value="U2F" />
-    <label for="u2f">U2F</label>
+  <div class="Ledger">
     <br />
     <!--
-            Commands
-        -->
+        Commands
+    -->
     <button @click="getVersion">
       Get Version
     </button>
-    <br />
+
+    <button @click="appInfo">
+      AppInfo
+    </button>
+
     <button @click="getAddress">
       Get Address
     </button>
-    <br />
+
     <button @click="showAddress">
       Show Address
     </button>
-    <br />
+
     <button @click="signExampleTx">
       Sign Example TX
     </button>
     <!--
-            Commands
-        -->
+        Commands
+    -->
     <ul id="ledger-status">
       <li v-for="item in ledgerStatus" :key="item.index">
         {{ item.msg }}
@@ -47,7 +47,7 @@ const txBlobStr =
   "a48fcd425baf3fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf";
 
 export default {
-  name: "LedgerExample",
+  name: "Ledger",
   props: {},
   data() {
     return {
@@ -110,6 +110,24 @@ export default {
       this.log("Full response:");
       this.log(response);
     },
+    async appInfo() {
+      this.deviceLog = [];
+
+      // Given a transport (U2F/HIF/WebUSB) it is possible instantiate the app
+      const transport = await this.getTransport();
+      const app = new OasisApp(transport);
+
+      // now it is possible to access all commands in the app
+      const response = await app.appInfo();
+      if (response.return_code !== 0x9000) {
+        this.log(`Error [${response.return_code}] ${response.error_message}`);
+        return;
+      }
+
+      this.log("Response received!");
+      this.log(response);
+    },
+  },
     async getAddress() {
       this.deviceLog = [];
 
@@ -117,21 +135,22 @@ export default {
       const transport = await this.getTransport();
       const app = new LedgerApp(transport);
 
+      let response = await app.getVersion();
+      this.log(`App Version ${response.major}.${response.minor}.${response.patch}`);
+      this.log(`Device Locked: ${response.device_locked}`);
+      this.log(`Test mode: ${response.test_mode}`);
+
       // now it is possible to access all commands in the app
       const pathAccount = 0x80000000;
       const pathChange = 0x80000000;
       const pathIndex = 0x80000000;
-      const response = await app.getAddress(pathAccount, pathChange, pathIndex, false);
+      response = await app.getAddress(pathAccount, pathChange, pathIndex, false);
       if (response.return_code !== 0x9000) {
         this.log(`Error [${response.return_code}] ${response.error_message}`);
         return;
       }
 
       this.log("Response received!");
-      this.log("...");
-      this.log(`PubKey ${response.pubKey}`);
-      this.log(`Address: ${response.address}`);
-      this.log("...");
       this.log("Full response:");
       this.log(response);
     },
@@ -142,43 +161,46 @@ export default {
       const transport = await this.getTransport();
       const app = new LedgerApp(transport);
 
+      let response = await app.getVersion();
+      this.log(`App Version ${response.major}.${response.minor}.${response.patch}`);
+      this.log(`Device Locked: ${response.device_locked}`);
+      this.log(`Test mode: ${response.test_mode}`);
+
       // now it is possible to access all commands in the app
       this.log("Please click in the device");
       const pathAccount = 0x80000000;
       const pathChange = 0x80000000;
       const pathIndex = 0x80000000;
-      const response = await app.getAddress(pathAccount, pathChange, pathIndex, true);
+      response = await app.getAddress(pathAccount, pathChange, pathIndex, true);
       if (response.return_code !== 0x9000) {
         this.log(`Error [${response.return_code}] ${response.error_message}`);
         return;
       }
 
       this.log("Response received!");
-      this.log("...");
-      this.log(`PubKey ${response.pubKey}`);
-      this.log(`Address: ${response.address}`);
-      this.log("...");
       this.log("Full response:");
       this.log(response);
     },
     async signExampleTx() {
       this.deviceLog = [];
 
-      // Given a transport (U2F/HIF/WebUSB) it is possible instantiate the app
+      // Given a transport (U2F/HID/WebUSB) it is possible instantiate the app
       const transport = await this.getTransport();
       const app = new LedgerApp(transport);
+
+      let response = await app.getVersion();
+      this.log(`App Version ${response.major}.${response.minor}.${response.patch}`);
+      this.log(`Device Locked: ${response.device_locked}`);
+      this.log(`Test mode: ${response.test_mode}`);
 
       // now it is possible to access all commands in the app
       const message = Buffer.from(txBlobStr, "hex");
       const pathAccount = 0x80000000;
       const pathChange = 0x80000000;
       const pathIndex = 0x80000000;
-      const response = await app.sign(pathAccount, pathChange, pathIndex, message);
+      response = await app.sign(pathAccount, pathChange, pathIndex, message);
 
       this.log("Response received!");
-      this.log("...");
-      this.log(`Signature: ${response.signature.toString("hex")}`);
-      this.log("...");
       this.log("Full response:");
       this.log(response);
     },
