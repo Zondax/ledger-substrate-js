@@ -98,7 +98,7 @@ export default {
 
       // now it is possible to access all commands in the app
       const response = await app.getVersion();
-      if (response.return_code !== 0x9000) {
+      if (response.return_code !== ERROR_CODE.NoError) {
         this.log(`Error [${response.return_code}] ${response.error_message}`);
         return;
       }
@@ -115,7 +115,7 @@ export default {
 
       // Given a transport (U2F/HIF/WebUSB) it is possible instantiate the app
       const transport = await this.getTransport();
-      const app = new OasisApp(transport);
+      const app = new LedgerApp(transport);
 
       // now it is possible to access all commands in the app
       const response = await app.appInfo();

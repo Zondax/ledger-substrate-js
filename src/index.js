@@ -15,51 +15,16 @@
  *  limitations under the License.
  ******************************************************************************* */
 
-const CLA = 0x99;
-const CHUNK_SIZE = 250;
-const APP_KEY = "DOT";
-
-const INS = {
-  GET_VERSION: 0x00,
-  GET_ADDR_ED25519: 0x01,
-  SIGN_ED25519: 0x02,
-};
-
-const PAYLOAD_TYPE = {
-  INIT: 0x00,
-  ADD: 0x01,
-  LAST: 0x02,
-};
-
-const ERROR_DESCRIPTION = {
-  1: "U2F: Unknown",
-  2: "U2F: Bad request",
-  3: "U2F: Configuration unsupported",
-  4: "U2F: Device Ineligible",
-  5: "U2F: Timeout",
-  14: "Timeout",
-  0x9000: "No errors",
-  0x9001: "Device is busy",
-  0x6802: "Error deriving keys",
-  0x6400: "Execution Error",
-  0x6700: "Wrong Length",
-  0x6982: "Empty Buffer",
-  0x6983: "Output buffer too small",
-  0x6984: "Data is invalid",
-  0x6985: "Conditions not satisfied",
-  0x6986: "Transaction rejected",
-  0x6a80: "Bad key handle",
-  0x6b00: "Invalid P1/P2",
-  0x6d00: "Instruction not supported",
-  0x6e00: "Ledger app does not seem to be open",
-  0x6f00: "Unknown error",
-  0x6f01: "Sign/verify error",
-};
-
-function errorCodeToString(statusCode) {
-  if (statusCode in ERROR_DESCRIPTION) return ERROR_DESCRIPTION[statusCode];
-  return `Unknown Status Code: ${statusCode}`;
-}
+import {
+  APP_KEY,
+  CHUNK_SIZE,
+  CLA, ERROR_CODE,
+  errorCodeToString,
+  getVersion,
+  INS,
+  PAYLOAD_TYPE,
+  processErrorResponse
+} from "./common";
 
 export default class LedgerApp {
   constructor(transport, scrambleKey = APP_KEY) {
@@ -71,7 +36,7 @@ export default class LedgerApp {
     transport.decorateAppAPIMethods(this, ["getVersion", "getAddress", "sign"], scrambleKey);
   }
 
-  static serializeBIP44(account, change, addressIndex) {
+  static serializePath(account, change, addressIndex) {
     if (!Number.isInteger(account)) throw new Error("Input must be an integer");
     if (!Number.isInteger(change)) throw new Error("Input must be an integer");
     if (!Number.isInteger(addressIndex)) throw new Error("Input must be an integer");
@@ -91,7 +56,7 @@ export default class LedgerApp {
 
   static signGetChunks(account, change, addressIndex, message) {
     const chunks = [];
-    const bip44Path = LedgerApp.serializeBIP44(account, change, addressIndex);
+    const bip44Path = LedgerApp.serializePath(account, change, addressIndex);
     chunks.push(bip44Path);
 
     const buffer = Buffer.from(message);
@@ -107,41 +72,115 @@ export default class LedgerApp {
     return chunks;
   }
 
-  static processErrorResponse(response) {
-    return {
-      return_code: response.statusCode,
-      error_message: errorCodeToString(response.statusCode),
-    };
+  async getVersion() {
+    try {
+      this.versionResponse = await getVersion(this.transport);
+      return this.versionResponse;
+    } catch (e) {
+      return processErrorResponse(e);
+    }
   }
 
-  async getVersion() {
-    return this.transport.send(CLA, INS.GET_VERSION, 0, 0).then(response => {
+  async appInfo() {
+    return this.transport.send(0xb0, 0x01, 0, 0).then(response => {
       const errorCodeData = response.slice(-2);
-      const errorCode = errorCodeData[0] * 256 + errorCodeData[1];
+      const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
 
-      let targetId = 0;
-      if (response.length >= 9) {
-        /* eslint-disable no-bitwise */
-        targetId = (response[5] << 24) + (response[6] << 16) + (response[7] << 8) + (response[8] << 0);
-        /* eslint-enable no-bitwise */
+      const result = {};
+
+      let appName = "err";
+      let appVersion = "err";
+      let flagLen = 0;
+      let flagsValue = 0;
+
+      if (response[0] !== 1) {
+        // Ledger responds with format ID 1. There is no spec for any format != 1
+        result.error_message = "response format ID not recognized";
+        result.return_code = 0x9001;
+      } else {
+        const appNameLen = response[1];
+        appName = response.slice(2, 2 + appNameLen).toString("ascii");
+        let idx = 2 + appNameLen;
+        const appVersionLen = response[idx];
+        idx += 1;
+        appVersion = response.slice(idx, idx + appVersionLen).toString("ascii");
+        idx += appVersionLen;
+        const appFlagsLen = response[idx];
+        idx += 1;
+        flagLen = appFlagsLen;
+        flagsValue = response[idx];
       }
 
       return {
-        return_code: errorCode,
-        error_message: errorCodeToString(errorCode),
-        //
-        test_mode: response[0] !== 0,
-        major: response[1],
-        minor: response[2],
-        patch: response[3],
-        device_locked: response[4] === 1,
-        target_id: targetId.toString(16),
+        return_code: returnCode,
+        error_message: errorCodeToString(returnCode),
+        // //
+        appName,
+        appVersion,
+        flagLen,
+        flagsValue,
+        // eslint-disable-next-line no-bitwise
+        flag_recovery: (flagsValue & 1) !== 0,
+        // eslint-disable-next-line no-bitwise
+        flag_signed_mcu_code: (flagsValue & 2) !== 0,
+        // eslint-disable-next-line no-bitwise
+        flag_onboarded: (flagsValue & 4) !== 0,
+        // eslint-disable-next-line no-bitwise
+        flag_pin_validated: (flagsValue & 128) !== 0,
       };
-    }, LedgerApp.processErrorResponse);
+    }, processErrorResponse);
+  }
+
+  async deviceInfo() {
+    return this.transport
+      .send(0xe0, 0x01, 0, 0, Buffer.from([]), [ERROR_CODE.NoError, 0x6e00])
+      .then(response => {
+        const errorCodeData = response.slice(-2);
+        const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
+
+        if (returnCode === 0x6e00) {
+          return {
+            return_code: returnCode,
+            error_message: "This command is only available in the Dashboard",
+          };
+        }
+
+        const targetId = response.slice(0, 4).toString("hex");
+
+        let pos = 4;
+        const secureElementVersionLen = response[pos];
+        pos += 1;
+        const seVersion = response.slice(pos, pos + secureElementVersionLen).toString();
+        pos += secureElementVersionLen;
+
+        const flagsLen = response[pos];
+        pos += 1;
+        const flag = response.slice(pos, pos + flagsLen).toString("hex");
+        pos += flagsLen;
+
+        const mcuVersionLen = response[pos];
+        pos += 1;
+        // Patch issue in mcu version
+        let tmp = response.slice(pos, pos + mcuVersionLen);
+        if (tmp[mcuVersionLen - 1] === 0) {
+          tmp = response.slice(pos, pos + mcuVersionLen - 1);
+        }
+        const mcuVersion = tmp.toString();
+
+        return {
+          return_code: returnCode,
+          error_message: errorCodeToString(returnCode),
+          // //
+          targetId,
+          seVersion,
+          flag,
+          mcuVersion,
+        };
+      }, processErrorResponse);
   }
 
   async getAddress(account, change, addressIndex, requireConfirmation = false) {
-    const bip44Path = LedgerApp.serializeBIP44(account, change, addressIndex);
+    const bip44Path = LedgerApp.serializePath(account, change, addressIndex);
 
     let p1 = 0;
     if (requireConfirmation) p1 = 1;
@@ -156,7 +195,7 @@ export default class LedgerApp {
         return_code: errorCode,
         error_message: errorCodeToString(errorCode),
       };
-    }, LedgerApp.processErrorResponse);
+    }, processErrorResponse);
   }
 
   async signSendChunk(chunkIdx, chunkNum, chunk) {
@@ -187,7 +226,7 @@ export default class LedgerApp {
           return_code: returnCode,
           error_message: errorMessage,
         };
-      }, LedgerApp.processErrorResponse);
+      }, processErrorResponse);
   }
 
   async sign(account, change, addressIndex, message) {
@@ -206,6 +245,6 @@ export default class LedgerApp {
         error_message: result.error_message,
         signature: result.signature,
       };
-    }, LedgerApp.processErrorResponse);
+    }, processErrorResponse);
   }
 }

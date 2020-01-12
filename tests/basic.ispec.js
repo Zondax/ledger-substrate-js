@@ -1,7 +1,7 @@
-import LedgerApp from "index.js";
 import TransportNodeHid from "@ledgerhq/hw-transport-node-hid";
 import { expect, test } from "jest";
 import { blake2bInit, blake2bUpdate, blake2bFinal } from "blakejs";
+import LedgerApp from "../src";
 
 const ed25519 = require("ed25519-supercop");
 
@@ -35,8 +35,8 @@ test("get address", async () => {
   expect(response.return_code).toEqual(0x9000);
   expect(response.error_message).toEqual("No errors");
   expect(response).toHaveProperty("pubKey");
-  expect(response.pubKey).toEqual("1d07175b57f9d73de246035dd1f91c806b03ae5bead5f9e59692c9b82d337cc0");
-  expect(response.address).toEqual("DEP1hv6bkuhZdvgBdzKYwvPKnA6Quadsta7L74n3S4V9S9Z");
+  expect(response.pubKey).toEqual("d280b24dface41f31006e5a2783971fc5a66c862dd7d08f97603d2902b75e47a");
+  expect(response.address).toEqual("HLKocKgeGjpXkGJU6VACtTYJK4ApTCfcGRw51E5jWntcsXv");
 });
 
 test("show address", async () => {
@@ -58,37 +58,15 @@ test("show address", async () => {
   expect(response).toHaveProperty("address");
   expect(response).toHaveProperty("pubKey");
 
-  expect(response.pubKey).toEqual("51f412e4c0b84d911751df1352ce9b6e7404dd37b5cbc04e79b4710c938ce8ca");
-  expect(response.address).toEqual("ERmuEwD1LJaBrMsivMXpukWXR7ZQkF55VzfbrpgnhVmMpFH");
-});
-
-test("sign1", async () => {
-  jest.setTimeout(60000);
-
-  const transport = await TransportNodeHid.create(1000);
-
-  const txBlobStr =
-    "0400ff8d16d62802ca55326ec52bf76a8543b90e2aba5bcf6cd195c0d6fc1ef38fa1b3000600ae11030000c" +
-    "80100003fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf3fd7b9eb6a00376e" +
-    "5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf";
-
-  const txBlob = Buffer.from(txBlobStr, "hex");
-
-  const app = new LedgerApp(transport);
-
-  const pathAccount = 0x80000000;
-  const pathChange = 0x80000000;
-  const pathIndex = 0x80000000;
-  const response = await app.sign(pathAccount, pathChange, pathIndex, txBlob);
-
-  console.log(response);
+  expect(response.pubKey).toEqual("3306fecee2c27f149f8de8f1fbcaaa01d53801e9b74938d5d4c7b009d0fc93f9");
+  expect(response.address).toEqual("DjE39wTisBv1CVA5dVvppx5djFCiuNgxz8Xcey8Xmp16Bnv");
 });
 
 test("sign2_and_verify", async () => {
   jest.setTimeout(60000);
 
   const txBlobStr =
-    "0400fff27d305943815cdbefa6aabbeeb9dec0cd17591bdaf412ed6bce8f9e93708c6c0b63ce64c10c05d503ae1103006d0fef030000e3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f6361578af1cc2dfbd5393020eb7ab87e7d784ddd525f68e82cb4192af352713fd85";
+    "0400ff22626db5d34d228a1275aaa944e7bf2fc855ea9971c3096a01ab29051bed86206d0fd5038d240b63ce64c10c050f040000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafeb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe";
 
   const txBlob = Buffer.from(txBlobStr, "hex");
 
