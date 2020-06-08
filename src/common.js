@@ -91,7 +91,7 @@ export async function getVersion(transport) {
     const errorCodeData = response.slice(-2);
     const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
 
-    if (response.length !== 11) {
+    if (response.length !== 12) {
       return {
         return_code: 0x6984,
         error_message: errorCodeToString(0x6984),
@@ -101,9 +101,9 @@ export async function getVersion(transport) {
     const major = response[1] * 256 + response[2];
     const minor = response[3] * 256 + response[4];
     const patch = response[5] * 256 + response[6];
-    const deviceLocked = response[4] === 1;
+    const deviceLocked = response[7] === 1;
     // eslint-disable-next-line no-bitwise
-    const targetId = (response[7] << 24) + (response[8] << 16) + (response[9] << 8) + (response[10] << 0);
+    const targetId = (response[8] << 24) + (response[9] << 16) + (response[10] << 8) + (response[11] << 0);
 
     return {
       return_code: returnCode,
