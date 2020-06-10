@@ -91,7 +91,8 @@ export async function getVersion(transport) {
     const errorCodeData = response.slice(-2);
     const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
 
-    if (response.length !== 12) {
+    // 12 bytes + 2 error code
+    if (response.length !== 14) {
       return {
         return_code: 0x6984,
         error_message: errorCodeToString(0x6984),
