@@ -79,22 +79,14 @@ export default {
         }
       }
 
-      if (this.transportChoice === "U2F") {
-        try {
-          transport = await TransportU2F.create(10000);
-        } catch (e) {
-          this.log(e);
-        }
-      }
-
       return transport;
     },
     async getVersion() {
       this.deviceLog = [];
 
-      // Given a transport (U2F/HIF/WebUSB) it is possible instantiate the app
+      // Given a transport it is possible instantiate the app
       const transport = await this.getTransport();
-      const app = new LedgerApp(transport);
+      const app = newKusamaApp(transport);
 
       // now it is possible to access all commands in the app
       const response = await app.getVersion();
@@ -113,9 +105,9 @@ export default {
     async appInfo() {
       this.deviceLog = [];
 
-      // Given a transport (U2F/HIF/WebUSB) it is possible instantiate the app
+      // Given a transport it is possible instantiate the app
       const transport = await this.getTransport();
-      const app = new LedgerApp(transport);
+      const app = newKusamaApp(transport);
 
       // now it is possible to access all commands in the app
       const response = await app.appInfo();
@@ -131,9 +123,9 @@ export default {
     async getAddress() {
       this.deviceLog = [];
 
-      // Given a transport (U2F/HIF/WebUSB) it is possible instantiate the app
+      // Given a transport it is possible instantiate the app
       const transport = await this.getTransport();
-      const app = new LedgerApp(transport);
+      const app = newKusamaApp(transport);
 
       let response = await app.getVersion();
       this.log(`App Version ${response.major}.${response.minor}.${response.patch}`);
@@ -157,9 +149,9 @@ export default {
     async showAddress() {
       this.deviceLog = [];
 
-      // Given a transport (U2F/HIF/WebUSB) it is possible instantiate the app
+      // Given a transport it is possible instantiate the app
       const transport = await this.getTransport();
-      const app = new LedgerApp(transport);
+      const app = newKusamaApp(transport);
 
       let response = await app.getVersion();
       this.log(`App Version ${response.major}.${response.minor}.${response.patch}`);
@@ -184,9 +176,9 @@ export default {
     async signExampleTx() {
       this.deviceLog = [];
 
-      // Given a transport (U2F/HID/WebUSB) it is possible instantiate the app
+      // Given a transport it is possible instantiate the app
       const transport = await this.getTransport();
-      const app = new LedgerApp(transport);
+      const app = newKusamaApp(transport);
 
       let response = await app.getVersion();
       this.log(`App Version ${response.major}.${response.minor}.${response.patch}`);
