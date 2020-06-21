@@ -1,6 +1,7 @@
-export const CLA = 0x99;
+export const CLA_KUSAMA = 0x99;
+export const CLA_POLKADOT = 0x90;
+
 export const CHUNK_SIZE = 250;
-export const APP_KEY = "DOT";
 
 export const INS = {
   GET_VERSION: 0x00,
@@ -43,7 +44,7 @@ const ERROR_DESCRIPTION = {
   0x6a80: "Bad key handle",
   0x6b00: "Invalid P1/P2",
   0x6d00: "Instruction not supported",
-  0x6e00: "Ledger App does not seem to be open",
+  0x6e00: "App does not seem to be open",
   0x6f00: "Unknown error",
   0x6f01: "Sign/verify error",
 };
@@ -86,8 +87,8 @@ export function processErrorResponse(response) {
   };
 }
 
-export async function getVersion(transport) {
-  return transport.send(CLA, INS.GET_VERSION, 0, 0).then(response => {
+export async function getVersion(transport, cla) {
+  return transport.send(cla, INS.GET_VERSION, 0, 0).then((response) => {
     const errorCodeData = response.slice(-2);
     const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
 
