@@ -17,34 +17,43 @@
 
 import {
   CHUNK_SIZE,
-  CLA_KUSAMA,
   ERROR_CODE,
   errorCodeToString,
   getVersion,
-  INS,
   PAYLOAD_TYPE,
   processErrorResponse,
 } from "./common";
 
-export default class LedgerApp {
-  constructor(transport, cla = CLA_KUSAMA) {
+import { CLA, SLIP0044 } from "./config";
+
+const INS = {
+  GET_VERSION: 0x00,
+  GET_ADDR_ED25519: 0x01,
+  SIGN_ED25519: 0x02,
+};
+
+class SubstrateApp {
+  constructor(transport, cla, slip0044) {
     if (!transport) {
       throw new Error("Transport has not been defined");
     }
 
     this.transport = transport;
     this.cla = cla;
-    transport.decorateAppAPIMethods(this, ["getVersion", "getAddress", "sign"], scrambleKey);
+    this.slip0044 = slip0044;
+
+    // Disabled, we don't support U2F anymore
+    // transport.decorateAppAPIMethods(this, ["getVersion", "appInfo", "getAddress", "sign"], scrambleKey);
   }
 
-  static serializePath(account, change, addressIndex) {
+  static serializePath(slip0044, account, change, addressIndex) {
     if (!Number.isInteger(account)) throw new Error("Input must be an integer");
     if (!Number.isInteger(change)) throw new Error("Input must be an integer");
     if (!Number.isInteger(addressIndex)) throw new Error("Input must be an integer");
 
     const buf = Buffer.alloc(20);
     buf.writeUInt32LE(0x8000002c, 0);
-    buf.writeUInt32LE(0x800001b2, 4);
+    buf.writeUInt32LE(slip0044, 4);
     // eslint-disable-next-line no-bitwise
     buf.writeUInt32LE(account, 8);
     // eslint-disable-next-line no-bitwise
@@ -55,9 +64,9 @@ export default class LedgerApp {
     return buf;
   }
 
-  static signGetChunks(account, change, addressIndex, message) {
+  static signGetChunks(slip0044, account, change, addressIndex, message) {
     const chunks = [];
-    const bip44Path = LedgerApp.serializePath(account, change, addressIndex);
+    const bip44Path = SubstrateApp.serializePath(slip0044, account, change, addressIndex);
     chunks.push(bip44Path);
 
     const buffer = Buffer.from(message);
@@ -75,7 +84,7 @@ export default class LedgerApp {
 
   async getVersion() {
     try {
-      return await getVersion(this.transport, CLA_KUSAMA);
+      return await getVersion(this.transport, this.cla);
     } catch (e) {
       return processErrorResponse(e);
     }
@@ -132,7 +141,7 @@ export default class LedgerApp {
   }
 
   async getAddress(account, change, addressIndex, requireConfirmation = false) {
-    const bip44Path = LedgerApp.serializePath(account, change, addressIndex);
+    const bip44Path = SubstrateApp.serializePath(account, change, addressIndex);
 
     let p1 = 0;
     if (requireConfirmation) p1 = 1;
@@ -160,7 +169,7 @@ export default class LedgerApp {
     }
 
     return this.transport
-      .send(this.cla, INS.SIGN_ED25519, payloadType, 0, chunk, [0x9000, 0x6984, 0x6a80])
+      .send(this.cla, INS.SIGN_ED25519, payloadType, 0, chunk, [ERROR_CODE.NoError, 0x6984, 0x6a80])
       .then((response) => {
         const errorCodeData = response.slice(-2);
         const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
@@ -182,12 +191,12 @@ export default class LedgerApp {
   }
 
   async sign(account, change, addressIndex, message) {
-    const chunks = LedgerApp.signGetChunks(account, change, addressIndex, message);
+    const chunks = SubstrateApp.signGetChunks(this.slip0044, account, change, addressIndex, message);
     return this.signSendChunk(1, chunks.length, chunks[0]).then(async (result) => {
       for (let i = 1; i < chunks.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop,no-param-reassign
         result = await this.signSendChunk(1 + i, chunks.length, chunks[i]);
-        if (result.return_code !== 0x9000) {
+        if (result.return_code !== ERROR_CODE.NoError) {
           break;
         }
       }
@@ -200,3 +209,16 @@ export default class LedgerApp {
     }, processErrorResponse);
   }
 }
+
+function newKusamaApp(transport) {
+  return new SubstrateApp(transport, CLA.KUSAMA, SLIP0044.KUSAMA);
+}
+
+function newPolkadotApp(transport) {
+  return new SubstrateApp(transport, CLA.POLKADOT, SLIP0044.POLKADOT);
+}
+
+module.exports = {
+  newKusamaApp,
+  newPolkadotApp,
+};

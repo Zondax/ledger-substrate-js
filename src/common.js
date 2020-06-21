@@ -1,26 +1,17 @@
-export const CLA_KUSAMA = 0x99;
-export const CLA_POLKADOT = 0x90;
+const CHUNK_SIZE = 250;
 
-export const CHUNK_SIZE = 250;
-
-export const INS = {
-  GET_VERSION: 0x00,
-  GET_ADDR_ED25519: 0x01,
-  SIGN_ED25519: 0x02,
-};
-
-export const PAYLOAD_TYPE = {
+const PAYLOAD_TYPE = {
   INIT: 0x00,
   ADD: 0x01,
   LAST: 0x02,
 };
 
-export const P1_VALUES = {
+const P1_VALUES = {
   ONLY_RETRIEVE: 0x00,
   SHOW_ADDRESS_IN_DEVICE: 0x01,
 };
 
-export const ERROR_CODE = {
+const ERROR_CODE = {
   NoError: 0x9000,
 };
 
@@ -49,7 +40,7 @@ const ERROR_DESCRIPTION = {
   0x6f01: "Sign/verify error",
 };
 
-export function errorCodeToString(statusCode) {
+function errorCodeToString(statusCode) {
   if (statusCode in ERROR_DESCRIPTION) return ERROR_DESCRIPTION[statusCode];
   return `Unknown Status Code: ${statusCode}`;
 }
@@ -58,7 +49,7 @@ function isDict(v) {
   return typeof v === "object" && v !== null && !(v instanceof Array) && !(v instanceof Date);
 }
 
-export function processErrorResponse(response) {
+function processErrorResponse(response) {
   if (response) {
     if (isDict(response)) {
       if (Object.prototype.hasOwnProperty.call(response, "statusCode")) {
@@ -87,7 +78,7 @@ export function processErrorResponse(response) {
   };
 }
 
-export async function getVersion(transport, cla) {
+async function getVersion(transport, cla) {
   return transport.send(cla, INS.GET_VERSION, 0, 0).then((response) => {
     const errorCodeData = response.slice(-2);
     const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
@@ -120,3 +111,14 @@ export async function getVersion(transport, cla) {
     };
   }, processErrorResponse);
 }
+
+module.exports = {
+  CHUNK_SIZE,
+  INS,
+  PAYLOAD_TYPE,
+  P1_VALUES,
+  ERROR_CODE,
+  getVersion,
+  processErrorResponse,
+  errorCodeToString,
+};

@@ -1,4 +1,4 @@
-import Transport from '@ledgerhq/hw-transport';
+import Transport from "@ledgerhq/hw-transport";
 
 export interface ResponseBase {
   error_message: string;
@@ -22,13 +22,18 @@ export interface ResponseSign extends ResponseBase {
   signature: Buffer;
 }
 
-declare class LedgerApp {
-  constructor (transport: Transport, CLA : number);
+declare class SubstrateApp {
+  constructor(transport: Transport, CLA: number, slip0044: number);
 
-  getVersion (): Promise<ResponseVersion>;
-  getAddress (account: number, change: number, addressIndex: number, requireConfirmation?: boolean): Promise<ResponseAddress>;
-  signSendChunk (chunkIdx: number, chunkNum: number, chunk: Buffer): Promise<ResponseSign>;
-  sign (account: number, change: number, addressIndex: number, message: Buffer): Promise<ResponseSign>;
+  getVersion(): Promise<ResponseVersion>;
+  getAddress(
+    account: number,
+    change: number,
+    addressIndex: number,
+    requireConfirmation?: boolean,
+  ): Promise<ResponseAddress>;
+  signSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer): Promise<ResponseSign>;
+  sign(account: number, change: number, addressIndex: number, message: Buffer): Promise<ResponseSign>;
 }
 
-export default LedgerApp;
+export default SubstrateApp;
