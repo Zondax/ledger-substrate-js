@@ -46,14 +46,14 @@ class SubstrateApp {
     // transport.decorateAppAPIMethods(this, ["getVersion", "appInfo", "getAddress", "sign"], scrambleKey);
   }
 
-  static serializePath(account, change, addressIndex) {
+  static serializePath(slip0044, account, change, addressIndex) {
     if (!Number.isInteger(account)) throw new Error("Input must be an integer");
     if (!Number.isInteger(change)) throw new Error("Input must be an integer");
     if (!Number.isInteger(addressIndex)) throw new Error("Input must be an integer");
 
     const buf = Buffer.alloc(20);
     buf.writeUInt32LE(0x8000002c, 0);
-    buf.writeUInt32LE(this.slip0044, 4);
+    buf.writeUInt32LE(slip0044, 4);
     // eslint-disable-next-line no-bitwise
     buf.writeUInt32LE(account, 8);
     // eslint-disable-next-line no-bitwise
@@ -64,9 +64,9 @@ class SubstrateApp {
     return buf;
   }
 
-  static signGetChunks(account, change, addressIndex, message) {
+  static signGetChunks(slip0044, account, change, addressIndex, message) {
     const chunks = [];
-    const bip44Path = SubstrateApp.serializePath(account, change, addressIndex);
+    const bip44Path = SubstrateApp.serializePath(slip0044, account, change, addressIndex);
     chunks.push(bip44Path);
 
     const buffer = Buffer.from(message);
@@ -84,7 +84,7 @@ class SubstrateApp {
 
   async getVersion() {
     try {
-      return await getVersion(this.transport, CLA_KUSAMA);
+      return await getVersion(this.transport, this.cla);
     } catch (e) {
       return processErrorResponse(e);
     }
@@ -191,7 +191,7 @@ class SubstrateApp {
   }
 
   async sign(account, change, addressIndex, message) {
-    const chunks = SubstrateApp.signGetChunks(account, change, addressIndex, message);
+    const chunks = SubstrateApp.signGetChunks(this.slip0044, account, change, addressIndex, message);
     return this.signSendChunk(1, chunks.length, chunks[0]).then(async (result) => {
       for (let i = 1; i < chunks.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop,no-param-reassign

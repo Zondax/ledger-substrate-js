@@ -1,14 +1,14 @@
 import TransportNodeHid from "@ledgerhq/hw-transport-node-hid";
 import { expect, test } from "jest";
 import { blake2bInit, blake2bUpdate, blake2bFinal } from "blakejs";
-import LedgerApp from "../src";
+import { newKusamaApp } from "../src";
 
 const ed25519 = require("ed25519-supercop");
 
 test("get version", async () => {
   const transport = await TransportNodeHid.create(1000);
 
-  const app = new LedgerApp(transport);
+  const app = newKusamaApp(transport);
   const resp = await app.getVersion();
   console.log(resp);
 
@@ -23,7 +23,7 @@ test("get version", async () => {
 
 test("get address", async () => {
   const transport = await TransportNodeHid.create(1000);
-  const app = new LedgerApp(transport);
+  const app = newKusamaApp(transport);
 
   const pathAccount = 0x80000000;
   const pathChange = 0x80000000;
@@ -43,7 +43,7 @@ test("show address", async () => {
   jest.setTimeout(60000);
 
   const transport = await TransportNodeHid.create(1000);
-  const app = new LedgerApp(transport);
+  const app = newKusamaApp(transport);
 
   const pathAccount = 0x80000000;
   const pathChange = 0x80000000;
@@ -71,7 +71,7 @@ test("sign2_and_verify", async () => {
   const txBlob = Buffer.from(txBlobStr, "hex");
 
   const transport = await TransportNodeHid.create(1000);
-  const app = new LedgerApp(transport);
+  const app = newKusamaApp(transport);
   const pathAccount = 0x80000000;
   const pathChange = 0x80000000;
   const pathIndex = 0x80000000;

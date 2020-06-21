@@ -1,7 +1,7 @@
-import LedgerApp from "index.js";
 import TransportNodeHid from "@ledgerhq/hw-transport-node-hid";
 import { expect, test } from "jest";
 import { blake2bInit, blake2bUpdate, blake2bFinal } from "blakejs";
+import { newKusamaApp } from "../src";
 
 const ed25519 = require("ed25519");
 
@@ -9,7 +9,7 @@ const data = require("testcases");
 
 async function signAndVerify(txBlob) {
   const transport = await TransportNodeHid.create(1000);
-  const app = new LedgerApp(transport);
+  const app = newKusamaApp(transport);
   const pathAccount = 0x80000000;
   const pathChange = 0x80000000;
   const pathIndex = 0x80000000;
@@ -34,7 +34,7 @@ async function signAndVerify(txBlob) {
   expect(valid).toEqual(true);
 }
 
-data.forEach(tc => {
+data.forEach((tc) => {
   test(`${tc.index} - ${tc.name}`, async () => {
     jest.setTimeout(60000);
     const txBlob = Buffer.from(tc.blob, "hex");
