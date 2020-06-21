@@ -1,3 +1,7 @@
+const INS = {
+  GET_VERSION: 0x00,
+};
+
 const CHUNK_SIZE = 250;
 
 const PAYLOAD_TYPE = {
