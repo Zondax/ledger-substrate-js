@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <img alt="Zondax logo" src="./assets/logo.png" width="300" />
-    <h1>Kusama integration example</h1>
+    <h1>Integration example</h1>
     <LedgerExample msg="Minimal integration example" />
   </div>
 </template>

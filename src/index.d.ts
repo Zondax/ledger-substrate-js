@@ -23,7 +23,7 @@ export interface ResponseSign extends ResponseBase {
 }
 
 declare class LedgerApp {
-  constructor (transport: Transport, scrambleKey?: string);
+  constructor (transport: Transport, CLA : number);
 
   getVersion (): Promise<ResponseVersion>;
   getAddress (account: number, change: number, addressIndex: number, requireConfirmation?: boolean): Promise<ResponseAddress>;

@@ -16,23 +16,24 @@
  ******************************************************************************* */
 
 import {
-  APP_KEY,
   CHUNK_SIZE,
-  CLA, ERROR_CODE,
+  CLA_KUSAMA,
+  ERROR_CODE,
   errorCodeToString,
   getVersion,
   INS,
   PAYLOAD_TYPE,
-  processErrorResponse
+  processErrorResponse,
 } from "./common";
 
 export default class LedgerApp {
-  constructor(transport, scrambleKey = APP_KEY) {
+  constructor(transport, cla = CLA_KUSAMA) {
     if (!transport) {
       throw new Error("Transport has not been defined");
     }
 
     this.transport = transport;
+    this.cla = cla;
     transport.decorateAppAPIMethods(this, ["getVersion", "getAddress", "sign"], scrambleKey);
   }
 
@@ -74,15 +75,14 @@ export default class LedgerApp {
 
   async getVersion() {
     try {
-      this.versionResponse = await getVersion(this.transport);
-      return this.versionResponse;
+      return await getVersion(this.transport, CLA_KUSAMA);
     } catch (e) {
       return processErrorResponse(e);
     }
   }
 
   async appInfo() {
-    return this.transport.send(0xb0, 0x01, 0, 0).then(response => {
+    return this.transport.send(0xb0, 0x01, 0, 0).then((response) => {
       const errorCodeData = response.slice(-2);
       const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
 
@@ -131,61 +131,13 @@ export default class LedgerApp {
     }, processErrorResponse);
   }
 
-  async deviceInfo() {
-    return this.transport
-      .send(0xe0, 0x01, 0, 0, Buffer.from([]), [ERROR_CODE.NoError, 0x6e00])
-      .then(response => {
-        const errorCodeData = response.slice(-2);
-        const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
-
-        if (returnCode === 0x6e00) {
-          return {
-            return_code: returnCode,
-            error_message: "This command is only available in the Dashboard",
-          };
-        }
-
-        const targetId = response.slice(0, 4).toString("hex");
-
-        let pos = 4;
-        const secureElementVersionLen = response[pos];
-        pos += 1;
-        const seVersion = response.slice(pos, pos + secureElementVersionLen).toString();
-        pos += secureElementVersionLen;
-
-        const flagsLen = response[pos];
-        pos += 1;
-        const flag = response.slice(pos, pos + flagsLen).toString("hex");
-        pos += flagsLen;
-
-        const mcuVersionLen = response[pos];
-        pos += 1;
-        // Patch issue in mcu version
-        let tmp = response.slice(pos, pos + mcuVersionLen);
-        if (tmp[mcuVersionLen - 1] === 0) {
-          tmp = response.slice(pos, pos + mcuVersionLen - 1);
-        }
-        const mcuVersion = tmp.toString();
-
-        return {
-          return_code: returnCode,
-          error_message: errorCodeToString(returnCode),
-          // //
-          targetId,
-          seVersion,
-          flag,
-          mcuVersion,
-        };
-      }, processErrorResponse);
-  }
-
   async getAddress(account, change, addressIndex, requireConfirmation = false) {
     const bip44Path = LedgerApp.serializePath(account, change, addressIndex);
 
     let p1 = 0;
     if (requireConfirmation) p1 = 1;
 
-    return this.transport.send(CLA, INS.GET_ADDR_ED25519, p1, 0, bip44Path).then(response => {
+    return this.transport.send(this.cla, INS.GET_ADDR_ED25519, p1, 0, bip44Path).then((response) => {
       const errorCodeData = response.slice(-2);
       const errorCode = errorCodeData[0] * 256 + errorCodeData[1];
 
@@ -208,8 +160,8 @@ export default class LedgerApp {
     }
 
     return this.transport
-      .send(CLA, INS.SIGN_ED25519, payloadType, 0, chunk, [0x9000, 0x6984, 0x6a80])
-      .then(response => {
+      .send(this.cla, INS.SIGN_ED25519, payloadType, 0, chunk, [0x9000, 0x6984, 0x6a80])
+      .then((response) => {
         const errorCodeData = response.slice(-2);
         const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
         let errorMessage = errorCodeToString(returnCode);
@@ -231,7 +183,7 @@ export default class LedgerApp {
 
   async sign(account, change, addressIndex, message) {
     const chunks = LedgerApp.signGetChunks(account, change, addressIndex, message);
-    return this.signSendChunk(1, chunks.length, chunks[0]).then(async result => {
+    return this.signSendChunk(1, chunks.length, chunks[0]).then(async (result) => {
       for (let i = 1; i < chunks.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop,no-param-reassign
         result = await this.signSendChunk(1 + i, chunks.length, chunks[i]);
