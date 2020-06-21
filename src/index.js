@@ -20,7 +20,6 @@ import {
   ERROR_CODE,
   errorCodeToString,
   getVersion,
-  INS,
   PAYLOAD_TYPE,
   processErrorResponse,
 } from "./common";
