@@ -22,8 +22,8 @@ export interface ResponseSign extends ResponseBase {
   signature: Buffer;
 }
 
-declare class SubstrateApp {
-  constructor(transport: Transport, CLA: number, slip0044: number);
+export interface SubstrateApp {
+  new(transport: Transport, CLA: number, slip0044: number): SubstrateApp;
 
   getVersion(): Promise<ResponseVersion>;
   getAddress(
