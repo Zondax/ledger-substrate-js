@@ -36,10 +36,10 @@ export interface SubstrateApp {
   sign(account: number, change: number, addressIndex: number, message: Buffer): Promise<ResponseSign>;
 }
 
-export type AppCreator = (transport: Transport) => SubstrateApp;
+export type SubstrateAppCreator = (transport: Transport) => SubstrateApp;
 
-const newKusamaApp: AppCreator;
-const newPolkadotApp: AppCreator;
+const newKusamaApp: SubstrateAppCreator;
+const newPolkadotApp: SubstrateAppCreator;
 
 export {
   newKusamaApp,
