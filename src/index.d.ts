@@ -22,8 +22,8 @@ export interface ResponseSign extends ResponseBase {
   signature: Buffer;
 }
 
-declare class SubstrateApp {
-  constructor(transport: Transport, CLA: number, slip0044: number);
+export interface SubstrateApp {
+  new(transport: Transport, CLA: number, slip0044: number): SubstrateApp;
 
   getVersion(): Promise<ResponseVersion>;
   getAddress(
@@ -36,4 +36,12 @@ declare class SubstrateApp {
   sign(account: number, change: number, addressIndex: number, message: Buffer): Promise<ResponseSign>;
 }
 
-export default SubstrateApp;
+export type SubstrateAppCreator = (transport: Transport) => SubstrateApp;
+
+const newKusamaApp: SubstrateAppCreator;
+const newPolkadotApp: SubstrateAppCreator;
+
+export {
+  newKusamaApp,
+  newPolkadotApp
+};
