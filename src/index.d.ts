@@ -36,4 +36,12 @@ declare class SubstrateApp {
   sign(account: number, change: number, addressIndex: number, message: Buffer): Promise<ResponseSign>;
 }
 
-export default SubstrateApp;
+export type AppCreator = (transport: Transport) => SubstrateApp;
+
+const newKusamaApp: AppCreator;
+const newPolkadotApp: AppCreator;
+
+export {
+  newKusamaApp,
+  newPolkadotApp
+};
