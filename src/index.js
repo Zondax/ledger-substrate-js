@@ -141,7 +141,7 @@ class SubstrateApp {
   }
 
   async getAddress(account, change, addressIndex, requireConfirmation = false) {
-    const bip44Path = SubstrateApp.serializePath(account, change, addressIndex);
+    const bip44Path = SubstrateApp.serializePath(this.slip0044, account, change, addressIndex);
 
     let p1 = 0;
     if (requireConfirmation) p1 = 1;
