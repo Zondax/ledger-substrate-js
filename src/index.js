@@ -257,7 +257,7 @@ class SubstrateApp {
 
       console.log(response);
 
-      const pubkey = response.slice(0, 32);
+      const hash = response.slice(0, 32);
       // 32 bytes + 2 error code
       if (response.length !== 34) {
         return {
@@ -269,7 +269,7 @@ class SubstrateApp {
       return {
         return_code: returnCode,
         error_message: errorCodeToString(returnCode),
-        pubkey,
+        hash,
       };
     }, processErrorResponse);
   }
@@ -284,21 +284,13 @@ class SubstrateApp {
     }
 
     return this.transport
-      .send(this.cla, INS.ALLOWLIST_UPLOAD, payloadType, 0, chunk, [ERROR_CODE.NoError, 0x6984, 0x6a80])
+      .send(this.cla, INS.ALLOWLIST_UPLOAD, payloadType, 0, chunk, [ERROR_CODE.NoError])
       .then((response) => {
         const errorCodeData = response.slice(-2);
         const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
         let errorMessage = errorCodeToString(returnCode);
-        let signature = null;
-
-        if (returnCode === 0x6a80 || returnCode === 0x6984) {
-          errorMessage = response.slice(0, response.length - 2).toString("ascii");
-        } else if (response.length > 2) {
-          signature = response.slice(0, response.length - 2);
-        }
 
         return {
-          signature,
           return_code: returnCode,
           error_message: errorMessage,
         };
@@ -311,9 +303,16 @@ class SubstrateApp {
     chunks.push(...SubstrateApp.GetChunks(message));
 
     return this.uploadSendChunk(1, chunks.length, chunks[0]).then(async (result) => {
+        if (result.return_code !== ERROR_CODE.NoError) {
+          return {
+            return_code: result.return_code,
+            error_message: result.error_message,
+          };
+        }
+
       for (let i = 1; i < chunks.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop,no-param-reassign
-        result = await this.signSendChunk(1 + i, chunks.length, chunks[i]);
+        result = await this.uploadSendChunk(1 + i, chunks.length, chunks[i]);
         if (result.return_code !== ERROR_CODE.NoError) {
           break;
         }
