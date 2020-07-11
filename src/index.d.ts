@@ -18,6 +18,14 @@ export interface ResponseVersion extends ResponseBase {
   test_mode: boolean;
 }
 
+export interface ResponseAllowlistPubKey extends ResponseBase {
+  pubKey: string;
+}
+
+export interface ResponseAllowlistHash extends ResponseBase {
+  hash: Buffer;
+}
+
 export interface ResponseSign extends ResponseBase {
   signature: Buffer;
 }
@@ -34,6 +42,11 @@ export interface SubstrateApp {
   ): Promise<ResponseAddress>;
   signSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer): Promise<ResponseSign>;
   sign(account: number, change: number, addressIndex: number, message: Buffer): Promise<ResponseSign>;
+
+  // Ledgeracio Related
+  getAllowListPubKey(): Promise<ResponseAllowlistPubKey>;
+  setAllowListPubKey(pk: Buffer): boolean;
+  getAllowListHash(): Promise<ResponseAllowlistHash>;
 }
 
 export type SubstrateAppCreator = (transport: Transport) => SubstrateApp;
