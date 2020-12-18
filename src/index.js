@@ -338,8 +338,13 @@ function newPolymathApp(transport) {
   return new SubstrateApp(transport, CLA.POLYMATH, SLIP0044.POLYMATH);
 }
 
+function newDockApp(transport) {
+  return new SubstrateApp(transport, CLA.DOCK, SLIP0044.DOCK);
+}
+
 module.exports = {
   newKusamaApp,
   newPolkadotApp,
   newPolymathApp,
+  newDockApp,
 };
