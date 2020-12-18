@@ -303,12 +303,12 @@ class SubstrateApp {
     chunks.push(...SubstrateApp.GetChunks(message));
 
     return this.uploadSendChunk(1, chunks.length, chunks[0]).then(async (result) => {
-        if (result.return_code !== ERROR_CODE.NoError) {
-          return {
-            return_code: result.return_code,
-            error_message: result.error_message,
-          };
-        }
+      if (result.return_code !== ERROR_CODE.NoError) {
+        return {
+          return_code: result.return_code,
+          error_message: result.error_message,
+        };
+      }
 
       for (let i = 1; i < chunks.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop,no-param-reassign
