@@ -51,10 +51,6 @@ export interface SubstrateApp {
 
 export type SubstrateAppCreator = (transport: Transport) => SubstrateApp;
 
-const newKusamaApp: SubstrateAppCreator;
-const newPolkadotApp: SubstrateAppCreator;
-
-export {
-  newKusamaApp,
-  newPolkadotApp
-};
+export const newKusamaApp: SubstrateAppCreator;
+export const newPolkadotApp: SubstrateAppCreator;
+export const newDockApp: SubstrateAppCreator;
