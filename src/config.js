@@ -10,7 +10,7 @@ const SLIP0044 = {
   KUSAMA: 0x800001b2,
   POLKADOT: 0x80000162,
   POLYMATH: 0x80000001, // TODO replace with mainnet code when available
-  DOCK: 0x80000252, // TODO: PR https://github.com/satoshilabs/slips/pull/1039
+  DOCK: 0x80000252,
 };
 
 module.exports = {
