@@ -15,6 +15,11 @@ const P1_VALUES = {
   SHOW_ADDRESS_IN_DEVICE: 0x01,
 };
 
+const SCHEME = {
+  ED25519: 0x00,
+  SR25519: 0x01,
+};
+
 const ERROR_CODE = {
   NoError: 0x9000,
 };
@@ -121,6 +126,7 @@ module.exports = {
   INS,
   PAYLOAD_TYPE,
   P1_VALUES,
+  SCHEME,
   ERROR_CODE,
   getVersion,
   processErrorResponse,

@@ -39,9 +39,10 @@ export interface SubstrateApp {
     change: number,
     addressIndex: number,
     requireConfirmation?: boolean,
+    scheme?: number,
   ): Promise<ResponseAddress>;
-  signSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer): Promise<ResponseSign>;
-  sign(account: number, change: number, addressIndex: number, message: Buffer): Promise<ResponseSign>;
+  signSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer, scheme?: number): Promise<ResponseSign>;
+  sign(account: number, change: number, addressIndex: number, message: Buffer, scheme?: number): Promise<ResponseSign>;
 
   // Ledgeracio Related
   getAllowListPubKey(): Promise<ResponseAllowlistPubKey>;
