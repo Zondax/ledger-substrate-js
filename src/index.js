@@ -152,7 +152,7 @@ class SubstrateApp {
 
     let p2 = 0;
     if (!isNaN(scheme)) p2 = scheme;
-    
+
     return this.transport.send(this.cla, INS.GET_ADDR, p1, p2, bip44Path).then((response) => {
       const errorCodeData = response.slice(-2);
       const errorCode = errorCodeData[0] * 256 + errorCodeData[1];
@@ -341,8 +341,8 @@ function newPolkadotApp(transport) {
   return new SubstrateApp(transport, CLA.POLKADOT, SLIP0044.POLKADOT);
 }
 
-function newPolymathApp(transport) {
-  return new SubstrateApp(transport, CLA.POLYMESH, SLIP0044.POLYMATH);
+function newPolymeshApp(transport) {
+  return new SubstrateApp(transport, CLA.POLYMESH, SLIP0044.POLYMESH);
 }
 
 function newDockApp(transport) {
@@ -352,6 +352,6 @@ function newDockApp(transport) {
 module.exports = {
   newKusamaApp,
   newPolkadotApp,
-  newPolymathApp,
+  newPolymeshApp,
   newDockApp,
 };
