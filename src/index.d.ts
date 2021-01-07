@@ -31,7 +31,7 @@ export interface ResponseSign extends ResponseBase {
 }
 
 export interface SubstrateApp {
-  new(transport: Transport, CLA: number, slip0044: number): SubstrateApp;
+  new (transport: Transport, CLA: number, slip0044: number): SubstrateApp;
 
   getVersion(): Promise<ResponseVersion>;
   getAddress(
@@ -39,9 +39,16 @@ export interface SubstrateApp {
     change: number,
     addressIndex: number,
     requireConfirmation?: boolean,
+    scheme?: number,
   ): Promise<ResponseAddress>;
-  signSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer): Promise<ResponseSign>;
-  sign(account: number, change: number, addressIndex: number, message: Buffer): Promise<ResponseSign>;
+  signSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer, scheme?: number): Promise<ResponseSign>;
+  sign(
+    account: number,
+    change: number,
+    addressIndex: number,
+    message: Buffer,
+    scheme?: number,
+  ): Promise<ResponseSign>;
 
   // Ledgeracio Related
   getAllowListPubKey(): Promise<ResponseAllowlistPubKey>;
@@ -51,10 +58,7 @@ export interface SubstrateApp {
 
 export type SubstrateAppCreator = (transport: Transport) => SubstrateApp;
 
-const newKusamaApp: SubstrateAppCreator;
-const newPolkadotApp: SubstrateAppCreator;
-
-export {
-  newKusamaApp,
-  newPolkadotApp
-};
+export const newKusamaApp: SubstrateAppCreator;
+export const newPolkadotApp: SubstrateAppCreator;
+export const newPolymeshApp: SubstrateAppCreator;
+export const newDockApp: SubstrateAppCreator;

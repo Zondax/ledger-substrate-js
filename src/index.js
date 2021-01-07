@@ -21,6 +21,7 @@ import {
   errorCodeToString,
   getVersion,
   PAYLOAD_TYPE,
+  SCHEME,
   processErrorResponse,
 } from "./common";
 
@@ -28,8 +29,8 @@ import { CLA, SLIP0044 } from "./config";
 
 const INS = {
   GET_VERSION: 0x00,
-  GET_ADDR_ED25519: 0x01,
-  SIGN_ED25519: 0x02,
+  GET_ADDR: 0x01,
+  SIGN: 0x02,
 
   // Allow list related commands
   ALLOWLIST_GET_PUBKEY: 0x90,
@@ -143,13 +144,16 @@ class SubstrateApp {
     }, processErrorResponse);
   }
 
-  async getAddress(account, change, addressIndex, requireConfirmation = false) {
+  async getAddress(account, change, addressIndex, requireConfirmation = false, scheme = SCHEME.ED25519) {
     const bip44Path = SubstrateApp.serializePath(this.slip0044, account, change, addressIndex);
 
     let p1 = 0;
     if (requireConfirmation) p1 = 1;
 
-    return this.transport.send(this.cla, INS.GET_ADDR_ED25519, p1, 0, bip44Path).then((response) => {
+    let p2 = 0;
+    if (!isNaN(scheme)) p2 = scheme;
+
+    return this.transport.send(this.cla, INS.GET_ADDR, p1, p2, bip44Path).then((response) => {
       const errorCodeData = response.slice(-2);
       const errorCode = errorCodeData[0] * 256 + errorCodeData[1];
 
@@ -162,7 +166,7 @@ class SubstrateApp {
     }, processErrorResponse);
   }
 
-  async signSendChunk(chunkIdx, chunkNum, chunk) {
+  async signSendChunk(chunkIdx, chunkNum, chunk, scheme = SCHEME.ED25519) {
     let payloadType = PAYLOAD_TYPE.ADD;
     if (chunkIdx === 1) {
       payloadType = PAYLOAD_TYPE.INIT;
@@ -171,8 +175,11 @@ class SubstrateApp {
       payloadType = PAYLOAD_TYPE.LAST;
     }
 
+    let p2 = 0;
+    if (!isNaN(scheme)) p2 = scheme;
+
     return this.transport
-      .send(this.cla, INS.SIGN_ED25519, payloadType, 0, chunk, [ERROR_CODE.NoError, 0x6984, 0x6a80])
+      .send(this.cla, INS.SIGN, payloadType, p2, chunk, [ERROR_CODE.NoError, 0x6984, 0x6a80])
       .then((response) => {
         const errorCodeData = response.slice(-2);
         const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
@@ -193,12 +200,12 @@ class SubstrateApp {
       }, processErrorResponse);
   }
 
-  async sign(account, change, addressIndex, message) {
+  async sign(account, change, addressIndex, message, scheme = SCHEME.ED25519) {
     const chunks = SubstrateApp.signGetChunks(this.slip0044, account, change, addressIndex, message);
-    return this.signSendChunk(1, chunks.length, chunks[0]).then(async (result) => {
+    return this.signSendChunk(1, chunks.length, chunks[0], scheme).then(async (result) => {
       for (let i = 1; i < chunks.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop,no-param-reassign
-        result = await this.signSendChunk(1 + i, chunks.length, chunks[i]);
+        result = await this.signSendChunk(1 + i, chunks.length, chunks[i], scheme);
         if (result.return_code !== ERROR_CODE.NoError) {
           break;
         }
@@ -303,12 +310,12 @@ class SubstrateApp {
     chunks.push(...SubstrateApp.GetChunks(message));
 
     return this.uploadSendChunk(1, chunks.length, chunks[0]).then(async (result) => {
-        if (result.return_code !== ERROR_CODE.NoError) {
-          return {
-            return_code: result.return_code,
-            error_message: result.error_message,
-          };
-        }
+      if (result.return_code !== ERROR_CODE.NoError) {
+        return {
+          return_code: result.return_code,
+          error_message: result.error_message,
+        };
+      }
 
       for (let i = 1; i < chunks.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop,no-param-reassign
@@ -334,12 +341,17 @@ function newPolkadotApp(transport) {
   return new SubstrateApp(transport, CLA.POLKADOT, SLIP0044.POLKADOT);
 }
 
-function newPolymathApp(transport) {
-  return new SubstrateApp(transport, CLA.POLYMATH, SLIP0044.POLYMATH);
+function newPolymeshApp(transport) {
+  return new SubstrateApp(transport, CLA.POLYMESH, SLIP0044.POLYMESH);
+}
+
+function newDockApp(transport) {
+  return new SubstrateApp(transport, CLA.DOCK, SLIP0044.DOCK);
 }
 
 module.exports = {
   newKusamaApp,
   newPolkadotApp,
-  newPolymathApp,
+  newPolymeshApp,
+  newDockApp,
 };
