@@ -1,7 +1,7 @@
 const CLA = {
   KUSAMA: 0x99,
   POLKADOT: 0x90,
-  POLYMATH: 0x91,
+  POLYMESH: 0x91,
   DOCK: 0x92,
 };
 
@@ -9,7 +9,7 @@ const CLA = {
 const SLIP0044 = {
   KUSAMA: 0x800001b2,
   POLKADOT: 0x80000162,
-  POLYMATH: 0x80000001, // TODO replace with mainnet code when available
+  POLYMESH: 0x80000253,
   DOCK: 0x80000252,
 };
 

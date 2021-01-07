@@ -335,7 +335,7 @@ function newPolkadotApp(transport) {
 }
 
 function newPolymathApp(transport) {
-  return new SubstrateApp(transport, CLA.POLYMATH, SLIP0044.POLYMATH);
+  return new SubstrateApp(transport, CLA.POLYMESH, SLIP0044.POLYMATH);
 }
 
 function newDockApp(transport) {
