@@ -349,9 +349,14 @@ function newDockApp(transport) {
   return new SubstrateApp(transport, CLA.DOCK, SLIP0044.DOCK);
 }
 
+function newCentrifugeApp(transport) {
+  return new SubstrateApp(transport, CLA.CENTRIFUGE, SLIP0044.CENTRIFUGE);
+}
+
 module.exports = {
   newKusamaApp,
   newPolkadotApp,
   newPolymeshApp,
   newDockApp,
+  newCentrifugeApp,
 };
