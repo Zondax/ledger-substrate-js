@@ -4,7 +4,7 @@ const CLA = {
   POLYMESH: 0x91,
   DOCK: 0x92,
   CENTRIFUGE: 0x93,
-};
+}
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
 const SLIP0044 = {
@@ -13,9 +13,9 @@ const SLIP0044 = {
   POLYMESH: 0x80000253,
   DOCK: 0x80000252,
   CENTRIFUGE: 0x80000001,
-};
+}
 
 module.exports = {
   CLA,
   SLIP0044,
-};
+}

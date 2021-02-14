@@ -15,17 +15,9 @@
  *  limitations under the License.
  ******************************************************************************* */
 
-import {
-  CHUNK_SIZE,
-  ERROR_CODE,
-  errorCodeToString,
-  getVersion,
-  PAYLOAD_TYPE,
-  SCHEME,
-  processErrorResponse,
-} from "./common";
+import { CHUNK_SIZE, ERROR_CODE, errorCodeToString, getVersion, PAYLOAD_TYPE, SCHEME, processErrorResponse } from './common'
 
-import { CLA, SLIP0044 } from "./config";
+import { CLA, SLIP0044 } from './config'
 
 const INS = {
   GET_VERSION: 0x00,
@@ -37,91 +29,91 @@ const INS = {
   ALLOWLIST_SET_PUBKEY: 0x91,
   ALLOWLIST_GET_HASH: 0x92,
   ALLOWLIST_UPLOAD: 0x93,
-};
+}
 
 class SubstrateApp {
   constructor(transport, cla, slip0044) {
     if (!transport) {
-      throw new Error("Transport has not been defined");
+      throw new Error('Transport has not been defined')
     }
-    this.transport = transport;
-    this.cla = cla;
-    this.slip0044 = slip0044;
+    this.transport = transport
+    this.cla = cla
+    this.slip0044 = slip0044
   }
 
   static serializePath(slip0044, account, change, addressIndex) {
-    if (!Number.isInteger(account)) throw new Error("Input must be an integer");
-    if (!Number.isInteger(change)) throw new Error("Input must be an integer");
-    if (!Number.isInteger(addressIndex)) throw new Error("Input must be an integer");
+    if (!Number.isInteger(account)) throw new Error('Input must be an integer')
+    if (!Number.isInteger(change)) throw new Error('Input must be an integer')
+    if (!Number.isInteger(addressIndex)) throw new Error('Input must be an integer')
 
-    const buf = Buffer.alloc(20);
-    buf.writeUInt32LE(0x8000002c, 0);
-    buf.writeUInt32LE(slip0044, 4);
-    buf.writeUInt32LE(account, 8);
-    buf.writeUInt32LE(change, 12);
-    buf.writeUInt32LE(addressIndex, 16);
-    return buf;
+    const buf = Buffer.alloc(20)
+    buf.writeUInt32LE(0x8000002c, 0)
+    buf.writeUInt32LE(slip0044, 4)
+    buf.writeUInt32LE(account, 8)
+    buf.writeUInt32LE(change, 12)
+    buf.writeUInt32LE(addressIndex, 16)
+    return buf
   }
 
   static GetChunks(message) {
-    const chunks = [];
-    const buffer = Buffer.from(message);
+    const chunks = []
+    const buffer = Buffer.from(message)
 
     for (let i = 0; i < buffer.length; i += CHUNK_SIZE) {
-      let end = i + CHUNK_SIZE;
+      let end = i + CHUNK_SIZE
       if (i > buffer.length) {
-        end = buffer.length;
+        end = buffer.length
       }
-      chunks.push(buffer.slice(i, end));
+      chunks.push(buffer.slice(i, end))
     }
 
-    return chunks;
+    return chunks
   }
 
   static signGetChunks(slip0044, account, change, addressIndex, message) {
-    const chunks = [];
-    const bip44Path = SubstrateApp.serializePath(slip0044, account, change, addressIndex);
-    chunks.push(bip44Path);
-    chunks.push(...SubstrateApp.GetChunks(message));
-    return chunks;
+    const chunks = []
+    const bip44Path = SubstrateApp.serializePath(slip0044, account, change, addressIndex)
+    chunks.push(bip44Path)
+    chunks.push(...SubstrateApp.GetChunks(message))
+    return chunks
   }
 
   async getVersion() {
     try {
-      return await getVersion(this.transport, this.cla);
+      return await getVersion(this.transport, this.cla)
     } catch (e) {
-      return processErrorResponse(e);
+      return processErrorResponse(e)
     }
   }
 
   async appInfo() {
-    return this.transport.send(0xb0, 0x01, 0, 0).then((response) => {
-      const errorCodeData = response.slice(-2);
-      const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
+    return this.transport.send(0xb0, 0x01, 0, 0).then(response => {
+      const errorCodeData = response.slice(-2)
+      const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
 
-      const result = {};
+      const result = {}
 
-      let appName = "err";
-      let appVersion = "err";
-      let flagLen = 0;
-      let flagsValue = 0;
+      let appName = 'err'
+      let appVersion = 'err'
+      let flagLen = 0
+      let flagsValue = 0
 
       if (response[0] !== 1) {
         // Ledger responds with format ID 1. There is no spec for any format != 1
-        result.error_message = "response format ID not recognized";
-        result.return_code = 0x9001;
+        result.error_message = 'response format ID not recognized'
+        result.return_code = 0x9001
       } else {
-        const appNameLen = response[1];
-        appName = response.slice(2, 2 + appNameLen).toString("ascii");
-        let idx = 2 + appNameLen;
-        const appVersionLen = response[idx];
-        idx += 1;
-        appVersion = response.slice(idx, idx + appVersionLen).toString("ascii");
-        idx += appVersionLen;
-        const appFlagsLen = response[idx];
-        idx += 1;
-        flagLen = appFlagsLen;
-        flagsValue = response[idx];
+        const appNameLen = response[1]
+        appName = response.slice(2, 2 + appNameLen).toString('ascii')
+        let idx = 2 + appNameLen
+        const appVersionLen = response[idx]
+        idx += 1
+        appVersion = response.slice(idx, idx + appVersionLen).toString('ascii')
+        idx += appVersionLen
+        const appFlagsLen = response[idx]
+        idx += 1
+        flagLen = appFlagsLen
+        flagsValue = response[idx]
       }
 
       return {
@@ -140,74 +132,72 @@ class SubstrateApp {
         flag_onboarded: (flagsValue & 4) !== 0,
         // eslint-disable-next-line no-bitwise
         flag_pin_validated: (flagsValue & 128) !== 0,
-      };
-    }, processErrorResponse);
+      }
+    }, processErrorResponse)
   }
 
   async getAddress(account, change, addressIndex, requireConfirmation = false, scheme = SCHEME.ED25519) {
-    const bip44Path = SubstrateApp.serializePath(this.slip0044, account, change, addressIndex);
+    const bip44Path = SubstrateApp.serializePath(this.slip0044, account, change, addressIndex)
 
-    let p1 = 0;
-    if (requireConfirmation) p1 = 1;
+    let p1 = 0
+    if (requireConfirmation) p1 = 1
 
-    let p2 = 0;
-    if (!isNaN(scheme)) p2 = scheme;
+    let p2 = 0
+    if (!isNaN(scheme)) p2 = scheme
 
-    return this.transport.send(this.cla, INS.GET_ADDR, p1, p2, bip44Path).then((response) => {
-      const errorCodeData = response.slice(-2);
-      const errorCode = errorCodeData[0] * 256 + errorCodeData[1];
+    return this.transport.send(this.cla, INS.GET_ADDR, p1, p2, bip44Path).then(response => {
+      const errorCodeData = response.slice(-2)
+      const errorCode = errorCodeData[0] * 256 + errorCodeData[1]
 
       return {
-        pubKey: response.slice(0, 32).toString("hex"),
-        address: response.slice(32, response.length - 2).toString("ascii"),
+        pubKey: response.slice(0, 32).toString('hex'),
+        address: response.slice(32, response.length - 2).toString('ascii'),
         return_code: errorCode,
         error_message: errorCodeToString(errorCode),
-      };
-    }, processErrorResponse);
+      }
+    }, processErrorResponse)
   }
 
   async signSendChunk(chunkIdx, chunkNum, chunk, scheme = SCHEME.ED25519) {
-    let payloadType = PAYLOAD_TYPE.ADD;
+    let payloadType = PAYLOAD_TYPE.ADD
     if (chunkIdx === 1) {
-      payloadType = PAYLOAD_TYPE.INIT;
+      payloadType = PAYLOAD_TYPE.INIT
     }
     if (chunkIdx === chunkNum) {
-      payloadType = PAYLOAD_TYPE.LAST;
+      payloadType = PAYLOAD_TYPE.LAST
     }
 
-    let p2 = 0;
-    if (!isNaN(scheme)) p2 = scheme;
+    let p2 = 0
+    if (!isNaN(scheme)) p2 = scheme
 
-    return this.transport
-      .send(this.cla, INS.SIGN, payloadType, p2, chunk, [ERROR_CODE.NoError, 0x6984, 0x6a80])
-      .then((response) => {
-        const errorCodeData = response.slice(-2);
-        const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
-        let errorMessage = errorCodeToString(returnCode);
-        let signature = null;
+    return this.transport.send(this.cla, INS.SIGN, payloadType, p2, chunk, [ERROR_CODE.NoError, 0x6984, 0x6a80]).then(response => {
+      const errorCodeData = response.slice(-2)
+      const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
+      let errorMessage = errorCodeToString(returnCode)
+      let signature = null
 
-        if (returnCode === 0x6a80 || returnCode === 0x6984) {
-          errorMessage = response.slice(0, response.length - 2).toString("ascii");
-        } else if (response.length > 2) {
-          signature = response.slice(0, response.length - 2);
-        }
+      if (returnCode === 0x6a80 || returnCode === 0x6984) {
+        errorMessage = response.slice(0, response.length - 2).toString('ascii')
+      } else if (response.length > 2) {
+        signature = response.slice(0, response.length - 2)
+      }
 
-        return {
-          signature,
-          return_code: returnCode,
-          error_message: errorMessage,
-        };
-      }, processErrorResponse);
+      return {
+        signature,
+        return_code: returnCode,
+        error_message: errorMessage,
+      }
+    }, processErrorResponse)
   }
 
   async sign(account, change, addressIndex, message, scheme = SCHEME.ED25519) {
-    const chunks = SubstrateApp.signGetChunks(this.slip0044, account, change, addressIndex, message);
-    return this.signSendChunk(1, chunks.length, chunks[0], scheme).then(async (result) => {
+    const chunks = SubstrateApp.signGetChunks(this.slip0044, account, change, addressIndex, message)
+    return this.signSendChunk(1, chunks.length, chunks[0], scheme).then(async result => {
       for (let i = 1; i < chunks.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop,no-param-reassign
-        result = await this.signSendChunk(1 + i, chunks.length, chunks[i], scheme);
+        result = await this.signSendChunk(1 + i, chunks.length, chunks[i], scheme)
         if (result.return_code !== ERROR_CODE.NoError) {
-          break;
+          break
         }
       }
 
@@ -215,142 +205,140 @@ class SubstrateApp {
         return_code: result.return_code,
         error_message: result.error_message,
         signature: result.signature,
-      };
-    }, processErrorResponse);
+      }
+    }, processErrorResponse)
   }
 
   /// Allow list related commands. They are NOT available on all apps
 
   async getAllowlistPubKey() {
-    return this.transport.send(this.cla, INS.ALLOWLIST_GET_PUBKEY, 0, 0).then((response) => {
-      const errorCodeData = response.slice(-2);
-      const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
+    return this.transport.send(this.cla, INS.ALLOWLIST_GET_PUBKEY, 0, 0).then(response => {
+      const errorCodeData = response.slice(-2)
+      const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
 
-      console.log(response);
+      console.log(response)
 
-      const pubkey = response.slice(0, 32);
+      const pubkey = response.slice(0, 32)
       // 32 bytes + 2 error code
       if (response.length !== 34) {
         return {
           return_code: 0x6984,
           error_message: errorCodeToString(0x6984),
-        };
+        }
       }
 
       return {
         return_code: returnCode,
         error_message: errorCodeToString(returnCode),
         pubkey,
-      };
-    }, processErrorResponse);
+      }
+    }, processErrorResponse)
   }
 
   async setAllowlistPubKey(pk) {
-    return this.transport.send(this.cla, INS.ALLOWLIST_SET_PUBKEY, 0, 0, pk).then((response) => {
-      const errorCodeData = response.slice(-2);
-      const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
+    return this.transport.send(this.cla, INS.ALLOWLIST_SET_PUBKEY, 0, 0, pk).then(response => {
+      const errorCodeData = response.slice(-2)
+      const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
 
       return {
         return_code: returnCode,
         error_message: errorCodeToString(returnCode),
-      };
-    }, processErrorResponse);
+      }
+    }, processErrorResponse)
   }
 
   async getAllowlistHash() {
-    return this.transport.send(this.cla, INS.ALLOWLIST_GET_HASH, 0, 0).then((response) => {
-      const errorCodeData = response.slice(-2);
-      const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
+    return this.transport.send(this.cla, INS.ALLOWLIST_GET_HASH, 0, 0).then(response => {
+      const errorCodeData = response.slice(-2)
+      const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
 
-      console.log(response);
+      console.log(response)
 
-      const hash = response.slice(0, 32);
+      const hash = response.slice(0, 32)
       // 32 bytes + 2 error code
       if (response.length !== 34) {
         return {
           return_code: 0x6984,
           error_message: errorCodeToString(0x6984),
-        };
+        }
       }
 
       return {
         return_code: returnCode,
         error_message: errorCodeToString(returnCode),
         hash,
-      };
-    }, processErrorResponse);
+      }
+    }, processErrorResponse)
   }
 
   async uploadSendChunk(chunkIdx, chunkNum, chunk) {
-    let payloadType = PAYLOAD_TYPE.ADD;
+    let payloadType = PAYLOAD_TYPE.ADD
     if (chunkIdx === 1) {
-      payloadType = PAYLOAD_TYPE.INIT;
+      payloadType = PAYLOAD_TYPE.INIT
     }
     if (chunkIdx === chunkNum) {
-      payloadType = PAYLOAD_TYPE.LAST;
+      payloadType = PAYLOAD_TYPE.LAST
     }
 
-    return this.transport
-      .send(this.cla, INS.ALLOWLIST_UPLOAD, payloadType, 0, chunk, [ERROR_CODE.NoError])
-      .then((response) => {
-        const errorCodeData = response.slice(-2);
-        const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
-        let errorMessage = errorCodeToString(returnCode);
+    return this.transport.send(this.cla, INS.ALLOWLIST_UPLOAD, payloadType, 0, chunk, [ERROR_CODE.NoError]).then(response => {
+      const errorCodeData = response.slice(-2)
+      const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
+      let errorMessage = errorCodeToString(returnCode)
 
-        return {
-          return_code: returnCode,
-          error_message: errorMessage,
-        };
-      }, processErrorResponse);
+      return {
+        return_code: returnCode,
+        error_message: errorMessage,
+      }
+    }, processErrorResponse)
   }
 
   async uploadAllowlist(message) {
-    const chunks = [];
-    chunks.push(Buffer.from([0]));
-    chunks.push(...SubstrateApp.GetChunks(message));
+    const chunks = []
+    chunks.push(Buffer.from([0]))
+    chunks.push(...SubstrateApp.GetChunks(message))
 
-    return this.uploadSendChunk(1, chunks.length, chunks[0]).then(async (result) => {
+    return this.uploadSendChunk(1, chunks.length, chunks[0]).then(async result => {
       if (result.return_code !== ERROR_CODE.NoError) {
         return {
           return_code: result.return_code,
           error_message: result.error_message,
-        };
+        }
       }
 
       for (let i = 1; i < chunks.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop,no-param-reassign
-        result = await this.uploadSendChunk(1 + i, chunks.length, chunks[i]);
+        result = await this.uploadSendChunk(1 + i, chunks.length, chunks[i])
         if (result.return_code !== ERROR_CODE.NoError) {
-          break;
+          break
         }
       }
 
       return {
         return_code: result.return_code,
         error_message: result.error_message,
-      };
-    }, processErrorResponse);
+      }
+    }, processErrorResponse)
   }
 }
 
 function newKusamaApp(transport) {
-  return new SubstrateApp(transport, CLA.KUSAMA, SLIP0044.KUSAMA);
+  return new SubstrateApp(transport, CLA.KUSAMA, SLIP0044.KUSAMA)
 }
 
 function newPolkadotApp(transport) {
-  return new SubstrateApp(transport, CLA.POLKADOT, SLIP0044.POLKADOT);
+  return new SubstrateApp(transport, CLA.POLKADOT, SLIP0044.POLKADOT)
 }
 
 function newPolymeshApp(transport) {
-  return new SubstrateApp(transport, CLA.POLYMESH, SLIP0044.POLYMESH);
+  return new SubstrateApp(transport, CLA.POLYMESH, SLIP0044.POLYMESH)
 }
 
 function newDockApp(transport) {
-  return new SubstrateApp(transport, CLA.DOCK, SLIP0044.DOCK);
+  return new SubstrateApp(transport, CLA.DOCK, SLIP0044.DOCK)
 }
 
 function newCentrifugeApp(transport) {
-  return new SubstrateApp(transport, CLA.CENTRIFUGE, SLIP0044.CENTRIFUGE);
+  return new SubstrateApp(transport, CLA.CENTRIFUGE, SLIP0044.CENTRIFUGE)
 }
 
 module.exports = {
@@ -359,4 +347,4 @@ module.exports = {
   newPolymeshApp,
   newDockApp,
   newCentrifugeApp,
-};
+}
