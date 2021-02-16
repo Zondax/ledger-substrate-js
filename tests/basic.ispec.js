@@ -1,9 +1,15 @@
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { expect, test } from 'jest'
 import { blake2bInit, blake2bUpdate, blake2bFinal } from 'blakejs'
-import { newKusamaApp } from '../src'
+import { newKusamaApp, hd_key_derivation } from '../src'
 
 const ed25519 = require('ed25519-supercop')
+
+test('test Kusama', () => {
+  let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
+  let s = hd_key_derivation(m, 0x800001b2, 0x80000000, 0x80000000, 0x80000000)
+  expect(s.pk.toString('hex')).toEqual('ffbc10f71d63e0da1b9e7ee2eb4037466551dc32b9d4641aafd73a65970fae42')
+})
 
 test('get version', async () => {
   const transport = await TransportNodeHid.create(1000)
