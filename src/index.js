@@ -21,7 +21,7 @@ import { CLA, SLIP0044 } from './config'
 
 const bip39 = require('bip39')
 const hash = require('hash.js')
-const bip32ed25519 = require("bip32-ed25519")
+const bip32ed25519 = require('bip32-ed25519')
 const bs58 = require('bs58')
 const blake = require('blakejs')
 
