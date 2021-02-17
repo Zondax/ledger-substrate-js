@@ -7,8 +7,9 @@ const ed25519 = require('ed25519-supercop')
 
 test('test Kusama', () => {
   let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
-  let s = hd_key_derivation(m, 0x800001b2, 0x80000000, 0x80000000, 0x80000000)
-  expect(s.pk.toString('hex')).toEqual('ffbc10f71d63e0da1b9e7ee2eb4037466551dc32b9d4641aafd73a65970fae42')
+  let output = hd_key_derivation(m, 0x800001b2, 0x80000000, 0x80000000, 0x80000000, 2)
+  expect(output.pk.toString('hex')).toEqual('ffbc10f71d63e0da1b9e7ee2eb4037466551dc32b9d4641aafd73a65970fae42')
+  expect(output.address.toString('hex')).toEqual('JMdbWK5cy3Bm4oCyhWNLQJoC4cczNgJsyk7nLZHMqFT7z7R')
 })
 
 test('get version', async () => {

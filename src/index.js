@@ -21,7 +21,10 @@ import { CLA, SLIP0044 } from './config'
 
 const bip39 = require('bip39')
 const hash = require('hash.js')
-const bip32ed25519 = require("bip32-ed25519");
+const bip32ed25519 = require("bip32-ed25519")
+const bs58 = require('bs58')
+const blake = require('blakejs')
+
 const HDPATH_0_DEFAULT = 0x8000002c
 
 const INS = {
@@ -365,6 +368,29 @@ function hmac512(key, data) {
   return Buffer.from(digest)
 }
 
+function ss58hash(data) {
+  var hash = blake.blake2bInit(64, null)
+  blake.blake2bUpdate(hash, Buffer.from('SS58PRE'))
+  blake.blake2bUpdate(hash, data)
+  const digest = blake.blake2bFinal(hash)
+  return digest
+}
+
+function ss58_encode(prefix, pubkey) {
+  if (pubkey.byteLength != 32) {
+    return null
+  }
+
+  let data = Buffer.alloc(35)
+  data[0] = prefix
+  pubkey.copy(data, 1)
+  let hash = ss58hash(data.slice(0, 33))
+  data[33] = hash[0]
+  data[34] = hash[1]
+
+  return bs58.encode(data)
+}
+
 function root_node_slip10(master_seed) {
   var data = Buffer.alloc(1 + 64)
   data[0] = 0x01
@@ -386,7 +412,7 @@ function root_node_slip10(master_seed) {
   return Buffer.concat([kL, kR, c])
 }
 
-function hd_key_derivation(mnemonic, slip0044, accountIndex, changeIndex, addressIndex) {
+function hd_key_derivation(mnemonic, slip0044, accountIndex, changeIndex, addressIndex, ss58prefix) {
   const seed = bip39.mnemonicToSeedSync(mnemonic)
   var node = root_node_slip10(seed)
   node = bip32ed25519.derivePrivate(node, HDPATH_0_DEFAULT)
@@ -402,10 +428,11 @@ function hd_key_derivation(mnemonic, slip0044, accountIndex, changeIndex, addres
   sk[31] |= 64
 
   let pk = bip32ed25519.toPublic(sk)
-
+  let address = ss58_encode(ss58prefix, pk)
   return {
     sk: sk,
     pk: pk,
+    address: address,
   }
 }
 
