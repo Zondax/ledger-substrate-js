@@ -6,13 +6,25 @@ import { SLIP0044, SS58_ADDR_TYPE } from '../src/config'
 
 const ed25519 = require('ed25519-supercop')
 
-test('test Kusama', () => {
+test('test Kusama hardened', () => {
   let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
   let output = hd_key_derivation(m, SLIP0044.KUSAMA, 0x80000000, 0x80000000, 0x80000000, SS58_ADDR_TYPE.KUSAMA)
   console.log(output)
 
   const expected_address = "JMdbWK5cy3Bm4oCyhWNLQJoC4cczNgJsyk7nLZHMqFT7z7R"
   const expected_pk = "ffbc10f71d63e0da1b9e7ee2eb4037466551dc32b9d4641aafd73a65970fae42"
+
+  expect(output.pk.toString('hex')).toEqual(expected_pk)
+  expect(output.address.toString('hex')).toEqual(expected_address)
+})
+
+test('test Kusama non-hardened', () => {
+  let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
+  let output = hd_key_derivation(m, SLIP0044.KUSAMA, 0, 0, 0, SS58_ADDR_TYPE.KUSAMA)
+  console.log(output)
+
+  const expected_address = "G58F7QUjgT273AaNScoXhpKVjCcnDvCcbyucDZiPEDmVD9d"
+  const expected_pk = "9aacddd17054070103ad37ee76610d1adaa7f8e0d02b76fb91391eec8a2470af"
 
   expect(output.pk.toString('hex')).toEqual(expected_pk)
   expect(output.address.toString('hex')).toEqual(expected_address)
