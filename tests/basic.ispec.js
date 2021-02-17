@@ -1,14 +1,14 @@
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { expect, test } from 'jest'
 import { blake2bInit, blake2bUpdate, blake2bFinal } from 'blakejs'
-import { newKusamaApp, hd_key_derivation } from '../src'
+import { newKusamaApp, hdKeyDerivation } from '../src'
 import { SLIP0044, SS58_ADDR_TYPE } from '../src/config'
 
 const ed25519 = require('ed25519-supercop')
 
 test('test Kusama hardened', () => {
   let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
-  let output = hd_key_derivation(m, SLIP0044.KUSAMA, 0x80000000, 0x80000000, 0x80000000, SS58_ADDR_TYPE.KUSAMA)
+  let output = hdKeyDerivation(m, SLIP0044.KUSAMA, 0x80000000, 0x80000000, 0x80000000, SS58_ADDR_TYPE.KUSAMA)
   console.log(output)
 
   const expected_address = 'JMdbWK5cy3Bm4oCyhWNLQJoC4cczNgJsyk7nLZHMqFT7z7R'
@@ -20,7 +20,7 @@ test('test Kusama hardened', () => {
 
 test('test Kusama non-hardened', () => {
   let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
-  let output = hd_key_derivation(m, SLIP0044.KUSAMA, 0, 0, 0, SS58_ADDR_TYPE.KUSAMA)
+  let output = hdKeyDerivation(m, SLIP0044.KUSAMA, 0, 0, 0, SS58_ADDR_TYPE.KUSAMA)
   console.log(output)
 
   const expected_address = 'G58F7QUjgT273AaNScoXhpKVjCcnDvCcbyucDZiPEDmVD9d'
@@ -32,7 +32,7 @@ test('test Kusama non-hardened', () => {
 
 test('test Polkadot', () => {
   let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
-  let output = hd_key_derivation(m, SLIP0044.POLKADOT, 0x80000000, 0x80000000, 0x80000000, SS58_ADDR_TYPE.POLKADOT)
+  let output = hdKeyDerivation(m, SLIP0044.POLKADOT, 0x80000000, 0x80000000, 0x80000000, SS58_ADDR_TYPE.POLKADOT)
   console.log(output)
 
   const expected_address = '166wVhuQsKFeb7bd1faydHgVvX1bZU2rUuY7FJmWApNz2fQY'

@@ -86,10 +86,6 @@ class SubstrateApp {
     return chunks
   }
 
-  static hd_key_derivation(mnemonic, account, change, addressIndex) {
-    const seed = bip39.mnemonicToSeedSync(mnemonic)
-  }
-
   async getVersion() {
     try {
       return await getVersion(this.transport, this.cla)
@@ -412,7 +408,7 @@ function root_node_slip10(master_seed) {
   return Buffer.concat([kL, kR, c])
 }
 
-function hd_key_derivation(mnemonic, slip0044, accountIndex, changeIndex, addressIndex, ss58prefix) {
+function hdKeyDerivation(mnemonic, slip0044, accountIndex, changeIndex, addressIndex, ss58prefix) {
   if (!bip39.validateMnemonic(mnemonic)) {
     console.log('Invalid mnemonic')
     return null
@@ -446,5 +442,5 @@ module.exports = {
   newPolymeshApp,
   newDockApp,
   newCentrifugeApp,
-  hd_key_derivation,
+  hdKeyDerivation,
 }
