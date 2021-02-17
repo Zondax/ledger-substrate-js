@@ -413,6 +413,10 @@ function root_node_slip10(master_seed) {
 }
 
 function hd_key_derivation(mnemonic, slip0044, accountIndex, changeIndex, addressIndex, ss58prefix) {
+  if (!bip39.validateMnemonic(mnemonic)) {
+    console.log('Invalid mnemonic')
+    return null
+  }
   const seed = bip39.mnemonicToSeedSync(mnemonic)
   var node = root_node_slip10(seed)
   node = bip32ed25519.derivePrivate(node, HDPATH_0_DEFAULT)
@@ -430,7 +434,7 @@ function hd_key_derivation(mnemonic, slip0044, accountIndex, changeIndex, addres
   let pk = bip32ed25519.toPublic(sk)
   let address = ss58_encode(ss58prefix, pk)
   return {
-    sk: sk,
+    sk: kL,
     pk: pk,
     address: address,
   }
