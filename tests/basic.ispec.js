@@ -2,14 +2,32 @@ import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { expect, test } from 'jest'
 import { blake2bInit, blake2bUpdate, blake2bFinal } from 'blakejs'
 import { newKusamaApp, hd_key_derivation } from '../src'
+import { SLIP0044, SS58_ADDR_TYPE } from '../src/config'
 
 const ed25519 = require('ed25519-supercop')
 
 test('test Kusama', () => {
   let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
-  let output = hd_key_derivation(m, 0x800001b2, 0x80000000, 0x80000000, 0x80000000, 2)
-  expect(output.pk.toString('hex')).toEqual('ffbc10f71d63e0da1b9e7ee2eb4037466551dc32b9d4641aafd73a65970fae42')
-  expect(output.address.toString('hex')).toEqual('JMdbWK5cy3Bm4oCyhWNLQJoC4cczNgJsyk7nLZHMqFT7z7R')
+  let output = hd_key_derivation(m, SLIP0044.KUSAMA, 0x80000000, 0x80000000, 0x80000000, SS58_ADDR_TYPE.KUSAMA)
+  console.log(output)
+
+  const expected_address = "JMdbWK5cy3Bm4oCyhWNLQJoC4cczNgJsyk7nLZHMqFT7z7R"
+  const expected_pk = "ffbc10f71d63e0da1b9e7ee2eb4037466551dc32b9d4641aafd73a65970fae42"
+
+  expect(output.pk.toString('hex')).toEqual(expected_pk)
+  expect(output.address.toString('hex')).toEqual(expected_address)
+})
+
+test('test Polkadot', () => {
+  let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
+  let output = hd_key_derivation(m, SLIP0044.POLKADOT, 0x80000000, 0x80000000, 0x80000000, SS58_ADDR_TYPE.POLKADOT)
+  console.log(output)
+
+  const expected_address = "166wVhuQsKFeb7bd1faydHgVvX1bZU2rUuY7FJmWApNz2fQY"
+  const expected_pk = "e1b4d72d27b3e91b9b6116555b4ea17138ddc12ca7cdbab30e2e0509bd848419"
+
+  expect(output.pk.toString('hex')).toEqual(expected_pk)
+  expect(output.address.toString('hex')).toEqual(expected_address)
 })
 
 test('get version', async () => {

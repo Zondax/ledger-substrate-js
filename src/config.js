@@ -15,7 +15,16 @@ const SLIP0044 = {
   CENTRIFUGE: 0x80000001,
 }
 
+const SS58_ADDR_TYPE = {
+  POLKADOT: 0,
+  KUSAMA: 2,
+  EDGEWARE: 7,
+  KULUPU: 16,
+  DOTHEREUM: 20,
+}
+
 module.exports = {
   CLA,
   SLIP0044,
+  SS58_ADDR_TYPE,
 }
