@@ -8,6 +8,9 @@
 
 This package provides a basic client library to communicate with the Kusama/Polkadot App running in a Ledger Nano S/X device
 
+Additionally, it provides a hd_key_derivation function to retrieve the keys that Ledger apps generate with BIP32-ED25519. 
+Warning: the hd_key_derivation function is not audited and depends on external pacakges. We recommend using the official Substrate Ledger apps in recovery mode.
+
 # Run Tests
 
 - Prepare your Ledger device (https://github.com/zondax/ledger-kusama)
