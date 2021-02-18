@@ -408,12 +408,12 @@ function root_node_slip10(master_seed) {
   return Buffer.concat([kL, kR, c])
 }
 
-function hdKeyDerivation(mnemonic, slip0044, accountIndex, changeIndex, addressIndex, ss58prefix) {
+function hdKeyDerivation(mnemonic, password, slip0044, accountIndex, changeIndex, addressIndex, ss58prefix) {
   if (!bip39.validateMnemonic(mnemonic)) {
     console.log('Invalid mnemonic')
     return null
   }
-  const seed = bip39.mnemonicToSeedSync(mnemonic)
+  const seed = bip39.mnemonicToSeedSync(mnemonic, password)
   var node = root_node_slip10(seed)
   node = bip32ed25519.derivePrivate(node, HDPATH_0_DEFAULT)
   node = bip32ed25519.derivePrivate(node, slip0044)
