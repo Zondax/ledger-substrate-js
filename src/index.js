@@ -19,6 +19,14 @@ import { CHUNK_SIZE, ERROR_CODE, errorCodeToString, getVersion, PAYLOAD_TYPE, SC
 
 import { CLA, SLIP0044 } from './config'
 
+const bip39 = require('bip39')
+const hash = require('hash.js')
+const bip32ed25519 = require('bip32-ed25519')
+const bs58 = require('bs58')
+const blake = require('blakejs')
+
+const HDPATH_0_DEFAULT = 0x8000002c
+
 const INS = {
   GET_VERSION: 0x00,
   GET_ADDR: 0x01,
@@ -341,10 +349,98 @@ function newCentrifugeApp(transport) {
   return new SubstrateApp(transport, CLA.CENTRIFUGE, SLIP0044.CENTRIFUGE)
 }
 
+function sha512(data) {
+  var digest = hash.sha512().update(data).digest()
+  return Buffer.from(digest)
+}
+
+function hmac256(key, data) {
+  var digest = hash.hmac(hash.sha256, key).update(data).digest()
+  return Buffer.from(digest)
+}
+
+function hmac512(key, data) {
+  var digest = hash.hmac(hash.sha512, key).update(data).digest()
+  return Buffer.from(digest)
+}
+
+function ss58hash(data) {
+  var hash = blake.blake2bInit(64, null)
+  blake.blake2bUpdate(hash, Buffer.from('SS58PRE'))
+  blake.blake2bUpdate(hash, data)
+  const digest = blake.blake2bFinal(hash)
+  return digest
+}
+
+function ss58_encode(prefix, pubkey) {
+  if (pubkey.byteLength != 32) {
+    return null
+  }
+
+  let data = Buffer.alloc(35)
+  data[0] = prefix
+  pubkey.copy(data, 1)
+  let hash = ss58hash(data.slice(0, 33))
+  data[33] = hash[0]
+  data[34] = hash[1]
+
+  return bs58.encode(data)
+}
+
+function root_node_slip10(master_seed) {
+  var data = Buffer.alloc(1 + 64)
+  data[0] = 0x01
+  master_seed.copy(data, 1)
+  var c = hmac256('ed25519 seed', data)
+  var I = hmac512('ed25519 seed', data.slice(1))
+  let kL = I.slice(0, 32)
+  let kR = I.slice(32)
+  while ((kL[31] & 32) != 0) {
+    I.copy(data, 1)
+    I = hmac512('ed25519 seed', data.slice(1))
+    kL = I.slice(0, 32)
+    kR = I.slice(32)
+  }
+  kL[0] &= 248
+  kL[31] &= 127
+  kL[31] |= 64
+
+  return Buffer.concat([kL, kR, c])
+}
+
+function hdKeyDerivation(mnemonic, password, slip0044, accountIndex, changeIndex, addressIndex, ss58prefix) {
+  if (!bip39.validateMnemonic(mnemonic)) {
+    console.log('Invalid mnemonic')
+    return null
+  }
+  const seed = bip39.mnemonicToSeedSync(mnemonic, password)
+  var node = root_node_slip10(seed)
+  node = bip32ed25519.derivePrivate(node, HDPATH_0_DEFAULT)
+  node = bip32ed25519.derivePrivate(node, slip0044)
+  node = bip32ed25519.derivePrivate(node, accountIndex)
+  node = bip32ed25519.derivePrivate(node, changeIndex)
+  node = bip32ed25519.derivePrivate(node, addressIndex)
+
+  let kL = node.slice(0, 32)
+  let sk = sha512(kL).slice(0, 32)
+  sk[0] &= 248
+  sk[31] &= 127
+  sk[31] |= 64
+
+  let pk = bip32ed25519.toPublic(sk)
+  let address = ss58_encode(ss58prefix, pk)
+  return {
+    sk: kL,
+    pk: pk,
+    address: address,
+  }
+}
+
 module.exports = {
   newKusamaApp,
   newPolkadotApp,
   newPolymeshApp,
   newDockApp,
   newCentrifugeApp,
+  hdKeyDerivation,
 }

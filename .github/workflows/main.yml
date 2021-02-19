@@ -26,7 +26,3 @@ jobs:
         run: yarn linter
       - name: Run formatter
         run: yarn format
-      - name: Build Kusama
-        run: yarn gen Kusama
-      - name: Build Polkadot
-        run: yarn gen Polkadot
