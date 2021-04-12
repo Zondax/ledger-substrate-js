@@ -1,24 +1,19 @@
 module.exports = {
+  root: true,
   parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint', 'jest'],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'plugin:jest/recommended', 'prettier'],
   env: {
     browser: true,
     es6: true,
     node: true,
   },
   settings: {},
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier/@typescript-eslint', 'plugin:prettier/recommended'],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
   },
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true,
-    },
-    ecmaVersion: 2018,
-    sourceType: 'module',
-  },
-  plugins: ['@typescript-eslint'],
+  parserOptions: {},
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',

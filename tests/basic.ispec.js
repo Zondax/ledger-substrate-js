@@ -1,8 +1,6 @@
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
-import { expect, test } from 'jest'
-import { blake2bInit, blake2bUpdate, blake2bFinal } from 'blakejs'
-import { newKusamaApp, hdKeyDerivation } from '../src'
-import { SLIP0044, SS58_ADDR_TYPE } from '../src/config'
+import { blake2bFinal, blake2bInit, blake2bUpdate } from 'blakejs'
+import { newKusamaApp } from '../src'
 
 const ed25519 = require('ed25519-supercop')
 

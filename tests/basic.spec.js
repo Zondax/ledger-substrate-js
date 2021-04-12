@@ -2,7 +2,7 @@ import { expect, test } from './jest'
 import { hdKeyDerivation } from '../src'
 import { SLIP0044, SS58_ADDR_TYPE } from '../src/config'
 
-test('test Kusama hardened', () => {
+test('Kusama hardened', () => {
   let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
   let output = hdKeyDerivation(m, '', SLIP0044.KUSAMA, 0x80000000, 0x80000000, 0x80000000, SS58_ADDR_TYPE.KUSAMA)
   console.log(output)
@@ -14,7 +14,7 @@ test('test Kusama hardened', () => {
   expect(output.address.toString('hex')).toEqual(expected_address)
 })
 
-test('test Kusama non-hardened', () => {
+test('Kusama non-hardened', () => {
   let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
   let output = hdKeyDerivation(m, '', SLIP0044.KUSAMA, 0, 0, 0, SS58_ADDR_TYPE.KUSAMA)
   console.log(output)
@@ -26,7 +26,7 @@ test('test Kusama non-hardened', () => {
   expect(output.address.toString('hex')).toEqual(expected_address)
 })
 
-test('test Polkadot', () => {
+test('Polkadot', () => {
   let m = 'equip will roof matter pink blind book anxiety banner elbow sun young'
   let output = hdKeyDerivation(m, '', SLIP0044.POLKADOT, 0x80000000, 0x80000000, 0x80000000, SS58_ADDR_TYPE.POLKADOT)
   console.log(output)

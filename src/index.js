@@ -15,7 +15,7 @@
  *  limitations under the License.
  ******************************************************************************* */
 
-import { CHUNK_SIZE, ERROR_CODE, errorCodeToString, getVersion, PAYLOAD_TYPE, SCHEME, processErrorResponse } from './common'
+import { CHUNK_SIZE, ERROR_CODE, errorCodeToString, getVersion, PAYLOAD_TYPE, processErrorResponse, SCHEME } from './common'
 
 import { CLA, SLIP0044 } from './config'
 
@@ -349,6 +349,10 @@ function newCentrifugeApp(transport) {
   return new SubstrateApp(transport, CLA.CENTRIFUGE, SLIP0044.CENTRIFUGE)
 }
 
+function newEdgewareApp(transport) {
+  return new SubstrateApp(transport, CLA.EDGEWARE, SLIP0044.EDGEWARE)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -368,12 +372,11 @@ function ss58hash(data) {
   var hash = blake.blake2bInit(64, null)
   blake.blake2bUpdate(hash, Buffer.from('SS58PRE'))
   blake.blake2bUpdate(hash, data)
-  const digest = blake.blake2bFinal(hash)
-  return digest
+  return blake.blake2bFinal(hash)
 }
 
 function ss58_encode(prefix, pubkey) {
-  if (pubkey.byteLength != 32) {
+  if (pubkey.byteLength !== 32) {
     return null
   }
 
@@ -395,7 +398,7 @@ function root_node_slip10(master_seed) {
   var I = hmac512('ed25519 seed', data.slice(1))
   let kL = I.slice(0, 32)
   let kR = I.slice(32)
-  while ((kL[31] & 32) != 0) {
+  while ((kL[31] & 32) !== 0) {
     I.copy(data, 1)
     I = hmac512('ed25519 seed', data.slice(1))
     kL = I.slice(0, 32)
@@ -437,10 +440,11 @@ function hdKeyDerivation(mnemonic, password, slip0044, accountIndex, changeIndex
 }
 
 module.exports = {
+  hdKeyDerivation,
   newKusamaApp,
   newPolkadotApp,
   newPolymeshApp,
   newDockApp,
   newCentrifugeApp,
-  hdKeyDerivation,
+  newEdgewareApp,
 }
