@@ -1,6 +1,5 @@
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
-import { expect, test } from 'jest'
-import { blake2bInit, blake2bUpdate, blake2bFinal } from 'blakejs'
+import { blake2bFinal, blake2bInit, blake2bUpdate } from 'blakejs'
 import { newKusamaApp } from '../src'
 
 const ed25519 = require('ed25519')
@@ -30,14 +29,14 @@ async function signAndVerify(txBlob) {
     prehash = Buffer.from(blake2bFinal(context))
   }
 
-  const valid = ed25519.Verify(prehash, responseSign.signature.slice(1), pubkey)
-  expect(valid).toEqual(true)
+  return ed25519.Verify(prehash, responseSign.signature.slice(1), pubkey)
 }
 
 data.forEach(tc => {
   test(`${tc.index} - ${tc.name}`, async () => {
     jest.setTimeout(60000)
     const txBlob = Buffer.from(tc.blob, 'hex')
-    await signAndVerify(txBlob)
+
+    expect(await signAndVerify(txBlob)).toEqual(true)
   })
 })

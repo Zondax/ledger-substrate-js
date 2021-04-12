@@ -23,9 +23,9 @@ import {
   PAYLOAD_TYPE,
   processErrorResponse,
   SCHEME,
-} from "./common";
+} from './common'
 
-import { CLA, SLIP0044 } from "./config";
+import { CLA, SLIP0044 } from './config'
 
 const bip39 = require('bip39')
 const hash = require('hash.js')
