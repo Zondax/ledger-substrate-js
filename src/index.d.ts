@@ -1,4 +1,4 @@
-import Transport from "@ledgerhq/hw-transport";
+import Transport from '@ledgerhq/hw-transport'
 
 export interface ResponseBase {
   error_message: string
@@ -31,7 +31,7 @@ export interface ResponseSign extends ResponseBase {
 }
 
 export interface SubstrateApp {
-  new(transport: Transport, CLA: number, slip0044: number): SubstrateApp
+  new (transport: Transport, CLA: number, slip0044: number): SubstrateApp
 
   getVersion(): Promise<ResponseVersion>
 
@@ -57,9 +57,9 @@ export interface SubstrateApp {
 
 export type SubstrateAppCreator = (transport: Transport) => SubstrateApp
 
-export const newKusamaApp: SubstrateAppCreator;
-export const newPolkadotApp: SubstrateAppCreator;
-export const newPolymeshApp: SubstrateAppCreator;
-export const newDockApp: SubstrateAppCreator;
-export const newCentrifugeApp: SubstrateAppCreator;
-export const newEdgewareApp: SubstrateAppCreator;
+export const newKusamaApp: SubstrateAppCreator
+export const newPolkadotApp: SubstrateAppCreator
+export const newPolymeshApp: SubstrateAppCreator
+export const newDockApp: SubstrateAppCreator
+export const newCentrifugeApp: SubstrateAppCreator
+export const newEdgewareApp: SubstrateAppCreator

@@ -15,15 +15,7 @@
  *  limitations under the License.
  ******************************************************************************* */
 
-import {
-  CHUNK_SIZE,
-  ERROR_CODE,
-  errorCodeToString,
-  getVersion,
-  PAYLOAD_TYPE,
-  processErrorResponse,
-  SCHEME,
-} from './common'
+import { CHUNK_SIZE, ERROR_CODE, errorCodeToString, getVersion, PAYLOAD_TYPE, processErrorResponse, SCHEME } from './common'
 
 import { CLA, SLIP0044 } from './config'
 
