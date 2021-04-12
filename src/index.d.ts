@@ -1,4 +1,4 @@
-import Transport from '@ledgerhq/hw-transport'
+import Transport from "@ledgerhq/hw-transport";
 
 export interface ResponseBase {
   error_message: string
@@ -31,9 +31,10 @@ export interface ResponseSign extends ResponseBase {
 }
 
 export interface SubstrateApp {
-  new (transport: Transport, CLA: number, slip0044: number): SubstrateApp
+  new(transport: Transport, CLA: number, slip0044: number): SubstrateApp
 
   getVersion(): Promise<ResponseVersion>
+
   getAddress(
     account: number,
     change: number,
@@ -41,20 +42,24 @@ export interface SubstrateApp {
     requireConfirmation?: boolean,
     scheme?: number,
   ): Promise<ResponseAddress>
+
   signSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer, scheme?: number): Promise<ResponseSign>
+
   sign(account: number, change: number, addressIndex: number, message: Buffer, scheme?: number): Promise<ResponseSign>
 
   // Ledgeracio Related
   getAllowListPubKey(): Promise<ResponseAllowlistPubKey>
+
   setAllowListPubKey(pk: Buffer): boolean
+
   getAllowListHash(): Promise<ResponseAllowlistHash>
 }
 
 export type SubstrateAppCreator = (transport: Transport) => SubstrateApp
 
-export const newKusamaApp: SubstrateAppCreator
-export const newPolkadotApp: SubstrateAppCreator
-export const newPolymeshApp: SubstrateAppCreator
-export const newDockApp: SubstrateAppCreator
-export const newCentrifugeApp: SubstrateAppCreator
-export const newEdgewareApp: SubstrateAppCreator
+export const newKusamaApp: SubstrateAppCreator;
+export const newPolkadotApp: SubstrateAppCreator;
+export const newPolymeshApp: SubstrateAppCreator;
+export const newDockApp: SubstrateAppCreator;
+export const newCentrifugeApp: SubstrateAppCreator;
+export const newEdgewareApp: SubstrateAppCreator;
