@@ -1,4 +1,4 @@
-# ledger-polkadot (JS Integration)
+# ledger-subtrate (JS Integration)
 
 [![Main](https://github.com/Zondax/ledger-substrate-js/workflows/Main/badge.svg)](https://github.com/Zondax/ledger-substrate-gen/actions?query=workflow%3AMain)
 
@@ -14,7 +14,7 @@ using the official Substrate Ledger apps in recovery mode.
 
 # Run Tests
 
-- Prepare your Ledger device (https://github.com/zondax/ledger-kusama)
+- Prepare your Ledger device (for instance, use https://github.com/zondax/ledger-kusama)
 
   - Prepare as development device:
 

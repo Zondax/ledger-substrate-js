@@ -357,6 +357,13 @@ function newEquilibriumApp(transport) {
   return new SubstrateApp(transport, CLA.EQUILIBRIUM, SLIP0044.EQUILIBRIUM)
 }
 
+function newStateMintApp(transport) {
+  return new SubstrateApp(transport, CLA.STATEMINT, SLIP0044.EQUILIBRIUM)
+}
+function newStateMineApp(transport) {
+  return new SubstrateApp(transport, CLA.STATEMINE, SLIP0044.EQUILIBRIUM)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -452,4 +459,6 @@ module.exports = {
   newCentrifugeApp,
   newEdgewareApp,
   newEquilibriumApp,
+  newStateMintApp,
+  newStateMineApp
 }

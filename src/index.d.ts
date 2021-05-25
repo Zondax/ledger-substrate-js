@@ -64,3 +64,5 @@ export const newDockApp: SubstrateAppCreator
 export const newCentrifugeApp: SubstrateAppCreator
 export const newEdgewareApp: SubstrateAppCreator
 export const newEquilibriumApp: SubstrateAppCreator
+export const newStateMintApp: SubstrateAppCreator
+export const newStateMineApp: SubstrateAppCreator
