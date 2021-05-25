@@ -353,6 +353,10 @@ function newEdgewareApp(transport) {
   return new SubstrateApp(transport, CLA.EDGEWARE, SLIP0044.EDGEWARE)
 }
 
+function newEquilibriumApp(transport) {
+  return new SubstrateApp(transport, CLA.EQUILIBRIUM, SLIP0044.EQUILIBRIUM)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -447,4 +451,5 @@ module.exports = {
   newDockApp,
   newCentrifugeApp,
   newEdgewareApp,
+  newEquilibriumApp,
 }

@@ -5,6 +5,7 @@ const CLA = {
   DOCK: 0x92,
   CENTRIFUGE: 0x93,
   EDGEWARE: 0x94,
+  EQUILIBRIUM: 0x95,
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -15,6 +16,7 @@ const SLIP0044 = {
   POLYMESH: 0x80000253,
   DOCK: 0x80000252,
   CENTRIFUGE: 0x800002eb,
+  EQUILIBRIUM: 0x85f5e0fd,
 }
 
 const SS58_ADDR_TYPE = {
@@ -24,6 +26,7 @@ const SS58_ADDR_TYPE = {
   POLYMESH: 12,
   DOCK: 22, //mainnet
   CENTRIFUGE: 36,
+  EQUILIBRIUM: 67,
 }
 
 module.exports = {
