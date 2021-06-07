@@ -357,6 +357,10 @@ function newEquilibriumApp(transport) {
   return new SubstrateApp(transport, CLA.EQUILIBRIUM, SLIP0044.EQUILIBRIUM)
 }
 
+function newGenshiroApp(transport) {
+  return new SubstrateApp(transport, CLA.GENSHIRO, SLIP0044.GENSHIRO)
+}
+
 function newStateMintApp(transport) {
   return new SubstrateApp(transport, CLA.STATEMINT, SLIP0044.EQUILIBRIUM)
 }
@@ -459,6 +463,7 @@ module.exports = {
   newCentrifugeApp,
   newEdgewareApp,
   newEquilibriumApp,
+  newGenshiroApp,
   newStateMintApp,
   newStateMineApp
 }

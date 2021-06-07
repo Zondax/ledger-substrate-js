@@ -9,6 +9,7 @@ const CLA = {
   STATEMINE: 0x97,
   RESERVED: 0x98,
   KUSAMA: 0x99,
+  GENSHIRO: 0x9E,
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -19,6 +20,7 @@ const SLIP0044 = {
   CENTRIFUGE: 0x800002eb,
   EDGEWARE: 0x8000020b,
   EQUILIBRIUM: 0x85f5e0fd,
+  GENSHIRO: 0x85f5e0fc,
   STATEMINT: 0x80000162,
   STATEMINE: 0x800001b2,
   RESERVED: 0x0,
@@ -33,6 +35,7 @@ const SS58_ADDR_TYPE = {
   DOCK: 22, //mainnet
   CENTRIFUGE: 36,
   EQUILIBRIUM: 67,
+  GENSHIRO: 67,
   STATEMINT: 0,
   STATEMINE: 2,
   RESERVED: 42,
