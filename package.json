@@ -1,5 +1,5 @@
 {
-  "name": "@zondax/ledger-polkadot",
+  "name": "@zondax/ledger-substrate",
   "version": "0.0.0",
   "description": "JS / Node API for Kusama/Polkadot app running (Ledger Nano S/X)",
   "author": "Zondax GmbH",
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zondax/ledger-polkadot-js.git"
+    "url": "git+https://github.com/zondax/ledger-substrate-js.git"
   },
   "keywords": [
     "Ledger",
@@ -28,9 +28,9 @@
     "Polkadot"
   ],
   "bugs": {
-    "url": "https://github.com/Zondax/ledger-polkadot-js/issues"
+    "url": "https://github.com/Zondax/ledger-substrate-js/issues"
   },
-  "homepage": "https://github.com/Zondax/ledger-polkadot-js",
+  "homepage": "https://github.com/Zondax/ledger-substrate-js",
   "dependencies": {
     "@babel/runtime": "^7.13.10",
     "@ledgerhq/hw-transport": "^5.49.0",
