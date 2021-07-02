@@ -362,10 +362,11 @@ function newGenshiroApp(transport) {
 }
 
 function newStateMintApp(transport) {
-  return new SubstrateApp(transport, CLA.STATEMINT, SLIP0044.EQUILIBRIUM)
+  return new SubstrateApp(transport, CLA.STATEMINT, SLIP0044.STATEMINT)
 }
+
 function newStateMineApp(transport) {
-  return new SubstrateApp(transport, CLA.STATEMINE, SLIP0044.EQUILIBRIUM)
+  return new SubstrateApp(transport, CLA.STATEMINE, SLIP0044.STATEMINE)
 }
 
 function sha512(data) {
