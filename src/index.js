@@ -361,11 +361,11 @@ function newGenshiroApp(transport) {
   return new SubstrateApp(transport, CLA.GENSHIRO, SLIP0044.GENSHIRO)
 }
 
-function newStateMintApp(transport) {
+function newStatemintApp(transport) {
   return new SubstrateApp(transport, CLA.STATEMINT, SLIP0044.STATEMINT)
 }
 
-function newStateMineApp(transport) {
+function newStatemineApp(transport) {
   return new SubstrateApp(transport, CLA.STATEMINE, SLIP0044.STATEMINE)
 }
 
@@ -465,6 +465,6 @@ module.exports = {
   newEdgewareApp,
   newEquilibriumApp,
   newGenshiroApp,
-  newStateMintApp,
-  newStateMineApp
+  newStatemintApp,
+  newStatemineApp
 }
