@@ -1,4 +1,4 @@
-# ledger-subtrate (JS Integration)
+# ledger-substrate (JS Integration)
 
 [![Main](https://github.com/Zondax/ledger-substrate-js/workflows/Main/badge.svg)](https://github.com/Zondax/ledger-substrate-gen/actions?query=workflow%3AMain)
 
