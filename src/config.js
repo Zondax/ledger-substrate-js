@@ -7,9 +7,9 @@ const CLA = {
   EQUILIBRIUM: 0x95,
   STATEMINT: 0x96,
   STATEMINE: 0x97,
-  RESERVED: 0x98,
+  NODLE: 0x98,
   KUSAMA: 0x99,
-  GENSHIRO: 0x9E,
+  GENSHIRO: 0x9e,
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -23,7 +23,7 @@ const SLIP0044 = {
   GENSHIRO: 0x85f5e0fc,
   STATEMINT: 0x80000162,
   STATEMINE: 0x800001b2,
-  RESERVED: 0x0,
+  NODLE: 0x800003eb,
   KUSAMA: 0x800001b2,
 }
 
@@ -38,7 +38,7 @@ const SS58_ADDR_TYPE = {
   GENSHIRO: 67,
   STATEMINT: 0,
   STATEMINE: 2,
-  RESERVED: 42,
+  NODLE: 37,
 }
 
 module.exports = {

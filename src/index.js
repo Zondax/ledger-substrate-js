@@ -369,6 +369,10 @@ function newStatemineApp(transport) {
   return new SubstrateApp(transport, CLA.STATEMINE, SLIP0044.STATEMINE)
 }
 
+function newNodleApp(transport) {
+  return new SubstrateApp(transport, CLA.NODLE, SLIP0044.STATEMINE)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -466,5 +470,6 @@ module.exports = {
   newEquilibriumApp,
   newGenshiroApp,
   newStatemintApp,
-  newStatemineApp
+  newStatemineApp,
+  newNodleApp,
 }
