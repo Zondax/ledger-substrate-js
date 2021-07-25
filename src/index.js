@@ -370,7 +370,7 @@ function newStatemineApp(transport) {
 }
 
 function newNodleApp(transport) {
-  return new SubstrateApp(transport, CLA.NODLE, SLIP0044.STATEMINE)
+  return new SubstrateApp(transport, CLA.NODLE, SLIP0044.NODLE)
 }
 
 function sha512(data) {
