@@ -373,6 +373,10 @@ function newNodleApp(transport) {
   return new SubstrateApp(transport, CLA.NODLE, SLIP0044.NODLE)
 }
 
+function newSoraApp(transport) {
+  return new SubstrateApp(transport, CLA.SORA, SLIP0044.SORA)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -472,4 +476,5 @@ module.exports = {
   newStatemintApp,
   newStatemineApp,
   newNodleApp,
+  newSoraApp,
 }
