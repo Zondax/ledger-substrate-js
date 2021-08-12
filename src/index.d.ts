@@ -68,4 +68,5 @@ export const newGenshiroApp: SubstrateAppCreator
 export const newStatemintApp: SubstrateAppCreator
 export const newStatemineApp: SubstrateAppCreator
 export const newNodleApp: SubstrateAppCreator
+export const newSoraApp: SubstrateAppCreator
 
