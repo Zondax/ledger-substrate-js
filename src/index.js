@@ -377,6 +377,10 @@ function newSoraApp(transport) {
   return new SubstrateApp(transport, CLA.SORA, SLIP0044.SORA)
 }
 
+function newPolkadexApp(transport) {
+  return new SubstrateApp(transport, CLA.POLKADEX, SLIP0044.POLKADEX)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -477,4 +481,5 @@ module.exports = {
   newStatemineApp,
   newNodleApp,
   newSoraApp,
+  newPolkadexApp,
 }

@@ -11,6 +11,7 @@ const CLA = {
   KUSAMA: 0x99,
   GENSHIRO: 0x9e,
   SORA: 0x9f,
+  POLKADEX: 0xa0,
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -27,6 +28,7 @@ const SLIP0044 = {
   NODLE: 0x800003eb,
   KUSAMA: 0x800001b2,
   SORA: 0x80000269
+  POLKADEX: 0x00000000,
 }
 
 const SS58_ADDR_TYPE = {
@@ -42,6 +44,7 @@ const SS58_ADDR_TYPE = {
   STATEMINE: 2,
   NODLE: 37,
   SORA: 69
+  POLKADEX: 88,
 }
 
 module.exports = {
