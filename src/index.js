@@ -377,6 +377,10 @@ function newSoraApp(transport) {
   return new SubstrateApp(transport, CLA.SORA, SLIP0044.SORA)
 }
 
+function newPolkadexApp(transport) {
+  return new SubstrateApp(transport, CLA.POLKADEX, SLIP0044.POLKADEX)
+}
+
 function newBifrostApp(transport) {
   return new SubstrateApp(transport, CLA.BIFROST, SLIP0044.BIFROST)
 }
@@ -481,5 +485,6 @@ module.exports = {
   newStatemineApp,
   newNodleApp,
   newSoraApp,
-  newBifrostApp,
+  newPolkadexApp,
+  newBifrostApp
 }
