@@ -381,6 +381,10 @@ function newPolkadexApp(transport) {
   return new SubstrateApp(transport, CLA.POLKADEX, SLIP0044.POLKADEX)
 }
 
+function newKaruraApp(transport) {
+  return new SubstrateApp(transport, CLA.KARURA, SLIP0044.KARURA)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -482,4 +486,5 @@ module.exports = {
   newNodleApp,
   newSoraApp,
   newPolkadexApp,
+  newKaruraApp,
 }
