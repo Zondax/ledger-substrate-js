@@ -49,7 +49,7 @@ const SS58_ADDR_TYPE = {
   NODLE: 37,
   SORA: 69,
   POLKADEX: 88,
-  BIFROST: 6
+  BIFROST: 6,
   KARURA: 8,
 }
 
