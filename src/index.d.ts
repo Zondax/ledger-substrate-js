@@ -70,3 +70,4 @@ export const newStatemineApp: SubstrateAppCreator
 export const newNodleApp: SubstrateAppCreator
 export const newSoraApp: SubstrateAppCreator
 export const newBifrostApp: SubstrateAppCreator
+export const newKaruraApp: SubstrateAppCreator

@@ -9,6 +9,7 @@ const CLA = {
   STATEMINE: 0x97,
   NODLE: 0x98,
   KUSAMA: 0x99,
+  KARURA: 0x9a,
   GENSHIRO: 0x9e,
   SORA: 0x9f,
   POLKADEX: 0xa0,
@@ -31,6 +32,7 @@ const SLIP0044 = {
   SORA: 0x80000269,
   POLKADEX: 0x00000000,
   BIFROST: 0x80000314,
+  KARURA: 0x800002ae,
 }
 
 const SS58_ADDR_TYPE = {
@@ -48,6 +50,7 @@ const SS58_ADDR_TYPE = {
   SORA: 69,
   POLKADEX: 88,
   BIFROST: 6
+  KARURA: 8,
 }
 
 module.exports = {
