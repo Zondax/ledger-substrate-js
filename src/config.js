@@ -13,6 +13,7 @@ const CLA = {
   GENSHIRO: 0x9e,
   SORA: 0x9f,
   POLKADEX: 0xa0,
+  BIFROST: 0xa1,
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -30,6 +31,7 @@ const SLIP0044 = {
   KUSAMA: 0x800001b2,
   SORA: 0x80000269,
   POLKADEX: 0x00000000,
+  BIFROST: 0x80000314,
   KARURA: 0x800002ae,
 }
 
@@ -47,6 +49,7 @@ const SS58_ADDR_TYPE = {
   NODLE: 37,
   SORA: 69,
   POLKADEX: 88,
+  BIFROST: 6,
   KARURA: 8,
 }
 

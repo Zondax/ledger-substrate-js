@@ -381,6 +381,10 @@ function newPolkadexApp(transport) {
   return new SubstrateApp(transport, CLA.POLKADEX, SLIP0044.POLKADEX)
 }
 
+function newBifrostApp(transport) {
+  return new SubstrateApp(transport, CLA.BIFROST, SLIP0044.BIFROST)
+}
+
 function newKaruraApp(transport) {
   return new SubstrateApp(transport, CLA.KARURA, SLIP0044.KARURA)
 }
@@ -486,5 +490,6 @@ module.exports = {
   newNodleApp,
   newSoraApp,
   newPolkadexApp,
-  newKaruraApp,
+  newBifrostApp,
+  newKaruraApp
 }
