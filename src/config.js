@@ -14,6 +14,7 @@ const CLA = {
   SORA: 0x9f,
   POLKADEX: 0xa0,
   BIFROST: 0xa1,
+  REEF: 0xa2,
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -33,6 +34,7 @@ const SLIP0044 = {
   POLKADEX: 0x00000000,
   BIFROST: 0x80000314,
   KARURA: 0x800002ae,
+  REEF: 0x80000333,
 }
 
 const SS58_ADDR_TYPE = {
@@ -51,6 +53,7 @@ const SS58_ADDR_TYPE = {
   POLKADEX: 88,
   BIFROST: 6,
   KARURA: 8,
+  REEF: 42,
 }
 
 module.exports = {
