@@ -389,6 +389,10 @@ function newKaruraApp(transport) {
   return new SubstrateApp(transport, CLA.KARURA, SLIP0044.KARURA)
 }
 
+function newReefApp(transport) {
+  return new SubstrateApp(transport, CLA.REEF, SLIP0044.REEF)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -491,5 +495,6 @@ module.exports = {
   newSoraApp,
   newPolkadexApp,
   newBifrostApp,
-  newKaruraApp
+  newKaruraApp,
+  newReefApp,
 }
