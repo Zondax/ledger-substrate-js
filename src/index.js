@@ -393,6 +393,14 @@ function newReefApp(transport) {
   return new SubstrateApp(transport, CLA.REEF, SLIP0044.REEF)
 }
 
+function newAcalaApp(transport) {
+  return new SubstrateApp(transport, CLA.ACA, SLIP0044.ACA)
+}
+
+function newElixxirApp(transport) {
+  return new SubstrateApp(transport, CLA.XX, SLIP0044.XX)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -497,4 +505,6 @@ module.exports = {
   newBifrostApp,
   newKaruraApp,
   newReefApp,
+  newAcalaApp,
+  newElixxirApp,
 }
