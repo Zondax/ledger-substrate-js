@@ -394,11 +394,11 @@ function newReefApp(transport) {
 }
 
 function newAcalaApp(transport) {
-  return new SubstrateApp(transport, CLA.ACA, SLIP0044.ACA)
+  return new SubstrateApp(transport, CLA.ACALA, SLIP0044.ACALA)
 }
 
 function newElixxirApp(transport) {
-  return new SubstrateApp(transport, CLA.XX, SLIP0044.XX)
+  return new SubstrateApp(transport, CLA.ELIXXIR, SLIP0044.ELIXXIR)
 }
 
 function sha512(data) {

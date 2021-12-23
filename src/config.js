@@ -10,13 +10,13 @@ const CLA = {
   NODLE: 0x98,
   KUSAMA: 0x99,
   KARURA: 0x9a,
-  ACA: 0x9b,
+  ACALA: 0x9b,
   GENSHIRO: 0x9e,
   SORA: 0x9f,
   POLKADEX: 0xa0,
   BIFROST: 0xa1,
   REEF: 0xa2,
-  XX: 0xa3,
+  ELIXXIR: 0xa3,
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -33,12 +33,12 @@ const SLIP0044 = {
   NODLE: 0x800003eb,
   KUSAMA: 0x800001b2,
   SORA: 0x80000269,
-  POLKADEX: 0x00000000,
+  POLKADEX: 0x8000031f,
   BIFROST: 0x80000314,
   KARURA: 0x800002ae,
   REEF: 0x80000333,
-  ACA: 0x80000313,
-  XX: 0x800007a3,
+  ACALA: 0x80000313,
+  ELIXXIR: 0x800007a3,
 }
 
 const SS58_ADDR_TYPE = {
@@ -58,8 +58,8 @@ const SS58_ADDR_TYPE = {
   BIFROST: 6,
   KARURA: 8,
   REEF: 42,
-  ACA: 10,
-  XX: 55,
+  ACALA: 10,
+  ELIXXIR: 55,
 }
 
 module.exports = {
