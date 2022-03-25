@@ -17,6 +17,9 @@ const CLA = {
   BIFROST: 0xa1,
   REEF: 0xa2,
   ELIXXIR: 0xa3,
+  ALEPHZERO: 0xa4,
+  INTERLAY: 0xa5,
+  PARALLEL: 0xa6,
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -39,6 +42,9 @@ const SLIP0044 = {
   REEF: 0x80000333,
   ACALA: 0x80000313,
   ELIXXIR: 0x800007a3,
+  ALEPHZERO: 0x80000283,
+  INTERLAY: 0x80000162,
+  PARALLEL: 0x80000162,
 }
 
 const SS58_ADDR_TYPE = {
@@ -60,6 +66,9 @@ const SS58_ADDR_TYPE = {
   REEF: 42,
   ACALA: 10,
   ELIXXIR: 55,
+  ALEPHZERO: 42,
+  INTERLAY: 42,
+  PARALLEL: 172,
 }
 
 module.exports = {

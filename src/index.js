@@ -401,6 +401,18 @@ function newElixxirApp(transport) {
   return new SubstrateApp(transport, CLA.ELIXXIR, SLIP0044.ELIXXIR)
 }
 
+function newAlephzeroApp(transport) {
+  return new SubstrateApp(transport, CLA.ALEPHZERO, SLIP0044.ALEPHZERO)
+}
+
+function newInterlayApp(transport) {
+  return new SubstrateApp(transport, CLA.INTERLAY, SLIP0044.INTERLAY)
+}
+
+function newParallelApp(transport) {
+  return new SubstrateApp(transport, CLA.PARALLEL, SLIP0044.PARALLEL)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -507,4 +519,7 @@ module.exports = {
   newReefApp,
   newAcalaApp,
   newElixxirApp,
+  newAlephzeroApp,
+  newInterlayApp,
+  newParallelApp,
 }

@@ -75,3 +75,6 @@ export const newKaruraApp: SubstrateAppCreator
 export const newReefApp: SubstrateAppCreator
 export const newAcalaApp: SubstrateAppCreator
 export const newElixxirApp: SubstrateAppCreator
+export const newAlephzeroApp: SubstrateAppCreator
+export const newInterlayApp: SubstrateAppCreator
+export const newParallelApp: SubstrateAppCreator
