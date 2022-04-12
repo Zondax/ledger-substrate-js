@@ -397,8 +397,8 @@ function newAcalaApp(transport) {
   return new SubstrateApp(transport, CLA.ACALA, SLIP0044.ACALA)
 }
 
-function newElixxirApp(transport) {
-  return new SubstrateApp(transport, CLA.ELIXXIR, SLIP0044.ELIXXIR)
+function newXXNetworkApp(transport) {
+  return new SubstrateApp(transport, CLA.XXNETWORK, SLIP0044.XXNETWORK)
 }
 
 function sha512(data) {
@@ -506,5 +506,5 @@ module.exports = {
   newKaruraApp,
   newReefApp,
   newAcalaApp,
-  newElixxirApp,
+  newXXNetworkApp,
 }
