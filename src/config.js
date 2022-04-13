@@ -16,7 +16,7 @@ const CLA = {
   POLKADEX: 0xa0,
   BIFROST: 0xa1,
   REEF: 0xa2,
-  ELIXXIR: 0xa3,
+  XXNETWORK: 0xa3,
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -38,7 +38,7 @@ const SLIP0044 = {
   KARURA: 0x800002ae,
   REEF: 0x80000333,
   ACALA: 0x80000313,
-  ELIXXIR: 0x800007a3,
+  XXNETWORK: 0x800007a3,
 }
 
 const SS58_ADDR_TYPE = {
@@ -59,7 +59,7 @@ const SS58_ADDR_TYPE = {
   KARURA: 8,
   REEF: 42,
   ACALA: 10,
-  ELIXXIR: 55,
+  XXNETWORK: 55,
 }
 
 module.exports = {
