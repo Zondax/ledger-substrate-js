@@ -401,6 +401,10 @@ function newXXNetworkApp(transport) {
   return new SubstrateApp(transport, CLA.XXNETWORK, SLIP0044.XXNETWORK)
 }
 
+function newParallelApp(transport) {
+  return new SubstrateApp(transport, CLA.PARALLEL, SLIP0044.PARALLEL)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -507,4 +511,5 @@ module.exports = {
   newReefApp,
   newAcalaApp,
   newXXNetworkApp,
+  newParallelApp,
 }
