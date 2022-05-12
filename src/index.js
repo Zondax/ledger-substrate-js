@@ -401,8 +401,8 @@ function newXXNetworkApp(transport) {
   return new SubstrateApp(transport, CLA.XXNETWORK, SLIP0044.XXNETWORK)
 }
 
-function newParallelFiApp(transport) {
-  return new SubstrateApp(transport, CLA.PARALLELFI, SLIP0044.PARALLELFI)
+function newParallelApp(transport) {
+  return new SubstrateApp(transport, CLA.PARALLEL, SLIP0044.PARALLEL)
 }
 
 function sha512(data) {
@@ -511,5 +511,5 @@ module.exports = {
   newReefApp,
   newAcalaApp,
   newXXNetworkApp,
-  newParallelFiApp,
+  newParallelApp,
 }
