@@ -75,4 +75,4 @@ export const newKaruraApp: SubstrateAppCreator
 export const newReefApp: SubstrateAppCreator
 export const newAcalaApp: SubstrateAppCreator
 export const newXXNetworkApp: SubstrateAppCreator
-export const newParallelFiApp: SubstrateAppCreator
+export const newParallelApp: SubstrateAppCreator
