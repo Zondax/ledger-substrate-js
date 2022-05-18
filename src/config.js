@@ -18,6 +18,7 @@ const CLA = {
   REEF: 0xa2,
   XXNETWORK: 0xa3,
   PARALLEL: 0xa6,
+  ASTAR: 0xa9,
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -41,6 +42,7 @@ const SLIP0044 = {
   ACALA: 0x80000313,
   XXNETWORK: 0x800007a3,
   PARALLEL: 0x80000162,
+  ASTAR: 0x80000162,
 }
 
 const SS58_ADDR_TYPE = {
@@ -63,6 +65,7 @@ const SS58_ADDR_TYPE = {
   ACALA: 10,
   XXNETWORK: 55,
   PARALLEL: 172,
+  ASTAR: 5,
 }
 
 module.exports = {
