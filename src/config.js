@@ -18,6 +18,7 @@ const CLA = {
   REEF: 0xa2,
   XXNETWORK: 0xa3,
   PARALLEL: 0xa6,
+  COMPOSABLE: 0xa8,
   ASTAR: 0xa9,
 }
 
@@ -43,6 +44,7 @@ const SLIP0044 = {
   XXNETWORK: 0x800007a3,
   PARALLEL: 0x80000162,
   ASTAR: 0x8000032a,
+  COMPOSABLE: 0x80000162,
 }
 
 const SS58_ADDR_TYPE = {
@@ -66,6 +68,7 @@ const SS58_ADDR_TYPE = {
   XXNETWORK: 55,
   PARALLEL: 172,
   ASTAR: 5,
+  COMPOSABLE:49,
 }
 
 module.exports = {
