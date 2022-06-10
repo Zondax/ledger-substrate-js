@@ -413,6 +413,10 @@ function newComposableApp(transport) {
   return new SubstrateApp(transport, CLA.COMPOSABLE, SLIP0044.COMPOSABLE)
 }
 
+function newBifrostPolkadotApp(transport) {
+  return new SubstrateApp(transport, CLA.BIFROSTPOLKADOT, SLIP0044.BIFROSTPOLKADOT)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -515,6 +519,7 @@ module.exports = {
   newSoraApp,
   newPolkadexApp,
   newBifrostApp,
+  newBifrostPolkadotApp,
   newKaruraApp,
   newReefApp,
   newAcalaApp,
