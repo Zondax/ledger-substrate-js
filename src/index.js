@@ -413,6 +413,10 @@ function newComposableApp(transport) {
   return new SubstrateApp(transport, CLA.COMPOSABLE, SLIP0044.COMPOSABLE)
 }
 
+function newStafiApp(transport) {
+  return new SubstrateApp(transport, CLA.STAFI, SLIP0044.STAFI)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -522,4 +526,5 @@ module.exports = {
   newParallelApp,
   newAstarApp,
   newComposableApp,
+  newStafiApp,
 }
