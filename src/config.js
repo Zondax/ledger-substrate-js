@@ -20,6 +20,7 @@ const CLA = {
   PARALLEL: 0xa6,
   COMPOSABLE: 0xa8,
   ASTAR: 0xa9,
+  STAFI: 0xac,
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -45,6 +46,7 @@ const SLIP0044 = {
   PARALLEL: 0x80000162,
   ASTAR: 0x8000032a,
   COMPOSABLE: 0x80000162,
+  STAFI: 0x8000038b,
 }
 
 const SS58_ADDR_TYPE = {
@@ -69,6 +71,7 @@ const SS58_ADDR_TYPE = {
   PARALLEL: 172,
   ASTAR: 5,
   COMPOSABLE:49,
+  STAFI: 20,
 }
 
 module.exports = {
