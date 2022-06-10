@@ -78,3 +78,4 @@ export const newXXNetworkApp: SubstrateAppCreator
 export const newParallelApp: SubstrateAppCreator
 export const newAstarApp: SubstrateAppCreator
 export const newComposableApp: SubstrateAppCreator
+export const newBifrostPolkadotApp: SubstrateAppCreator
