@@ -79,3 +79,4 @@ export const newParallelApp: SubstrateAppCreator
 export const newAstarApp: SubstrateAppCreator
 export const newComposableApp: SubstrateAppCreator
 export const newStafiApp: SubstrateAppCreator
+export const newAlephZeroApp: SubstrateAppCreator
