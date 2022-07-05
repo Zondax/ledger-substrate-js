@@ -17,6 +17,7 @@ const CLA = {
   BIFROST: 0xa1,
   REEF: 0xa2,
   XXNETWORK: 0xa3,
+  ALEPHZERO: 0xa4,
   PARALLEL: 0xa6,
   COMPOSABLE: 0xa8,
   ASTAR: 0xa9,
@@ -47,6 +48,7 @@ const SLIP0044 = {
   ASTAR: 0x8000032a,
   COMPOSABLE: 0x80000162,
   STAFI: 0x8000038b,
+  ALEPHZERO: 0x80000283,
 }
 
 const SS58_ADDR_TYPE = {
@@ -72,6 +74,7 @@ const SS58_ADDR_TYPE = {
   ASTAR: 5,
   COMPOSABLE:49,
   STAFI: 20,
+  ALEPHZERO: 42,
 }
 
 module.exports = {
