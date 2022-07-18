@@ -80,3 +80,5 @@ export const newAstarApp: SubstrateAppCreator
 export const newComposableApp: SubstrateAppCreator
 export const newStafiApp: SubstrateAppCreator
 export const newAlephZeroApp: SubstrateAppCreator
+export const newInterlayApp: SubstrateAppCreator
+export const newUniqueApp: SubstrateAppCreator

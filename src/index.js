@@ -420,6 +420,12 @@ function newStafiApp(transport) {
 function newAlephZeroApp(transport) {
   return new SubstrateApp(transport, CLA.ALEPHZERO, SLIP0044.ALEPHZERO)
 }
+function newInterlayApp(transport) {
+  return new SubstrateApp(transport, CLA.INTERLAY, SLIP0044.INTERLAY)
+}
+function newUniqueApp(transport) {
+  return new SubstrateApp(transport, CLA.UNIQUE, SLIP0044.UNIQUE)
+}
 
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
@@ -532,4 +538,6 @@ module.exports = {
   newComposableApp,
   newStafiApp,
   newAlephZeroApp,
+  newInterlayApp,
+  newUniqueApp,
 }
