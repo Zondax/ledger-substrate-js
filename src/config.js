@@ -18,10 +18,13 @@ const CLA = {
   REEF: 0xa2,
   XXNETWORK: 0xa3,
   ALEPHZERO: 0xa4,
+  INTERLAY: 0xa5,
   PARALLEL: 0xa6,
   COMPOSABLE: 0xa8,
   ASTAR: 0xa9,
   STAFI: 0xac,
+  UNIQUE: 0xad,
+  
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -49,6 +52,8 @@ const SLIP0044 = {
   COMPOSABLE: 0x80000162,
   STAFI: 0x8000038b,
   ALEPHZERO: 0x80000283,
+  INTERLAY: 0x80000162,
+  UNIQUE: 0x80000162,
 }
 
 const SS58_ADDR_TYPE = {
@@ -75,6 +80,8 @@ const SS58_ADDR_TYPE = {
   COMPOSABLE:49,
   STAFI: 20,
   ALEPHZERO: 42,
+  INTERLAY: 2032,
+  UNIQUE: 7391,
 }
 
 module.exports = {
