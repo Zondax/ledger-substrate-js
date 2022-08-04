@@ -1,30 +1,54 @@
-const INS = {
+/** ******************************************************************************
+ *  (c) 2019 - 2022 ZondaX AG
+ *  (c) 2016-2017 Ledger
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ ******************************************************************************* */
+export const CHUNK_SIZE = 250
+
+export const INS = {
   GET_VERSION: 0x00,
+  GET_ADDR: 0x01,
+  SIGN: 0x02,
+
+  // Allow list related commands
+  ALLOWLIST_GET_PUBKEY: 0x90,
+  ALLOWLIST_SET_PUBKEY: 0x91,
+  ALLOWLIST_GET_HASH: 0x92,
+  ALLOWLIST_UPLOAD: 0x93,
 }
 
-const CHUNK_SIZE = 250
-
-const PAYLOAD_TYPE = {
+export const PAYLOAD_TYPE = {
   INIT: 0x00,
   ADD: 0x01,
   LAST: 0x02,
 }
 
-const P1_VALUES = {
+export const P1_VALUES = {
   ONLY_RETRIEVE: 0x00,
   SHOW_ADDRESS_IN_DEVICE: 0x01,
 }
 
-const SCHEME = {
+export const SCHEME = {
   ED25519: 0x00,
   SR25519: 0x01,
 }
 
-const ERROR_CODE = {
+export const ERROR_CODE = {
   NoError: 0x9000,
 }
 
-const ERROR_DESCRIPTION = {
+export const ERROR_DESCRIPTION: any = {
   1: 'U2F: Unknown',
   2: 'U2F: Bad request',
   3: 'U2F: Configuration unsupported',
@@ -49,16 +73,53 @@ const ERROR_DESCRIPTION = {
   0x6f01: 'Sign/verify error',
 }
 
-function errorCodeToString(statusCode) {
+export interface SubstrateAppParams {
+  name: string
+  cla: number
+  slip0044: number
+  ss58_addr_type: number
+}
+
+export interface ResponseBase {
+  error_message: string
+  return_code: number
+}
+
+export interface ResponseAddress extends ResponseBase {
+  address: string
+  pubKey: string
+}
+
+export interface ResponseVersion extends ResponseBase {
+  device_locked: boolean
+  major: number
+  minor: number
+  patch: number
+  test_mode: boolean
+}
+
+export interface ResponseAllowlistPubKey extends ResponseBase {
+  pubKey: string
+}
+
+export interface ResponseAllowlistHash extends ResponseBase {
+  hash: Buffer
+}
+
+export interface ResponseSign extends ResponseBase {
+  signature: Buffer
+}
+
+export function errorCodeToString(statusCode: number) {
   if (statusCode in ERROR_DESCRIPTION) return ERROR_DESCRIPTION[statusCode]
   return `Unknown Status Code: ${statusCode}`
 }
 
-function isDict(v) {
+function isDict(v: any) {
   return typeof v === 'object' && v !== null && !(v instanceof Array) && !(v instanceof Date)
 }
 
-function processErrorResponse(response) {
+export function processErrorResponse(response: any) {
   if (response) {
     if (isDict(response)) {
       if (Object.prototype.hasOwnProperty.call(response, 'statusCode')) {
@@ -87,8 +148,8 @@ function processErrorResponse(response) {
   }
 }
 
-async function getVersion(transport, cla) {
-  return transport.send(cla, INS.GET_VERSION, 0, 0).then(response => {
+export async function getVersion(transport: any, cla: number) {
+  return transport.send(cla, INS.GET_VERSION, 0, 0).then((response: any) => {
     const errorCodeData = response.slice(-2)
     const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
 
@@ -119,16 +180,4 @@ async function getVersion(transport, cla) {
       target_id: targetId.toString(16),
     }
   }, processErrorResponse)
-}
-
-module.exports = {
-  CHUNK_SIZE,
-  INS,
-  PAYLOAD_TYPE,
-  P1_VALUES,
-  SCHEME,
-  ERROR_CODE,
-  getVersion,
-  processErrorResponse,
-  errorCodeToString,
 }

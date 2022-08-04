@@ -1,27 +1,20 @@
 {
   "name": "@zondax/ledger-substrate",
-  "version": "0.17.9",
-  "description": "JS / Node API for Kusama/Polkadot app running (Ledger Nano S/X)",
-  "author": "Zondax GmbH",
+  "author": "Zondax AG",
   "license": "Apache-2.0",
+  "version": "0.17.9",
+  "description": "TS / Node API for Substrate based apps running on Ledger Nano S/S+/X",
   "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
   "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "babel src --out-dir dist",
-    "build:ci": "yarn build && cp -f src/index.d.ts dist",
-    "test:unit": "jest -c jest.config.unit.js",
-    "test:integration": "jest -c jest.config.integration.js --runInBand --detectOpenHandles",
-    "linter": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .eslintignore .",
-    "linter:fix": "yarn linter --fix",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\""
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zondax/ledger-substrate-js.git"
   },
   "keywords": [
     "Ledger",
-    "Javascript",
+    "Typescript",
+    "Substrate",
     "Kusama",
     "Polkadot"
   ],
@@ -39,24 +32,28 @@
     "bs58": "^4.0.1",
     "hash.js": "^1.1.7"
   },
+
   "devDependencies": {
     "@babel/cli": "^7.14.8",
     "@babel/core": "^7.14.8",
     "@babel/node": "^7.14.7",
-    "@babel/plugin-transform-runtime": "^7.14.5",
-    "@babel/preset-env": "^7.14.8",
+    "@babel/plugin-transform-runtime": "^7.18.9",
+    "@babel/preset-env": "^7.18.9",
     "@ledgerhq/hw-transport-node-hid": "^6.2.0",
     "@ledgerhq/hw-transport-webusb": "^6.2.0",
     "@ledgerhq/logs": "^6.2.0",
+    "@swc/core": "^1.2.220",
     "@types/fs-extra": "^9.0.12",
     "@types/jest": "^26.0.24",
+    "@types/figlet": "^1.5.4",
+    "@types/minimist": "^1.2.2",
     "@types/ledgerhq__hw-transport": "^4.21.4",
     "@types/pngjs": "^6.0.1",
     "@types/sleep": "^0.0.8",
     "@typescript-eslint/eslint-plugin": "^4.28.4",
     "@typescript-eslint/parser": "^4.28.4",
     "babel-eslint": "^10.1.0",
-    "babel-jest": "^27.0.6",
+    "babel-jest": "^28.1.3",
     "core-js": "^3.15.2",
     "crypto-js": "4.1.1",
     "ed25519-supercop": "^2.0.1",
@@ -70,7 +67,11 @@
     "js-sha512": "^0.8.0",
     "prettier": "^2.3.2",
     "ts-jest": "^26",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "figlet": "^1.5.2",
+    "minimist": "^1.2.6",
+    "copyfiles": "^2.4.1",
+    "ts-node": "^10.8.1"
   },
   "moduleDirectories": [
     "node_modules",
@@ -85,7 +86,30 @@
     "> 1%",
     "last 2 versions"
   ],
+  "files": [
+    "dist/**",
+    "LICENSE",
+    "package.json"
+  ],
   "publishConfig": {
     "access": "public"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.17.5",
+    "@types/node": "^17.0.21"
+  },
+  "scripts": {
+    "build": "tsc && yarn copy-files",
+    "copy-files": "copyfiles -u 0 src/**/*.proto dist/",
+    "test:integration": "yarn build && jest -t 'Integration'",
+    "test:key-derivation": "yarn build && jest -t 'KeyDerivation'",
+    "supported": "ts-node src/index.ts supported",
+
+    "build:ci": "yarn build && cp -f src/index.d.ts dist",
+    "test:unit": "jest -c jest.config.unit.js",
+    "linter": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .eslintignore . --max-warnings 0",
+    "linter:fix": "yarn linter --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\""
+
   }
 }
