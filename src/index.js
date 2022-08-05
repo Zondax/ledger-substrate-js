@@ -427,6 +427,10 @@ function newUniqueApp(transport) {
   return new SubstrateApp(transport, CLA.UNIQUE, SLIP0044.UNIQUE)
 }
 
+function newBifrostKusamaApp(transport) {
+  return new SubstrateApp(transport, CLA.BIFROSTKUSAMA, SLIP0044.BIFROSTKUSAMA)
+}
+
 function sha512(data) {
   var digest = hash.sha512().update(data).digest()
   return Buffer.from(digest)
@@ -540,4 +544,5 @@ module.exports = {
   newAlephZeroApp,
   newInterlayApp,
   newUniqueApp,
+  newBifrostKusamaApp
 }

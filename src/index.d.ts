@@ -82,3 +82,4 @@ export const newStafiApp: SubstrateAppCreator
 export const newAlephZeroApp: SubstrateAppCreator
 export const newInterlayApp: SubstrateAppCreator
 export const newUniqueApp: SubstrateAppCreator
+export const newBifrostKusamaApp: SubstrateAppCreator

@@ -24,7 +24,7 @@ const CLA = {
   ASTAR: 0xa9,
   STAFI: 0xac,
   UNIQUE: 0xad,
-  
+  BIFROSTKUSAMA: 0xae
 }
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -54,6 +54,7 @@ const SLIP0044 = {
   ALEPHZERO: 0x80000283,
   INTERLAY: 0x80000162,
   UNIQUE: 0x80000162,
+  BIFROSTKUSAMA: 0x80000314,
 }
 
 const SS58_ADDR_TYPE = {
@@ -82,6 +83,7 @@ const SS58_ADDR_TYPE = {
   ALEPHZERO: 42,
   INTERLAY: 2032,
   UNIQUE: 7391,
+  BIFROSTKUSAMA: 6,
 }
 
 module.exports = {
