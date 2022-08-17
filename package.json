@@ -96,7 +96,6 @@
     "test:integration": "yarn build && jest -t 'Integration'",
     "test:key-derivation": "yarn build && jest -t 'KeyDerivation'",
     "supported": "ts-node src/index.ts supported",
-    "build:ci": "yarn build && cp -f src/index.d.ts dist",
     "test:unit": "jest -c jest.config.unit.js",
     "linter": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .eslintignore . --max-warnings 0",
     "linter:fix": "yarn linter --fix",

@@ -22,18 +22,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          submodules: true
       - name: Install node
         uses: actions/setup-node@v2
         with:
-          node-version: '14.17.0'
           registry-url: 'https://registry.npmjs.org'
           scope: '@zondax'
       - name: Install yarn
         run: npm install -g yarn
       - run: yarn install
-      - run: yarn build:ci
+      - run: yarn build
       - name: Get latest release version number
         id: get_version
         uses: battila7/get-version-action@v2
