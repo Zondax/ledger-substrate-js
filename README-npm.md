@@ -56,7 +56,7 @@ yarn test
 
 ## Example:
 
-Go and take the [latest release](https://github.com/Zondax/ledger-kusama/releases/tag/v12.9270.0) from repository (in this case Kusama).
+Visit and download the [latest release](https://github.com/Zondax/ledger-kusama/releases/latest) from repository (in this case Kusama).
 
 Download the installer script for your device but bear in mind that NanoX does not allow side loading applications. Give execution permission and run the script.
 
@@ -75,3 +75,7 @@ const YOUR_BLOB = '0400ffbc10f71d63e0da1b9e7ee2eb4037466551dc32b9d4641aafd73a659
 ```
 
 Run tests and you will see how this module communicates with your device.
+
+# Who we are?
+
+We are Zondax, a company pioneering blockchain services. If you want to know more about us, please visit us at [zondax.ch](https://zondax.ch)
