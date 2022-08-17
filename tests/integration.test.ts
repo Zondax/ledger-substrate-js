@@ -24,7 +24,8 @@ import { newSubstrateApp } from '../src/supported_apps'
 const CHAIN = 'Kusama'
 const YOUR_PUBKEY = 'd280b24dface41f31006e5a2783971fc5a66c862dd7d08f97603d2902b75e47a'
 const YOUR_ADDRESS = 'HLKocKgeGjpXkGJU6VACtTYJK4ApTCfcGRw51E5jWntcsXv'
-const YOUR_BLOB = '0400ffbc10f71d63e0da1b9e7ee2eb4037466551dc32b9d4641aafd73a65970fae4202286beed502000022040000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe280b332587f46c556aa806781884284f50d90b8c1b02488a059700673c93f41c'
+const YOUR_BLOB =
+  '040000313233343536373839303132333435363738393031323334353637383930313233158139ae28a3dfaac5fe1560a5e9e05cd5038d2433158139ae28a3dfaac5fe1560a5e9e05c362400000c000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafeb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe'
 
 let transport = {}
 
@@ -71,7 +72,7 @@ describe('Integration', function () {
 
     const pathAccount = 0x80000000
     const pathChange = 0x80000000
-    const pathIndex = 0x8000000a
+    const pathIndex = 0x80000005
     const response = await app?.getAddress(pathAccount, pathChange, pathIndex, true)
 
     console.log(response)
@@ -87,7 +88,6 @@ describe('Integration', function () {
   })
 
   test('sign2_and_verify', async () => {
-
     const txBlob = Buffer.from(YOUR_BLOB, 'hex')
 
     const app = newSubstrateApp(transport, CHAIN)
