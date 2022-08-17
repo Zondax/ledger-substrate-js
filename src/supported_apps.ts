@@ -16,19 +16,15 @@
  ******************************************************************************* */
 import { SubstrateApp } from './substrate_app'
 import { SubstrateAppParams } from './common'
-import chalk from 'chalk'
 
 export function newSubstrateApp(transport: any, chainName: string) {
   const requestedApp = supportedApps.find((app: SubstrateAppParams) => {
     return app.name.toLowerCase() === chainName.toLowerCase()
   })
-
-  if (requestedApp === undefined) {
-    console.log(chalk.bgRed(`Error: ${chainName} not supported`))
-    return undefined
+  if (requestedApp) {
+    return new SubstrateApp(transport, requestedApp.cla, requestedApp.slip0044)
   }
-
-  return new SubstrateApp(transport, requestedApp.cla, requestedApp.slip0044)
+  throw new Error(`Error: ${chainName} not supported`)
 }
 
 export function getAppParams(chainName: string) {
