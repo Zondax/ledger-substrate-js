@@ -1,27 +1,20 @@
 {
   "name": "@zondax/ledger-substrate",
-  "version": "0.17.9",
-  "description": "JS / Node API for Kusama/Polkadot app running (Ledger Nano S/X)",
-  "author": "Zondax GmbH",
+  "author": "Zondax AG",
   "license": "Apache-2.0",
+  "version": "0.17.9",
+  "description": "TS / Node API for Substrate based apps running on Ledger Nano S/S+/X",
   "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
   "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "babel src --out-dir dist",
-    "build:ci": "yarn build && cp -f src/index.d.ts dist",
-    "test:unit": "jest -c jest.config.unit.js",
-    "test:integration": "jest -c jest.config.integration.js --runInBand --detectOpenHandles",
-    "linter": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .eslintignore .",
-    "linter:fix": "yarn linter --fix",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\""
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zondax/ledger-substrate-js.git"
   },
   "keywords": [
     "Ledger",
-    "Javascript",
+    "Typescript",
+    "Substrate",
     "Kusama",
     "Polkadot"
   ],
@@ -29,63 +22,84 @@
     "url": "https://github.com/Zondax/ledger-substrate-js/issues"
   },
   "homepage": "https://github.com/Zondax/ledger-substrate-js",
+  "resolutions": {
+    "@ledgerhq/hw-transport-node-hid/@ledgerhq/hw-transport-node-hid-noevents": "6.27.1"
+  },
   "dependencies": {
-    "@babel/runtime": "^7.14.8",
-    "@ledgerhq/hw-transport": "^6.2.0",
-    "bip32": "2.0.6",
+    "@babel/runtime": "^7.18.9",
+    "@ledgerhq/hw-transport": "6.27.1",
+    "bip32": "3.0.1",
     "bip32-ed25519": "https://github.com/Zondax/bip32-ed25519",
     "bip39": "3.0.4",
-    "blakejs": "^1.1.1",
-    "bs58": "^4.0.1",
+    "blakejs": "^1.2.1",
+    "bs58": "^5.0.0",
+    "chalk": "4",
     "hash.js": "^1.1.7"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.8",
-    "@babel/core": "^7.14.8",
-    "@babel/node": "^7.14.7",
-    "@babel/plugin-transform-runtime": "^7.14.5",
-    "@babel/preset-env": "^7.14.8",
-    "@ledgerhq/hw-transport-node-hid": "^6.2.0",
-    "@ledgerhq/hw-transport-webusb": "^6.2.0",
-    "@ledgerhq/logs": "^6.2.0",
-    "@types/fs-extra": "^9.0.12",
-    "@types/jest": "^26.0.24",
+    "@babel/cli": "^7.18.10",
+    "@babel/core": "^7.18.10",
+    "@babel/node": "^7.18.10",
+    "@babel/plugin-transform-runtime": "^7.18.9",
+    "@babel/preset-env": "^7.18.9",
+    "@ledgerhq/hw-transport-node-hid": "6.27.1",
+    "@ledgerhq/hw-transport-webusb": "6.27.1",
+    "@ledgerhq/logs": "^6.10.0",
+    "@swc/core": "^1.2.237",
+    "@types/figlet": "^1.5.4",
+    "@types/fs-extra": "^9.0.13",
+    "@types/jest": "26",
     "@types/ledgerhq__hw-transport": "^4.21.4",
+    "@types/minimist": "^1.2.2",
+    "@types/node": "^18.7.6",
     "@types/pngjs": "^6.0.1",
     "@types/sleep": "^0.0.8",
-    "@typescript-eslint/eslint-plugin": "^4.28.4",
-    "@typescript-eslint/parser": "^4.28.4",
+    "@typescript-eslint/eslint-plugin": "^5.33.1",
+    "@typescript-eslint/parser": "^5.33.1",
     "babel-eslint": "^10.1.0",
-    "babel-jest": "^27.0.6",
-    "core-js": "^3.15.2",
+    "babel-jest": "26",
+    "copyfiles": "^2.4.1",
+    "core-js": "^3.24.1",
     "crypto-js": "4.1.1",
     "ed25519-supercop": "^2.0.1",
-    "eslint": "^7.31.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-jest": "^24.4.0",
-    "eslint-plugin-prettier": "^3.4.0",
+    "eslint": "^8.22.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^26.8.3",
+    "eslint-plugin-prettier": "^4.2.1",
+    "figlet": "^1.5.2",
     "jest": "^26",
-    "jest-serial-runner": "^1.1.0",
+    "jest-runner": "^26",
+    "jest-serial-runner": "^1.2.0",
     "js-sha512": "^0.8.0",
-    "prettier": "^2.3.2",
-    "ts-jest": "^26",
-    "typescript": "^4.3.5"
+    "minimist": "^1.2.6",
+    "prettier": "^2.7.1",
+    "ts-jest": "26",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.4"
   },
   "moduleDirectories": [
     "node_modules",
     "dist"
   ],
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions"
+  "files": [
+    "dist/**",
+    "LICENSE",
+    "package.json"
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "scripts": {
+    "build": "tsc && yarn copy-files",
+    "copy-files": "copyfiles -u 0 src/**/*.proto dist/",
+    "test:integration": "yarn build && jest -t 'Integration'",
+    "test:key-derivation": "yarn build && jest -t 'KeyDerivation'",
+    "supported": "ts-node src/index.ts supported",
+    "build:ci": "yarn build && cp -f src/index.d.ts dist",
+    "test:unit": "jest -c jest.config.unit.js",
+    "linter": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .eslintignore . --max-warnings 0",
+    "linter:fix": "yarn linter --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\""
   }
 }

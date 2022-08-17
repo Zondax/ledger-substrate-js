@@ -1,5 +1,5 @@
 /** ******************************************************************************
- *  (c) 2019 ZondaX GmbH
+ *  (c) 2019 - 2022 ZondaX AG
  *  (c) 2016-2017 Ledger
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,33 +14,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  ******************************************************************************* */
+import Transport from '@ledgerhq/hw-transport'
+import {
+  CHUNK_SIZE,
+  errorCodeToString,
+  ERROR_CODE,
+  getVersion,
+  INS,
+  PAYLOAD_TYPE,
+  processErrorResponse,
+  ResponseAddress,
+  ResponseAllowlistHash,
+  ResponseAllowlistPubKey,
+  ResponseSign,
+  ResponseVersion,
+  SCHEME,
+} from './common'
 
-import { CHUNK_SIZE, ERROR_CODE, errorCodeToString, getVersion, PAYLOAD_TYPE, processErrorResponse, SCHEME } from './common'
+export class SubstrateApp {
+  transport: Transport
+  cla: number
+  slip0044: number
 
-import { CLA, SLIP0044 } from './config'
-
-const bip39 = require('bip39')
-const hash = require('hash.js')
-const bip32ed25519 = require('bip32-ed25519')
-const bs58 = require('bs58')
-const blake = require('blakejs')
-
-const HDPATH_0_DEFAULT = 0x8000002c
-
-const INS = {
-  GET_VERSION: 0x00,
-  GET_ADDR: 0x01,
-  SIGN: 0x02,
-
-  // Allow list related commands
-  ALLOWLIST_GET_PUBKEY: 0x90,
-  ALLOWLIST_SET_PUBKEY: 0x91,
-  ALLOWLIST_GET_HASH: 0x92,
-  ALLOWLIST_UPLOAD: 0x93,
-}
-
-class SubstrateApp {
-  constructor(transport, cla, slip0044) {
+  constructor(transport: any, cla: number, slip0044: number) {
     if (!transport) {
       throw new Error('Transport has not been defined')
     }
@@ -49,7 +45,7 @@ class SubstrateApp {
     this.slip0044 = slip0044
   }
 
-  static serializePath(slip0044, account, change, addressIndex) {
+  static serializePath(slip0044: number, account: number, change: number, addressIndex: number) {
     if (!Number.isInteger(account)) throw new Error('Input must be an integer')
     if (!Number.isInteger(change)) throw new Error('Input must be an integer')
     if (!Number.isInteger(addressIndex)) throw new Error('Input must be an integer')
@@ -63,7 +59,7 @@ class SubstrateApp {
     return buf
   }
 
-  static GetChunks(message) {
+  static GetChunks(message: Buffer) {
     const chunks = []
     const buffer = Buffer.from(message)
 
@@ -78,7 +74,7 @@ class SubstrateApp {
     return chunks
   }
 
-  static signGetChunks(slip0044, account, change, addressIndex, message) {
+  static signGetChunks(slip0044: number, account: number, change: number, addressIndex: number, message: Buffer) {
     const chunks = []
     const bip44Path = SubstrateApp.serializePath(slip0044, account, change, addressIndex)
     chunks.push(bip44Path)
@@ -86,7 +82,7 @@ class SubstrateApp {
     return chunks
   }
 
-  async getVersion() {
+  async getVersion(): Promise<ResponseVersion> {
     try {
       return await getVersion(this.transport, this.cla)
     } catch (e) {
@@ -99,17 +95,17 @@ class SubstrateApp {
       const errorCodeData = response.slice(-2)
       const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
 
-      const result = {}
-
-      let appName = 'err'
-      let appVersion = 'err'
+      let appName = ''
+      let appVersion = ''
       let flagLen = 0
       let flagsValue = 0
 
       if (response[0] !== 1) {
         // Ledger responds with format ID 1. There is no spec for any format != 1
-        result.error_message = 'response format ID not recognized'
-        result.return_code = 0x9001
+        return {
+          return_code: 0x9001,
+          error_message: 'response format ID not recognized',
+        }
       } else {
         const appNameLen = response[1]
         appName = response.slice(2, 2 + appNameLen).toString('ascii')
@@ -128,8 +124,8 @@ class SubstrateApp {
         return_code: returnCode,
         error_message: errorCodeToString(returnCode),
         // //
-        appName,
-        appVersion,
+        appName: appName ? appName : 'err',
+        appVersion: appVersion ? appVersion : 'err',
         flagLen,
         flagsValue,
         // eslint-disable-next-line no-bitwise
@@ -144,7 +140,13 @@ class SubstrateApp {
     }, processErrorResponse)
   }
 
-  async getAddress(account, change, addressIndex, requireConfirmation = false, scheme = SCHEME.ED25519) {
+  async getAddress(
+    account: number,
+    change: number,
+    addressIndex: number,
+    requireConfirmation = false,
+    scheme = SCHEME.ED25519,
+  ): Promise<ResponseAddress> {
     const bip44Path = SubstrateApp.serializePath(this.slip0044, account, change, addressIndex)
 
     let p1 = 0
@@ -166,7 +168,7 @@ class SubstrateApp {
     }, processErrorResponse)
   }
 
-  async signSendChunk(chunkIdx, chunkNum, chunk, scheme = SCHEME.ED25519) {
+  async signSendChunk(chunkIdx: number, chunkNum: number, chunk: any, scheme = SCHEME.ED25519) {
     let payloadType = PAYLOAD_TYPE.ADD
     if (chunkIdx === 1) {
       payloadType = PAYLOAD_TYPE.INIT
@@ -198,11 +200,11 @@ class SubstrateApp {
     }, processErrorResponse)
   }
 
-  async sign(account, change, addressIndex, message, scheme = SCHEME.ED25519) {
+  async sign(account: number, change: number, addressIndex: number, message: Buffer, scheme = SCHEME.ED25519): Promise<ResponseSign> {
     const chunks = SubstrateApp.signGetChunks(this.slip0044, account, change, addressIndex, message)
-    return this.signSendChunk(1, chunks.length, chunks[0], scheme).then(async result => {
+    return this.signSendChunk(1, chunks.length, chunks[0], scheme).then(async () => {
+      let result
       for (let i = 1; i < chunks.length; i += 1) {
-        // eslint-disable-next-line no-await-in-loop,no-param-reassign
         result = await this.signSendChunk(1 + i, chunks.length, chunks[i], scheme)
         if (result.return_code !== ERROR_CODE.NoError) {
           break
@@ -219,7 +221,7 @@ class SubstrateApp {
 
   /// Allow list related commands. They are NOT available on all apps
 
-  async getAllowlistPubKey() {
+  async getAllowlistPubKey(): Promise<ResponseAllowlistPubKey> {
     return this.transport.send(this.cla, INS.ALLOWLIST_GET_PUBKEY, 0, 0).then(response => {
       const errorCodeData = response.slice(-2)
       const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
@@ -243,7 +245,7 @@ class SubstrateApp {
     }, processErrorResponse)
   }
 
-  async setAllowlistPubKey(pk) {
+  async setAllowlistPubKey(pk: Buffer) {
     return this.transport.send(this.cla, INS.ALLOWLIST_SET_PUBKEY, 0, 0, pk).then(response => {
       const errorCodeData = response.slice(-2)
       const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
@@ -255,7 +257,7 @@ class SubstrateApp {
     }, processErrorResponse)
   }
 
-  async getAllowlistHash() {
+  async getAllowlistHash(): Promise<ResponseAllowlistHash> {
     return this.transport.send(this.cla, INS.ALLOWLIST_GET_HASH, 0, 0).then(response => {
       const errorCodeData = response.slice(-2)
       const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
@@ -279,7 +281,7 @@ class SubstrateApp {
     }, processErrorResponse)
   }
 
-  async uploadSendChunk(chunkIdx, chunkNum, chunk) {
+  async uploadSendChunk(chunkIdx: number, chunkNum: number, chunk: any) {
     let payloadType = PAYLOAD_TYPE.ADD
     if (chunkIdx === 1) {
       payloadType = PAYLOAD_TYPE.INIT
@@ -291,7 +293,7 @@ class SubstrateApp {
     return this.transport.send(this.cla, INS.ALLOWLIST_UPLOAD, payloadType, 0, chunk, [ERROR_CODE.NoError]).then(response => {
       const errorCodeData = response.slice(-2)
       const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
-      let errorMessage = errorCodeToString(returnCode)
+      const errorMessage = errorCodeToString(returnCode)
 
       return {
         return_code: returnCode,
@@ -300,8 +302,8 @@ class SubstrateApp {
     }, processErrorResponse)
   }
 
-  async uploadAllowlist(message) {
-    const chunks = []
+  async uploadAllowlist(message: any) {
+    const chunks: any[] = []
     chunks.push(Buffer.from([0]))
     chunks.push(...SubstrateApp.GetChunks(message))
 
@@ -327,222 +329,4 @@ class SubstrateApp {
       }
     }, processErrorResponse)
   }
-}
-
-function newKusamaApp(transport) {
-  return new SubstrateApp(transport, CLA.KUSAMA, SLIP0044.KUSAMA)
-}
-
-function newPolkadotApp(transport) {
-  return new SubstrateApp(transport, CLA.POLKADOT, SLIP0044.POLKADOT)
-}
-
-function newPolymeshApp(transport) {
-  return new SubstrateApp(transport, CLA.POLYMESH, SLIP0044.POLYMESH)
-}
-
-function newDockApp(transport) {
-  return new SubstrateApp(transport, CLA.DOCK, SLIP0044.DOCK)
-}
-
-function newCentrifugeApp(transport) {
-  return new SubstrateApp(transport, CLA.CENTRIFUGE, SLIP0044.CENTRIFUGE)
-}
-
-function newEdgewareApp(transport) {
-  return new SubstrateApp(transport, CLA.EDGEWARE, SLIP0044.EDGEWARE)
-}
-
-function newEquilibriumApp(transport) {
-  return new SubstrateApp(transport, CLA.EQUILIBRIUM, SLIP0044.EQUILIBRIUM)
-}
-
-function newGenshiroApp(transport) {
-  return new SubstrateApp(transport, CLA.GENSHIRO, SLIP0044.GENSHIRO)
-}
-
-function newStatemintApp(transport) {
-  return new SubstrateApp(transport, CLA.STATEMINT, SLIP0044.STATEMINT)
-}
-
-function newStatemineApp(transport) {
-  return new SubstrateApp(transport, CLA.STATEMINE, SLIP0044.STATEMINE)
-}
-
-function newNodleApp(transport) {
-  return new SubstrateApp(transport, CLA.NODLE, SLIP0044.NODLE)
-}
-
-function newSoraApp(transport) {
-  return new SubstrateApp(transport, CLA.SORA, SLIP0044.SORA)
-}
-
-function newPolkadexApp(transport) {
-  return new SubstrateApp(transport, CLA.POLKADEX, SLIP0044.POLKADEX)
-}
-
-function newBifrostApp(transport) {
-  return new SubstrateApp(transport, CLA.BIFROST, SLIP0044.BIFROST)
-}
-
-function newKaruraApp(transport) {
-  return new SubstrateApp(transport, CLA.KARURA, SLIP0044.KARURA)
-}
-
-function newReefApp(transport) {
-  return new SubstrateApp(transport, CLA.REEF, SLIP0044.REEF)
-}
-
-function newAcalaApp(transport) {
-  return new SubstrateApp(transport, CLA.ACALA, SLIP0044.ACALA)
-}
-
-function newXXNetworkApp(transport) {
-  return new SubstrateApp(transport, CLA.XXNETWORK, SLIP0044.XXNETWORK)
-}
-
-function newParallelApp(transport) {
-  return new SubstrateApp(transport, CLA.PARALLEL, SLIP0044.PARALLEL)
-}
-
-function newAstarApp(transport) {
-  return new SubstrateApp(transport, CLA.ASTAR, SLIP0044.ASTAR)
-}
-
-function newComposableApp(transport) {
-  return new SubstrateApp(transport, CLA.COMPOSABLE, SLIP0044.COMPOSABLE)
-}
-
-function newStafiApp(transport) {
-  return new SubstrateApp(transport, CLA.STAFI, SLIP0044.STAFI)
-}
-
-function newAlephZeroApp(transport) {
-  return new SubstrateApp(transport, CLA.ALEPHZERO, SLIP0044.ALEPHZERO)
-}
-function newInterlayApp(transport) {
-  return new SubstrateApp(transport, CLA.INTERLAY, SLIP0044.INTERLAY)
-}
-function newUniqueApp(transport) {
-  return new SubstrateApp(transport, CLA.UNIQUE, SLIP0044.UNIQUE)
-}
-
-function newBifrostKusamaApp(transport) {
-  return new SubstrateApp(transport, CLA.BIFROSTKUSAMA, SLIP0044.BIFROSTKUSAMA)
-}
-
-function sha512(data) {
-  var digest = hash.sha512().update(data).digest()
-  return Buffer.from(digest)
-}
-
-function hmac256(key, data) {
-  var digest = hash.hmac(hash.sha256, key).update(data).digest()
-  return Buffer.from(digest)
-}
-
-function hmac512(key, data) {
-  var digest = hash.hmac(hash.sha512, key).update(data).digest()
-  return Buffer.from(digest)
-}
-
-function ss58hash(data) {
-  var hash = blake.blake2bInit(64, null)
-  blake.blake2bUpdate(hash, Buffer.from('SS58PRE'))
-  blake.blake2bUpdate(hash, data)
-  return blake.blake2bFinal(hash)
-}
-
-function ss58_encode(prefix, pubkey) {
-  if (pubkey.byteLength !== 32) {
-    return null
-  }
-
-  let data = Buffer.alloc(35)
-  data[0] = prefix
-  pubkey.copy(data, 1)
-  let hash = ss58hash(data.slice(0, 33))
-  data[33] = hash[0]
-  data[34] = hash[1]
-
-  return bs58.encode(data)
-}
-
-function root_node_slip10(master_seed) {
-  var data = Buffer.alloc(1 + 64)
-  data[0] = 0x01
-  master_seed.copy(data, 1)
-  var c = hmac256('ed25519 seed', data)
-  var I = hmac512('ed25519 seed', data.slice(1))
-  let kL = I.slice(0, 32)
-  let kR = I.slice(32)
-  while ((kL[31] & 32) !== 0) {
-    I.copy(data, 1)
-    I = hmac512('ed25519 seed', data.slice(1))
-    kL = I.slice(0, 32)
-    kR = I.slice(32)
-  }
-  kL[0] &= 248
-  kL[31] &= 127
-  kL[31] |= 64
-
-  return Buffer.concat([kL, kR, c])
-}
-
-function hdKeyDerivation(mnemonic, password, slip0044, accountIndex, changeIndex, addressIndex, ss58prefix) {
-  if (!bip39.validateMnemonic(mnemonic)) {
-    console.log('Invalid mnemonic')
-    return null
-  }
-  const seed = bip39.mnemonicToSeedSync(mnemonic, password)
-  var node = root_node_slip10(seed)
-  node = bip32ed25519.derivePrivate(node, HDPATH_0_DEFAULT)
-  node = bip32ed25519.derivePrivate(node, slip0044)
-  node = bip32ed25519.derivePrivate(node, accountIndex)
-  node = bip32ed25519.derivePrivate(node, changeIndex)
-  node = bip32ed25519.derivePrivate(node, addressIndex)
-
-  let kL = node.slice(0, 32)
-  let sk = sha512(kL).slice(0, 32)
-  sk[0] &= 248
-  sk[31] &= 127
-  sk[31] |= 64
-
-  let pk = bip32ed25519.toPublic(sk)
-  let address = ss58_encode(ss58prefix, pk)
-  return {
-    sk: kL,
-    pk: pk,
-    address: address,
-  }
-}
-
-module.exports = {
-  hdKeyDerivation,
-  newKusamaApp,
-  newPolkadotApp,
-  newPolymeshApp,
-  newDockApp,
-  newCentrifugeApp,
-  newEdgewareApp,
-  newEquilibriumApp,
-  newGenshiroApp,
-  newStatemintApp,
-  newStatemineApp,
-  newNodleApp,
-  newSoraApp,
-  newPolkadexApp,
-  newBifrostApp,
-  newKaruraApp,
-  newReefApp,
-  newAcalaApp,
-  newXXNetworkApp,
-  newParallelApp,
-  newAstarApp,
-  newComposableApp,
-  newStafiApp,
-  newAlephZeroApp,
-  newInterlayApp,
-  newUniqueApp,
-  newBifrostKusamaApp
 }

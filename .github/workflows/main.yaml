@@ -1,4 +1,4 @@
-name: "Main"
+name: 'Main'
 on:
   - push
 
@@ -15,9 +15,7 @@ jobs:
         run: echo "::set-output name=datetime::$(date +'%Y%m%d%H%M%S')"
 
   build:
-    needs: [ configure ]
-    container:
-      image: zondax/rust-ci:latest
+    needs: [configure]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,11 +24,13 @@ jobs:
           submodules: true
       - name: Install node
         uses: actions/setup-node@v2
-        with:
-          node-version: "14.17.0"
       - name: Install dependencies
         run: yarn install
       - name: Run linter
         run: yarn linter
       - name: Run formatter
         run: yarn format
+      - name: Build
+        run: yarn build
+      - name: Key derivation tests
+        run: yarn test:key-derivation
