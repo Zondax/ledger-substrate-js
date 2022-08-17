@@ -1,5 +1,3 @@
-#!/usr/bin/env ts-node
-
 /** ******************************************************************************
  *  (c) 2019 - 2022 ZondaX AG
  *  (c) 2016-2017 Ledger
@@ -17,36 +15,6 @@
  *  limitations under the License.
  ******************************************************************************* */
 
-import chalk from 'chalk'
-import minimist from 'minimist'
-import figlet from 'figlet'
-
-import { printSupported } from './cmd/cli'
-
-async function main(): Promise<any> {
-  const args = minimist(process.argv.slice(2))
-  const cmd = args._[0]
-  let chain = args._[1]
-
-  if (chain) {
-    chain = chain.toLowerCase()
-    console.log(chalk.green(figlet.textSync(`${chain}`, { horizontalLayout: 'full' })))
-  }
-
-  if (cmd === 'supported') return printSupported()
-  else return `"${cmd}" is not a valid command!`
-}
-
-;(async () => {
-  const response = await main()
-  if (response) {
-    console.log(response)
-  }
-})()
-  .catch(e => {
-    console.log(chalk.bgRed(e.message))
-    console.log(chalk.bgRed(e.stack))
-  })
-  .then(() => {
-    process.exit()
-  })
+export * from './legacy_apps'
+export { SubstrateApp } from './substrate_app'
+export { newSubstrateApp } from './supported_apps'

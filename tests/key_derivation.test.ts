@@ -24,7 +24,7 @@ describe('KeyDerivation', function () {
     const KSM = getAppParams('Kusama')
 
     //@ts-ignore
-    const output = hdKeyDerivation(SEED, '', KSM?.slip0044, 0x80000000, 0x80000000, 0x80000000, KSM?.ss58_addr_type)
+    const output = hdKeyDerivation(SEED, '', KSM.slip0044, 0x80000000, 0x80000000, 0x80000000, KSM.ss58_addr_type)
     console.log(output)
 
     const expected_address = 'JMdbWK5cy3Bm4oCyhWNLQJoC4cczNgJsyk7nLZHMqFT7z7R'
@@ -38,7 +38,7 @@ describe('KeyDerivation', function () {
     const KSM = getAppParams('Kusama')
 
     //@ts-ignore
-    const output = hdKeyDerivation(SEED, '', KSM?.slip0044, 0, 0, 0, KSM?.ss58_addr_type)
+    const output = hdKeyDerivation(SEED, '', KSM.slip0044, 0, 0, 0, KSM.ss58_addr_type)
     console.log(output)
 
     const expected_address = 'G58F7QUjgT273AaNScoXhpKVjCcnDvCcbyucDZiPEDmVD9d'
@@ -52,7 +52,7 @@ describe('KeyDerivation', function () {
     const DOT = getAppParams('Polkadot')
 
     //@ts-ignore
-    const output = hdKeyDerivation(SEED, '', DOT?.slip0044, 0x80000000, 0x80000000, 0x80000000, DOT?.ss58_addr_type)
+    const output = hdKeyDerivation(SEED, '', DOT.slip0044, 0x80000000, 0x80000000, 0x80000000, DOT.ss58_addr_type)
     console.log(output)
 
     const expected_address = '166wVhuQsKFeb7bd1faydHgVvX1bZU2rUuY7FJmWApNz2fQY'

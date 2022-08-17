@@ -38,16 +38,16 @@ beforeAll(async () => {
 describe('Integration', function () {
   test('get version', async () => {
     const app = newSubstrateApp(transport, CHAIN)
-    const resp = await app?.getVersion()
+    const resp = await app.getVersion()
     console.log(resp)
 
-    expect(resp?.return_code).toEqual(0x9000)
-    expect(resp?.error_message).toEqual('No errors')
+    expect(resp.return_code).toEqual(0x9000)
+    expect(resp.error_message).toEqual('No errors')
     expect(resp).toHaveProperty('test_mode')
     expect(resp).toHaveProperty('major')
     expect(resp).toHaveProperty('minor')
     expect(resp).toHaveProperty('patch')
-    expect(resp?.test_mode).toEqual(false)
+    expect(resp.test_mode).toEqual(false)
   })
 
   test('get address', async () => {
@@ -57,14 +57,14 @@ describe('Integration', function () {
     const pathChange = 0x80000000
     const pathIndex = 0x80000005
 
-    const response = await app?.getAddress(pathAccount, pathChange, pathIndex)
+    const response = await app.getAddress(pathAccount, pathChange, pathIndex)
     console.log(response)
 
-    expect(response?.return_code).toEqual(0x9000)
-    expect(response?.error_message).toEqual('No errors')
+    expect(response.return_code).toEqual(0x9000)
+    expect(response.error_message).toEqual('No errors')
     expect(response).toHaveProperty('pubKey')
-    expect(response?.pubKey).toEqual(YOUR_PUBKEY)
-    expect(response?.address).toEqual(YOUR_ADDRESS)
+    expect(response.pubKey).toEqual(YOUR_PUBKEY)
+    expect(response.address).toEqual(YOUR_ADDRESS)
   })
 
   test('show address', async () => {
@@ -73,18 +73,18 @@ describe('Integration', function () {
     const pathAccount = 0x80000000
     const pathChange = 0x80000000
     const pathIndex = 0x80000005
-    const response = await app?.getAddress(pathAccount, pathChange, pathIndex, true)
+    const response = await app.getAddress(pathAccount, pathChange, pathIndex, true)
 
     console.log(response)
 
-    expect(response?.return_code).toEqual(0x9000)
-    expect(response?.error_message).toEqual('No errors')
+    expect(response.return_code).toEqual(0x9000)
+    expect(response.error_message).toEqual('No errors')
 
     expect(response).toHaveProperty('address')
     expect(response).toHaveProperty('pubKey')
 
-    expect(response?.pubKey).toEqual(YOUR_PUBKEY)
-    expect(response?.address).toEqual(YOUR_ADDRESS)
+    expect(response.pubKey).toEqual(YOUR_PUBKEY)
+    expect(response.address).toEqual(YOUR_ADDRESS)
   })
 
   test('sign2_and_verify', async () => {
@@ -96,10 +96,10 @@ describe('Integration', function () {
     const pathChange = 0x80000000
     const pathIndex = 0x80000000
 
-    const responseAddr = await app?.getAddress(pathAccount, pathChange, pathIndex)
-    const responseSign = await app?.sign(pathAccount, pathChange, pathIndex, txBlob)
+    const responseAddr = await app.getAddress(pathAccount, pathChange, pathIndex)
+    const responseSign = await app.sign(pathAccount, pathChange, pathIndex, txBlob)
 
-    const pubkey = responseAddr?.pubKey
+    const pubkey = responseAddr.pubKey
 
     console.log(responseAddr)
     console.log(responseSign)
@@ -111,7 +111,7 @@ describe('Integration', function () {
       blake2bUpdate(context, txBlob)
       prehash = Buffer.from(blake2bFinal(context))
     }
-    const valid = ed25519.verify(responseSign?.signature.slice(1), prehash, pubkey)
+    const valid = ed25519.verify(responseSign.signature.slice(1), prehash, pubkey)
     expect(valid).toEqual(true)
   })
 })
