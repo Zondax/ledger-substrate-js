@@ -17,4 +17,4 @@
 
 export * from './legacy_apps'
 export { SubstrateApp } from './substrate_app'
-export { newSubstrateApp } from './supported_apps'
+export { newSubstrateApp, supportedApps } from './supported_apps'
