@@ -200,7 +200,7 @@ export const supportedApps: SubstrateAppParams[] = [
   },
   {
     name: 'Khala',
-    cla: 0xb0,
+    cla: 0xb1,
     slip0044: 0x800001b2,
     ss58_addr_type: 30,
   },
