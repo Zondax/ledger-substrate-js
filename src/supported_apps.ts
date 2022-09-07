@@ -204,4 +204,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x800001b2,
     ss58_addr_type: 30,
   },
+  {
+    name: 'Darwinia',
+    cla: 0xb2,
+    slip0044: 0x80000162,
+    ss58_addr_type: 18,
+  },
 ]
