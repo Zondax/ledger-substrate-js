@@ -210,4 +210,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x80000162,
     ss58_addr_type: 18,
   },
+  {
+    name: 'HydraDX',
+    cla: 0xab,
+    slip0044: 0x80000162,
+    ss58_addr_type: 63,
+  },
 ]
