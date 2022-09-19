@@ -120,7 +120,3 @@ export function newUniqueApp(transport: any) {
 export function newBifrostKusamaApp(transport: any) {
   return newSubstrateApp(transport, 'BifrostKusama')
 }
-
-export function newVTBApp(transport: any) {
-  return newSubstrateApp(transport, 'VTB')
-}
