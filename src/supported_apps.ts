@@ -218,8 +218,8 @@ export const supportedApps: SubstrateAppParams[] = [
   },
   {
     name: 'VTB',
-    cla: 0xa7,
+    cla: 0x9c,
     slip0044: 0x800002b6,
-    ss58_addr_type: 42
+    ss58_addr_type: 42,
   },
 ]
