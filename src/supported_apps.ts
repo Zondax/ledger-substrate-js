@@ -216,4 +216,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x80000162,
     ss58_addr_type: 63,
   },
+  {
+    name: 'VTB',
+    cla: 0x9c,
+    slip0044: 0x800002b6,
+    ss58_addr_type: 42,
+  },
 ]
