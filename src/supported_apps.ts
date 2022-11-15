@@ -109,6 +109,18 @@ export const supportedApps: SubstrateAppParams[] = [
     ss58_addr_type: 10,
   },
   {
+    name: 'VTB',
+    cla: 0x9c,
+    slip0044: 0x800002b6,
+    ss58_addr_type: 42,
+  },
+  {
+    name: 'Peer',
+    cla: 0x9d,
+    slip0044: 0x800002ce,
+    ss58_addr_type: 42,
+  },
+  {
     name: 'Genshiro',
     cla: 0x9e,
     slip0044: 0x85f5e0fc,
@@ -163,6 +175,12 @@ export const supportedApps: SubstrateAppParams[] = [
     ss58_addr_type: 172,
   },
   {
+    name: 'Picasso',
+    cla: 0xa7,
+    slip0044: 0x800001b2,
+    ss58_addr_type: 49,
+  },
+  {
     name: 'Composable',
     cla: 0xa8,
     slip0044: 0x80000162,
@@ -173,6 +191,12 @@ export const supportedApps: SubstrateAppParams[] = [
     cla: 0xa9,
     slip0044: 0x8000032a,
     ss58_addr_type: 5,
+  },
+  {
+    name: 'HydraDX',
+    cla: 0xab,
+    slip0044: 0x80000162,
+    ss58_addr_type: 63,
   },
   {
     name: 'Stafi',
@@ -209,17 +233,5 @@ export const supportedApps: SubstrateAppParams[] = [
     cla: 0xb2,
     slip0044: 0x80000162,
     ss58_addr_type: 18,
-  },
-  {
-    name: 'HydraDX',
-    cla: 0xab,
-    slip0044: 0x80000162,
-    ss58_addr_type: 63,
-  },
-  {
-    name: 'VTB',
-    cla: 0x9c,
-    slip0044: 0x800002b6,
-    ss58_addr_type: 42,
   },
 ]
