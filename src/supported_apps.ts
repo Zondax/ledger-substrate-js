@@ -222,4 +222,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x800002b6,
     ss58_addr_type: 42,
   },
+  {
+    name: 'Peer',
+    cla: 0x9d,
+    slip0044: 0x800002ce,
+    ss58_addr_type: 42,
+  },
 ]
