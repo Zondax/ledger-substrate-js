@@ -193,6 +193,12 @@ export const supportedApps: SubstrateAppParams[] = [
     ss58_addr_type: 5,
   },
   {
+    name: 'OriginTrail',
+    cla: 0xaa,
+    slip0044: 0x80000162,
+    ss58_addr_type: 101,
+  },
+  {
     name: 'HydraDX',
     cla: 0xab,
     slip0044: 0x80000162,
