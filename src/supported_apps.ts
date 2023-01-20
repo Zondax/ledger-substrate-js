@@ -252,4 +252,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x800003ed,
     ss58_addr_type: 13116,
   },
+  {
+    name: 'Ternoa',
+    cla: 0xb5,
+    slip0044: 0x800003e3,
+    ss58_addr_type: 42,
+  }
 ]
