@@ -121,6 +121,3 @@ export function newBifrostKusamaApp(transport: any) {
   return newSubstrateApp(transport, 'BifrostKusama')
 }
 
-export function newTernoaApp(transport: any) {
-  return newSubstrateApp(transport, 'Ternoa')
-}
