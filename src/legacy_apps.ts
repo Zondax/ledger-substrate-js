@@ -120,4 +120,3 @@ export function newUniqueApp(transport: any) {
 export function newBifrostKusamaApp(transport: any) {
   return newSubstrateApp(transport, 'BifrostKusama')
 }
-
