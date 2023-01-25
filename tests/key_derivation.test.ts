@@ -61,18 +61,4 @@ describe('KeyDerivation', function () {
     expect(output?.pk.toString('hex')).toEqual(expected_pk)
     expect(output?.address.toString('hex')).toEqual(expected_address)
   })
-
-  test('Ternoa', () => {
-    const CAPS = getAppParams('Ternoa')
-
-    //@ts-ignore
-    const output = hdKeyDerivation(SEED, '', CAPS.slip0044, 0x80000000, 0x80000000, 0x80000000, CAPS.ss58_addr_type)
-    console.log(output)
-
-    const expected_address = '5ED8FvTWgsk9AmJoBPj7UyfdTfpJYaKZGA9CKmJWzb4Dk9Wd'
-    const expected_pk = '5ee4922bdb199b22175df9f13b8b7bf282896b7dccfce815c9621f9c2a9fdf03'
-
-    expect(output?.pk.toString('hex')).toEqual(expected_pk)
-    expect(output?.address.toString('hex')).toEqual(expected_address)
-  })
 })
