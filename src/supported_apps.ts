@@ -258,4 +258,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x800003e3,
     ss58_addr_type: 42,
   },
+  {
+    name: 'Pendulum',
+    cla: 0xb6,
+    slip0044: 0x80000162,
+    ss58_addr_type: 56,
+  },
 ]
