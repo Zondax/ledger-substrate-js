@@ -250,7 +250,7 @@ export const supportedApps: SubstrateAppParams[] = [
     name: 'Bittensor',
     cla: 0xb4,
     slip0044: 0x800003ed,
-    ss58_addr_type: 13116,
+    ss58_addr_type: 42,
   },
   {
     name: 'Ternoa',
