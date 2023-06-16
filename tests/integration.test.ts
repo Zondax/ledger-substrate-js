@@ -37,6 +37,7 @@ beforeAll(async () => {
 
 describe("Integration", function () {
   test("get version", async () => {
+    // @ts-expect-error transport will be there
     const app = newSubstrateApp(transport, CHAIN);
     const resp = await app.getVersion();
     console.log(resp);
@@ -51,6 +52,7 @@ describe("Integration", function () {
   });
 
   test("get address", async () => {
+    // @ts-expect-error transport will be there
     const app = newSubstrateApp(transport, CHAIN);
 
     const pathAccount = 0x80000000;
@@ -68,6 +70,7 @@ describe("Integration", function () {
   });
 
   test("show address", async () => {
+    // @ts-expect-error transport will be there
     const app = newSubstrateApp(transport, CHAIN);
 
     const pathAccount = 0x80000000;
@@ -90,6 +93,7 @@ describe("Integration", function () {
   test("sign2_and_verify", async () => {
     const txBlob = Buffer.from(YOUR_BLOB, "hex");
 
+    // @ts-expect-error transport will be there
     const app = newSubstrateApp(transport, CHAIN);
 
     const pathAccount = 0x80000000;

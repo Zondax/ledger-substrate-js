@@ -15,7 +15,7 @@
  ******************************************************************************* */
 
 import { getAppParams } from "../src/supported_apps";
-import { hdKeyDerivation } from "../src/key_derivation";
+import { hdKeyDerivation } from "./key_derivation";
 
 const SEED = "equip will roof matter pink blind book anxiety banner elbow sun young";
 
