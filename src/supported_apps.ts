@@ -15,13 +15,13 @@
  *  limitations under the License.
  ******************************************************************************* */
 import { SubstrateApp } from "./substrate_app";
-import { SubstrateAppParams } from "./common";
+import { type SubstrateAppParams } from "./common";
 
 export function newSubstrateApp(transport: any, chainName: string) {
   const requestedApp = supportedApps.find((app: SubstrateAppParams) => {
     return app.name.toLowerCase() === chainName.toLowerCase();
   });
-  if (requestedApp) {
+  if (requestedApp != null) {
     return new SubstrateApp(transport, requestedApp.cla, requestedApp.slip0044);
   }
   throw new Error(`Error: ${chainName} not supported`);

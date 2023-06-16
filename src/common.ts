@@ -1,3 +1,5 @@
+import type Transport from "@ledgerhq/hw-transport";
+
 /** ******************************************************************************
  *  (c) 2019 - 2022 ZondaX AG
  *  (c) 2016-2017 Ledger
@@ -120,7 +122,7 @@ function isDict(v: any) {
 }
 
 export function processErrorResponse(response: any) {
-  if (response) {
+  if (response != null) {
     if (isDict(response)) {
       if (Object.prototype.hasOwnProperty.call(response, "statusCode")) {
         return {
@@ -148,9 +150,9 @@ export function processErrorResponse(response: any) {
   };
 }
 
-export async function getVersion(transport: any, cla: number) {
-  return transport.send(cla, INS.GET_VERSION, 0, 0).then((response: any) => {
-    const errorCodeData = response.slice(-2);
+export async function getVersion(transport: Transport, cla: number) {
+  return await transport.send(cla, INS.GET_VERSION, 0, 0).then((response) => {
+    const errorCodeData = response.subarray(-2);
     const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
 
     // 12 bytes + 2 error code
