@@ -14,51 +14,51 @@
  *  limitations under the License.
  ******************************************************************************* */
 
-import { getAppParams } from '../src/supported_apps'
-import { hdKeyDerivation } from '../src/key_derivation'
+import { getAppParams } from "../src/supported_apps";
+import { hdKeyDerivation } from "../src/key_derivation";
 
-const SEED = 'equip will roof matter pink blind book anxiety banner elbow sun young'
+const SEED = "equip will roof matter pink blind book anxiety banner elbow sun young";
 
-describe('KeyDerivation', function () {
-  test('Kusama hardened', () => {
-    const KSM = getAppParams('Kusama')
-
-    //@ts-ignore
-    const output = hdKeyDerivation(SEED, '', KSM.slip0044, 0x80000000, 0x80000000, 0x80000000, KSM.ss58_addr_type)
-    console.log(output)
-
-    const expected_address = 'JMdbWK5cy3Bm4oCyhWNLQJoC4cczNgJsyk7nLZHMqFT7z7R'
-    const expected_pk = 'ffbc10f71d63e0da1b9e7ee2eb4037466551dc32b9d4641aafd73a65970fae42'
-
-    expect(output?.pk.toString('hex')).toEqual(expected_pk)
-    expect(output?.address.toString('hex')).toEqual(expected_address)
-  })
-
-  test('Kusama non-hardened', () => {
-    const KSM = getAppParams('Kusama')
+describe("KeyDerivation", function () {
+  test("Kusama hardened", () => {
+    const KSM = getAppParams("Kusama");
 
     //@ts-ignore
-    const output = hdKeyDerivation(SEED, '', KSM.slip0044, 0, 0, 0, KSM.ss58_addr_type)
-    console.log(output)
+    const output = hdKeyDerivation(SEED, "", KSM.slip0044, 0x80000000, 0x80000000, 0x80000000, KSM.ss58_addr_type);
+    console.log(output);
 
-    const expected_address = 'G58F7QUjgT273AaNScoXhpKVjCcnDvCcbyucDZiPEDmVD9d'
-    const expected_pk = '9aacddd17054070103ad37ee76610d1adaa7f8e0d02b76fb91391eec8a2470af'
+    const expected_address = "JMdbWK5cy3Bm4oCyhWNLQJoC4cczNgJsyk7nLZHMqFT7z7R";
+    const expected_pk = "ffbc10f71d63e0da1b9e7ee2eb4037466551dc32b9d4641aafd73a65970fae42";
 
-    expect(output?.pk.toString('hex')).toEqual(expected_pk)
-    expect(output?.address.toString('hex')).toEqual(expected_address)
-  })
+    expect(output?.pk.toString("hex")).toEqual(expected_pk);
+    expect(output?.address.toString("hex")).toEqual(expected_address);
+  });
 
-  test('Polkadot', () => {
-    const DOT = getAppParams('Polkadot')
+  test("Kusama non-hardened", () => {
+    const KSM = getAppParams("Kusama");
 
     //@ts-ignore
-    const output = hdKeyDerivation(SEED, '', DOT.slip0044, 0x80000000, 0x80000000, 0x80000000, DOT.ss58_addr_type)
-    console.log(output)
+    const output = hdKeyDerivation(SEED, "", KSM.slip0044, 0, 0, 0, KSM.ss58_addr_type);
+    console.log(output);
 
-    const expected_address = '166wVhuQsKFeb7bd1faydHgVvX1bZU2rUuY7FJmWApNz2fQY'
-    const expected_pk = 'e1b4d72d27b3e91b9b6116555b4ea17138ddc12ca7cdbab30e2e0509bd848419'
+    const expected_address = "G58F7QUjgT273AaNScoXhpKVjCcnDvCcbyucDZiPEDmVD9d";
+    const expected_pk = "9aacddd17054070103ad37ee76610d1adaa7f8e0d02b76fb91391eec8a2470af";
 
-    expect(output?.pk.toString('hex')).toEqual(expected_pk)
-    expect(output?.address.toString('hex')).toEqual(expected_address)
-  })
-})
+    expect(output?.pk.toString("hex")).toEqual(expected_pk);
+    expect(output?.address.toString("hex")).toEqual(expected_address);
+  });
+
+  test("Polkadot", () => {
+    const DOT = getAppParams("Polkadot");
+
+    //@ts-ignore
+    const output = hdKeyDerivation(SEED, "", DOT.slip0044, 0x80000000, 0x80000000, 0x80000000, DOT.ss58_addr_type);
+    console.log(output);
+
+    const expected_address = "166wVhuQsKFeb7bd1faydHgVvX1bZU2rUuY7FJmWApNz2fQY";
+    const expected_pk = "e1b4d72d27b3e91b9b6116555b4ea17138ddc12ca7cdbab30e2e0509bd848419";
+
+    expect(output?.pk.toString("hex")).toEqual(expected_pk);
+    expect(output?.address.toString("hex")).toEqual(expected_address);
+  });
+});

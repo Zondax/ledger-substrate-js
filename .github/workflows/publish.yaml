@@ -1,4 +1,4 @@
-name: 'Publish packages'
+name: "Publish packages"
 
 on:
   release:
@@ -25,8 +25,8 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v2
         with:
-          registry-url: 'https://registry.npmjs.org'
-          scope: '@zondax'
+          registry-url: "https://registry.npmjs.org"
+          scope: "@zondax"
       - run: mv README-npm.md README.md
       - name: Install yarn
         run: npm install -g yarn
