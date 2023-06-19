@@ -70,7 +70,7 @@ export const ERROR_DESCRIPTION: any = {
   0x6a80: "Bad key handle",
   0x6b00: "Invalid P1/P2",
   0x6d00: "Instruction not supported",
-  0x6e00: "App does not seem to be open",
+  0x6e01: "App does not seem to be open",
   0x6f00: "Unknown error",
   0x6f01: "Sign/verify error",
 };
