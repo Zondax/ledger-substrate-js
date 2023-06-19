@@ -31,6 +31,8 @@ export const enum INS {
   ALLOWLIST_UPLOAD = 0x93,
 }
 
+export type INS_SIGN = INS.SIGN | INS.SIGN_RAW;
+
 export const enum PAYLOAD_TYPE {
   INIT = 0x00,
   ADD = 0x01,

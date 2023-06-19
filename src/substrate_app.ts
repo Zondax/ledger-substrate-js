@@ -29,6 +29,7 @@ import {
   type ResponseSign,
   type ResponseVersion,
   SCHEME,
+  type INS_SIGN,
 } from "./common";
 
 export class SubstrateApp {
@@ -168,7 +169,13 @@ export class SubstrateApp {
     }, processErrorResponse);
   }
 
-  async signSendChunk(chunkIdx: number, chunkNum: number, chunk: any, scheme = SCHEME.ED25519) {
+  async signSendChunk(
+    chunkIdx: number,
+    chunkNum: number,
+    chunk: Buffer,
+    scheme = SCHEME.ED25519,
+    ins: INS_SIGN = INS.SIGN
+  ) {
     let payloadType = PAYLOAD_TYPE.ADD;
     if (chunkIdx === 1) {
       payloadType = PAYLOAD_TYPE.INIT;
@@ -181,7 +188,7 @@ export class SubstrateApp {
     if (!isNaN(scheme)) p2 = scheme;
 
     return await this.transport
-      .send(this.cla, INS.SIGN, payloadType, p2, chunk, [ERROR_CODE.NoError, 0x6984, 0x6a80])
+      .send(this.cla, ins, payloadType, p2, chunk, [ERROR_CODE.NoError, 0x6984, 0x6a80])
       .then((response) => {
         const errorCodeData = response.subarray(-2);
         const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
@@ -202,15 +209,16 @@ export class SubstrateApp {
       }, processErrorResponse);
   }
 
-  async sign(
+  async signImpl(
     account: number,
     change: number,
     addressIndex: number,
     message: Buffer,
+    ins: INS_SIGN,
     scheme = SCHEME.ED25519
   ): Promise<ResponseSign> {
     const chunks = SubstrateApp.signGetChunks(this.slip0044, account, change, addressIndex, message);
-    return await this.signSendChunk(1, chunks.length, chunks[0], scheme).then(async () => {
+    return await this.signSendChunk(1, chunks.length, chunks[0], scheme, ins).then(async () => {
       let result;
       for (let i = 1; i < chunks.length; i += 1) {
         result = await this.signSendChunk(1 + i, chunks.length, chunks[i], scheme);
@@ -225,6 +233,14 @@ export class SubstrateApp {
         signature: result.signature,
       };
     }, processErrorResponse);
+  }
+
+  async sign(account: number, change: number, addressIndex: number, message: Buffer, scheme = SCHEME.ED25519) {
+    return await this.signImpl(account, change, addressIndex, message, INS.SIGN, scheme);
+  }
+
+  async signRaw(account: number, change: number, addressIndex: number, message: Buffer, scheme = SCHEME.ED25519) {
+    return await this.signImpl(account, change, addressIndex, message, INS.SIGN_RAW, scheme);
   }
 
   /// Allow list related commands. They are NOT available on all apps
