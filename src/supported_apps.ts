@@ -16,8 +16,9 @@
  ******************************************************************************* */
 import { SubstrateApp } from "./substrate_app";
 import { type SubstrateAppParams } from "./common";
+import type Transport from "@ledgerhq/hw-transport";
 
-export function newSubstrateApp(transport: any, chainName: string) {
+export function newSubstrateApp(transport: Transport, chainName: string) {
   const requestedApp = supportedApps.find((app: SubstrateAppParams) => {
     return app.name.toLowerCase() === chainName.toLowerCase();
   });

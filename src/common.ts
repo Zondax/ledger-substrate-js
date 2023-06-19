@@ -18,39 +18,40 @@ import type Transport from "@ledgerhq/hw-transport";
  ******************************************************************************* */
 export const CHUNK_SIZE = 250;
 
-export const INS = {
-  GET_VERSION: 0x00,
-  GET_ADDR: 0x01,
-  SIGN: 0x02,
+export const enum INS {
+  GET_VERSION = 0x00,
+  GET_ADDR = 0x01,
+  SIGN = 0x02,
+  SIGN_RAW = 0x03,
 
   // Allow list related commands
-  ALLOWLIST_GET_PUBKEY: 0x90,
-  ALLOWLIST_SET_PUBKEY: 0x91,
-  ALLOWLIST_GET_HASH: 0x92,
-  ALLOWLIST_UPLOAD: 0x93,
-};
+  ALLOWLIST_GET_PUBKEY = 0x90,
+  ALLOWLIST_SET_PUBKEY = 0x91,
+  ALLOWLIST_GET_HASH = 0x92,
+  ALLOWLIST_UPLOAD = 0x93,
+}
 
-export const PAYLOAD_TYPE = {
-  INIT: 0x00,
-  ADD: 0x01,
-  LAST: 0x02,
-};
+export const enum PAYLOAD_TYPE {
+  INIT = 0x00,
+  ADD = 0x01,
+  LAST = 0x02,
+}
 
-export const P1_VALUES = {
-  ONLY_RETRIEVE: 0x00,
-  SHOW_ADDRESS_IN_DEVICE: 0x01,
-};
+export const enum P1_VALUES {
+  ONLY_RETRIEVE = 0x00,
+  SHOW_ADDRESS_IN_DEVICE = 0x01,
+}
 
-export const SCHEME = {
-  ED25519: 0x00,
-  SR25519: 0x01,
-};
+export const enum SCHEME {
+  ED25519 = 0x00,
+  SR25519 = 0x01,
+}
 
-export const ERROR_CODE = {
-  NoError: 0x9000,
-};
+export const enum ERROR_CODE {
+  NoError = 0x9000,
+}
 
-export const ERROR_DESCRIPTION: any = {
+export const ERROR_DESCRIPTION: Record<number, string> = {
   1: "U2F: Unknown",
   2: "U2F: Bad request",
   3: "U2F: Configuration unsupported",

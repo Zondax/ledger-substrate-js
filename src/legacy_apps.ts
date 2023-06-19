@@ -14,109 +14,110 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  ******************************************************************************* */
+import type Transport from "@ledgerhq/hw-transport";
 import { newSubstrateApp } from "./supported_apps";
 
 // Legacy code
-export function newKusamaApp(transport: any) {
+export function newKusamaApp(transport: Transport) {
   return newSubstrateApp(transport, "Kusama");
 }
 
-export function newPolkadotApp(transport: any) {
+export function newPolkadotApp(transport: Transport) {
   return newSubstrateApp(transport, "Polkadot");
 }
 
-export function newPolymeshApp(transport: any) {
+export function newPolymeshApp(transport: Transport) {
   return newSubstrateApp(transport, "Polymesh");
 }
 
-export function newDockApp(transport: any) {
+export function newDockApp(transport: Transport) {
   return newSubstrateApp(transport, "Dock");
 }
 
-export function newCentrifugeApp(transport: any) {
+export function newCentrifugeApp(transport: Transport) {
   return newSubstrateApp(transport, "Centrifuge");
 }
 
-export function newEdgewareApp(transport: any) {
+export function newEdgewareApp(transport: Transport) {
   return newSubstrateApp(transport, "Edgeware");
 }
 
-export function newEquilibriumApp(transport: any) {
+export function newEquilibriumApp(transport: Transport) {
   return newSubstrateApp(transport, "Equilibrium");
 }
 
-export function newGenshiroApp(transport: any) {
+export function newGenshiroApp(transport: Transport) {
   return newSubstrateApp(transport, "Genshiro");
 }
 
-export function newStatemintApp(transport: any) {
+export function newStatemintApp(transport: Transport) {
   return newSubstrateApp(transport, "Statemint");
 }
 
-export function newStatemineApp(transport: any) {
+export function newStatemineApp(transport: Transport) {
   return newSubstrateApp(transport, "Statemine");
 }
 
-export function newNodleApp(transport: any) {
+export function newNodleApp(transport: Transport) {
   return newSubstrateApp(transport, "Nodle");
 }
 
-export function newSoraApp(transport: any) {
+export function newSoraApp(transport: Transport) {
   return newSubstrateApp(transport, "Sora");
 }
 
-export function newPolkadexApp(transport: any) {
+export function newPolkadexApp(transport: Transport) {
   return newSubstrateApp(transport, "Polkadex");
 }
 
-export function newBifrostApp(transport: any) {
+export function newBifrostApp(transport: Transport) {
   return newSubstrateApp(transport, "Bifrost");
 }
 
-export function newKaruraApp(transport: any) {
+export function newKaruraApp(transport: Transport) {
   return newSubstrateApp(transport, "Karura");
 }
 
-export function newReefApp(transport: any) {
+export function newReefApp(transport: Transport) {
   return newSubstrateApp(transport, "Reef");
 }
 
-export function newAcalaApp(transport: any) {
+export function newAcalaApp(transport: Transport) {
   return newSubstrateApp(transport, "Acala");
 }
 
-export function newXXNetworkApp(transport: any) {
+export function newXXNetworkApp(transport: Transport) {
   return newSubstrateApp(transport, "XXNetwork");
 }
 
-export function newParallelApp(transport: any) {
+export function newParallelApp(transport: Transport) {
   return newSubstrateApp(transport, "Parallel");
 }
 
-export function newAstarApp(transport: any) {
+export function newAstarApp(transport: Transport) {
   return newSubstrateApp(transport, "Astar");
 }
 
-export function newComposableApp(transport: any) {
+export function newComposableApp(transport: Transport) {
   return newSubstrateApp(transport, "Composable");
 }
 
-export function newStafiApp(transport: any) {
+export function newStafiApp(transport: Transport) {
   return newSubstrateApp(transport, "Stafi");
 }
 
-export function newAlephZeroApp(transport: any) {
+export function newAlephZeroApp(transport: Transport) {
   return newSubstrateApp(transport, "AlephZero");
 }
 
-export function newInterlayApp(transport: any) {
+export function newInterlayApp(transport: Transport) {
   return newSubstrateApp(transport, "Interlay");
 }
 
-export function newUniqueApp(transport: any) {
+export function newUniqueApp(transport: Transport) {
   return newSubstrateApp(transport, "Unique");
 }
 
-export function newBifrostKusamaApp(transport: any) {
+export function newBifrostKusamaApp(transport: Transport) {
   return newSubstrateApp(transport, "BifrostKusama");
 }

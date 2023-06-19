@@ -289,7 +289,7 @@ export class SubstrateApp {
     }, processErrorResponse);
   }
 
-  async uploadSendChunk(chunkIdx: number, chunkNum: number, chunk: any) {
+  async uploadSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer) {
     let payloadType = PAYLOAD_TYPE.ADD;
     if (chunkIdx === 1) {
       payloadType = PAYLOAD_TYPE.INIT;
@@ -312,8 +312,8 @@ export class SubstrateApp {
       }, processErrorResponse);
   }
 
-  async uploadAllowlist(message: any) {
-    const chunks: any[] = [];
+  async uploadAllowlist(message: Buffer) {
+    const chunks: Buffer[] = [];
     chunks.push(Buffer.from([0]));
     chunks.push(...SubstrateApp.GetChunks(message));
 
