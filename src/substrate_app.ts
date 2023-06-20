@@ -221,7 +221,7 @@ export class SubstrateApp {
     return await this.signSendChunk(1, chunks.length, chunks[0], scheme, ins).then(async () => {
       let result;
       for (let i = 1; i < chunks.length; i += 1) {
-        result = await this.signSendChunk(1 + i, chunks.length, chunks[i], scheme);
+        result = await this.signSendChunk(1 + i, chunks.length, chunks[i], scheme, ins);
         if (result.return_code !== ERROR_CODE.NoError) {
           break;
         }
