@@ -42,10 +42,6 @@ export function newEdgewareApp(transport: Transport) {
   return newSubstrateApp(transport, "Edgeware");
 }
 
-export function newEnjinApp(transport: Transport) {
-  return newSubstrateApp(transport, "Enjin");
-}
-
 export function newEquilibriumApp(transport: Transport) {
   return newSubstrateApp(transport, "Equilibrium");
 }
@@ -60,10 +56,6 @@ export function newStatemintApp(transport: Transport) {
 
 export function newStatemineApp(transport: Transport) {
   return newSubstrateApp(transport, "Statemine");
-}
-
-export function newMatrixchainApp(transport: Transport) {
-  return newSubstrateApp(transport, "Matrixchain");
 }
 
 export function newNodleApp(transport: Transport) {
