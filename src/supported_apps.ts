@@ -277,4 +277,16 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x80000219,
     ss58_addr_type: 126,
   },
+  {
+    name: "Enjin",
+    cla: 0xb9,
+    slip0044: 0x80000483,
+    ss58_addr_type: 2135,
+  },
+  {
+    name: "Matrixchain",
+    cla: 0xba,
+    slip0044: 0x80000483,
+    ss58_addr_type: 1110,
+  }
 ];
