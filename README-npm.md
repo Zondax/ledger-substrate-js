@@ -19,12 +19,13 @@ using the official Substrate Ledger apps in recovery mode.
 | getAddress | pubkey + address | path + ( showInDevice ) |
 | sign       | signed message   | path + message          |
 
-getAddress command requires that you set the derivation path (account, change, index) and has an option parameter to display the address on the device. By default, it will retrieve the information without confirmation from the user.
+getAddress command requires that you set the derivation path (account, change, index) and has an option parameter to
+display the address on the device. By default, it will retrieve the information without confirmation from the user.
 
 # Add new chain
 
-If you want to add support for your chain, you just need to create a PR in this repository adding the parameters that belong to the chain.
-Go to [supported APPs](./src/supported_apps.ts) and add a new entry at the end of the file.
+If you want to add support for your chain, you just need to create a PR in this repository adding the parameters that
+belong to the chain. Go to [supported APPs](./src/supported_apps.ts) and add a new entry at the end of the file.
 
 ```
 {
@@ -35,15 +36,18 @@ Go to [supported APPs](./src/supported_apps.ts) and add a new entry at the end o
 },
 ```
 
-Take the last used CLA and pick the following number. This is just an ID for the app that is used in APDU protocol. This is probably the easiest way to get a free CLA.
+Take the last used CLA and pick the following number. This is just an ID for the app that is used in APDU protocol. This
+is probably the easiest way to get a free CLA.
 
-For Slip0044 parameter, you might want to [register here](https://github.com/satoshilabs/slips/blob/master/slip-0044.md) as well.
+For Slip0044 parameter, you might want to [register here](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)
+as well.
 
 SS58 prefix have no limitation whatsoever, you just have to set an uint16 number that is used in your chain.
 
 # Testing with real devices
 
-It is possible to test this package with a real Ledger Nano device. To accomplish that, you will need to follow these steps:
+It is possible to test this package with a real Ledger Nano device. To accomplish that, you will need to follow these
+steps:
 
 - Install the application in the Ledger device
 - Install the dependencies from this project
@@ -56,9 +60,11 @@ yarn test
 
 ## Example:
 
-Visit and download the [latest release](https://github.com/Zondax/ledger-kusama/releases/latest) from repository (in this case Kusama).
+Visit and download the [latest release](https://github.com/Zondax/ledger-kusama/releases/latest) from repository (in
+this case Kusama).
 
-Download the installer script for your device but bear in mind that NanoX does not allow side loading applications. Give execution permission and run the script.
+Download the installer script for your device but bear in mind that NanoX does not allow side loading applications. Give
+execution permission and run the script.
 
 ```shell script
 chmod +x installer_nano_device.sh
@@ -78,4 +84,5 @@ Run tests and you will see how this module communicates with your device.
 
 # Who we are?
 
-We are Zondax, a company pioneering blockchain services. If you want to know more about us, please visit us at [zondax.ch](https://zondax.ch)
+We are Zondax, a company pioneering blockchain services. If you want to know more about us, please visit us at
+[zondax.ch](https://zondax.ch)

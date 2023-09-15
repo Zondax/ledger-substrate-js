@@ -146,7 +146,7 @@ export class SubstrateApp {
     change: number,
     addressIndex: number,
     requireConfirmation = false,
-    scheme = SCHEME.ED25519
+    scheme = SCHEME.ED25519,
   ): Promise<ResponseAddress> {
     const bip44Path = SubstrateApp.serializePath(this.slip0044, account, change, addressIndex);
 
@@ -174,7 +174,7 @@ export class SubstrateApp {
     chunkNum: number,
     chunk: Buffer,
     scheme = SCHEME.ED25519,
-    ins: INS_SIGN = INS.SIGN
+    ins: INS_SIGN = INS.SIGN,
   ) {
     let payloadType = PAYLOAD_TYPE.ADD;
     if (chunkIdx === 1) {
@@ -215,7 +215,7 @@ export class SubstrateApp {
     addressIndex: number,
     message: Buffer,
     ins: INS_SIGN,
-    scheme = SCHEME.ED25519
+    scheme = SCHEME.ED25519,
   ): Promise<ResponseSign> {
     const chunks = SubstrateApp.signGetChunks(this.slip0044, account, change, addressIndex, message);
     return await this.signSendChunk(1, chunks.length, chunks[0], scheme, ins).then(async () => {
