@@ -288,5 +288,11 @@ export const supportedApps: SubstrateAppParams[] = [
     cla: 0xba,
     slip0044: 0x80000483,
     ss58_addr_type: 1110,
+  },
+  {
+    name: "Quartz",
+    cla: 0xbb,
+    slip0044: 0x80000277,
+    ss58_addr_type: 255,
   }
 ];
