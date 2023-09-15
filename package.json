@@ -76,5 +76,6 @@
     "linter": "eslint . --max-warnings 0",
     "linter:fix": "yarn linter --fix",
     "format": "prettier --write ."
-  }
+  },
+  "packageManager": "yarn@3.6.3"
 }
