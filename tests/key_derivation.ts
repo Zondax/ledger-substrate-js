@@ -88,7 +88,7 @@ export function hdKeyDerivation(
   accountIndex: number,
   changeIndex: number,
   addressIndex: number,
-  ss58prefix: number
+  ss58prefix: number,
 ) {
   if (!bip39.validateMnemonic(mnemonic)) {
     console.log("Invalid mnemonic");
