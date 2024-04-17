@@ -237,8 +237,8 @@ export class SubstrateApp {
     }, processErrorResponse);
   }
 
-  async sign(account: number, change: number, addressIndex: number, blob: Buffer, metadata: Buffer) {
-    return await this.signImpl(account, change, addressIndex, INS.SIGN, blob, metadata);
+  async sign(account: number, change: number, addressIndex: number, blob: Buffer) {
+    return await this.signImpl(account, change, addressIndex, INS.SIGN, blob);
   }
 
   async signRaw(account: number, change: number, addressIndex: number, blob: Buffer) {
