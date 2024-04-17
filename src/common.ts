@@ -46,6 +46,7 @@ export const enum P1_VALUES {
 
 export const enum ERROR_CODE {
   NoError = 0x9000,
+  InvalidData = 0x6984,
 }
 
 export const ERROR_DESCRIPTION: Record<number, string> = {
@@ -149,15 +150,16 @@ export function processErrorResponse(response: any) {
 }
 
 export async function getVersion(transport: Transport, cla: number) {
-  return await transport.send(cla, INS.GET_VERSION, 0, 0).then((response) => {
+  try {
+    const response = await transport.send(cla, INS.GET_VERSION, 0, 0);
     const errorCodeData = response.subarray(-2);
     const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
 
     // 12 bytes + 2 error code
     if (response.length !== 14) {
       return {
-        return_code: 0x6984,
-        error_message: errorCodeToString(0x6984),
+        return_code: ERROR_CODE.InvalidData,
+        error_message: errorCodeToString(ERROR_CODE.InvalidData),
       };
     }
 
@@ -179,5 +181,58 @@ export async function getVersion(transport: Transport, cla: number) {
       deviceLocked,
       target_id: targetId.toString(16),
     };
-  }, processErrorResponse);
+  } catch (e) {
+    return processErrorResponse(e);
+  }
+}
+
+export function serializePath(slip0044: number, account: number, change: number, addressIndex: number) {
+  if (!Number.isInteger(account)) throw new Error("Input must be an integer");
+  if (!Number.isInteger(change)) throw new Error("Input must be an integer");
+  if (!Number.isInteger(addressIndex)) throw new Error("Input must be an integer");
+
+  const buf = Buffer.alloc(20);
+  buf.writeUInt32LE(0x8000002c, 0);
+  buf.writeUInt32LE(slip0044, 4);
+  buf.writeUInt32LE(account, 8);
+  buf.writeUInt32LE(change, 12);
+  buf.writeUInt32LE(addressIndex, 16);
+  return buf;
+}
+
+export function splitBufferToChunks(message: Buffer, chunkSize: number) {
+  const chunks = [];
+  const buffer = Buffer.from(message);
+
+  for (let i = 0; i < buffer.length; i += chunkSize) {
+    let end = i + chunkSize;
+    if (i > buffer.length) {
+      end = buffer.length;
+    }
+    chunks.push(buffer.subarray(i, end));
+  }
+
+  return chunks;
+}
+
+export function getSignReqChunks(
+  slip0044: number,
+  account: number,
+  change: number,
+  addressIndex: number,
+  blob: Buffer,
+  metadata?: Buffer,
+) {
+  const chunks: Buffer[] = [];
+  const bip44Path = serializePath(slip0044, account, change, addressIndex);
+
+  const blobLen = Buffer.alloc(2);
+  blobLen.writeUInt16LE(blob.length);
+
+  chunks.push(Buffer.concat([bip44Path, blobLen]));
+
+  if (metadata == null) chunks.push(...splitBufferToChunks(blob, CHUNK_SIZE));
+  else chunks.push(...splitBufferToChunks(Buffer.concat([blob, metadata]), CHUNK_SIZE));
+
+  return chunks;
 }

@@ -69,5 +69,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "packageManager": "yarn@3.6.3"
+  "packageManager": "yarn@3.6.3",
+  "dependencies": {
+    "axios": "^1.6.8"
+  }
 }
