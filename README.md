@@ -22,6 +22,22 @@ using the official Substrate Ledger apps in recovery mode.
 getAddress command requires that you set the derivation path (account, change, index) and has an option parameter to
 display the address on the device. By default, it will retrieve the information without confirmation from the user.
 
+# Migrating to the Generic App
+
+### Steps to Migrate
+1. **Update the Package**: Ensure you are using the latest version of the package (version 0.42.0 or higher).
+2. **Create a Generic App**:
+  - Import the `newGenericApp` function.
+  - Provide the following new arguments:
+    - **chainTicker**: This is the ticker symbol of the chain where you intend to sign transactions.
+    - **txMetadataSrvUrl**: This is the URL for the generic app API service, which generates the transaction metadata needed for signing transactions on the device. Zondax provides a live demo of this service [here](https://api.zondax.ch/polkadot/transaction/metadata).
+3. **Configure Address Retrieval**:
+  - When using the `getAddress` method, include the new required argument:
+    - **ss58prefix**: This is the ss58 prefix for the chain for which you want to retrieve or display addresses.
+
+### Additional Resources
+- The generic app API service repository is available on [Github](https://github.com/Zondax/ledger-polkadot-generic-api).
+
 # Add new chain
 
 If you want to add support for your chain, you just need to create a PR in this repository adding the parameters that
