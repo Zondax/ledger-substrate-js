@@ -44,6 +44,11 @@ export const enum P1_VALUES {
   SHOW_ADDRESS_IN_DEVICE = 0x01,
 }
 
+export const enum SCHEME {
+  ED25519 = 0x00,
+  SR25519 = 0x01,
+}
+
 export const enum ERROR_CODE {
   NoError = 0x9000,
   InvalidData = 0x6984,
