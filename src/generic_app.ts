@@ -33,8 +33,12 @@ import {
   P1_VALUES,
 } from "./common";
 
-export function newGenericApp(transport: Transport, txMetadataSrvUrl: string): GenericApp {
-  return GenericApp.new(transport, txMetadataSrvUrl);
+interface TxMetadata {
+  txMetadata: string;
+}
+
+export function newGenericApp(transport: Transport, chainTicker: string, txMetadataSrvUrl: string): GenericApp {
+  return GenericApp.new(transport, chainTicker, txMetadataSrvUrl);
 }
 
 export class GenericApp {
@@ -42,12 +46,19 @@ export class GenericApp {
   cla: number;
   slip0044: number;
   txMetadataSrvUrl: string;
+  chainTicker: string;
 
-  static new(transport: Transport, txMetadataSrvUrl: string): GenericApp {
-    return new GenericApp(transport, 0x90, 0x80000162, txMetadataSrvUrl);
+  static new(transport: Transport, chainTicker: string, txMetadataSrvUrl: string): GenericApp {
+    return new GenericApp(transport, 0x90, 0x80000162, chainTicker, txMetadataSrvUrl);
   }
 
-  private constructor(transport: Transport, cla: number, slip0044: number, txMetadataSrvUrl: string) {
+  private constructor(
+    transport: Transport,
+    cla: number,
+    slip0044: number,
+    chainTicker: string,
+    txMetadataSrvUrl: string,
+  ) {
     if (transport == null) {
       throw new Error("Transport has not been defined");
     }
@@ -55,11 +66,16 @@ export class GenericApp {
     this.cla = cla;
     this.slip0044 = slip0044;
     this.txMetadataSrvUrl = txMetadataSrvUrl;
+    this.chainTicker = chainTicker;
   }
 
   async getTxMetadata(txBlob: Buffer): Promise<Buffer> {
-    const resp = await axios.post(this.txMetadataSrvUrl, { txBlob: txBlob.toString("hex") });
-    return Buffer.from(resp.data, "hex");
+    const resp = await axios.post<TxMetadata>(this.txMetadataSrvUrl, {
+      txBlob: txBlob.toString("hex"),
+      chain: { id: this.chainTicker },
+    });
+
+    return Buffer.from(resp.data.txMetadata, "hex");
   }
 
   async getVersion(): Promise<ResponseVersion> {
