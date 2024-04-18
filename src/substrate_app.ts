@@ -28,6 +28,7 @@ import {
   type ResponseAllowlistPubKey,
   type ResponseSign,
   type ResponseVersion,
+  SCHEME,
   type INS_SIGN,
 } from "./common";
 
@@ -74,27 +75,11 @@ export class SubstrateApp {
     return chunks;
   }
 
-  static signGetChunks(
-    slip0044: number,
-    account: number,
-    change: number,
-    addressIndex: number,
-    blob: Buffer,
-    metadata?: Buffer,
-  ) {
-    const chunks: Buffer[] = [];
+  static signGetChunks(slip0044: number, account: number, change: number, addressIndex: number, message: Buffer) {
+    const chunks = [];
     const bip44Path = SubstrateApp.serializePath(slip0044, account, change, addressIndex);
-    if (metadata == null) {
-      chunks.push(bip44Path);
-      chunks.push(...SubstrateApp.GetChunks(blob));
-    } else {
-      const blobLen = Buffer.alloc(4);
-      blobLen.writeUInt32LE(blob.length);
-      const firstChunk = Buffer.concat([bip44Path, blobLen]);
-      chunks.push(firstChunk);
-      chunks.push(...SubstrateApp.GetChunks(Buffer.concat([blob, metadata])));
-    }
-
+    chunks.push(bip44Path);
+    chunks.push(...SubstrateApp.GetChunks(message));
     return chunks;
   }
 
@@ -161,13 +146,17 @@ export class SubstrateApp {
     change: number,
     addressIndex: number,
     requireConfirmation = false,
+    scheme = SCHEME.ED25519,
   ): Promise<ResponseAddress> {
     const bip44Path = SubstrateApp.serializePath(this.slip0044, account, change, addressIndex);
 
     let p1 = 0;
     if (requireConfirmation) p1 = 1;
 
-    return await this.transport.send(this.cla, INS.GET_ADDR, p1, 0, bip44Path).then((response) => {
+    let p2 = 0;
+    if (!isNaN(scheme)) p2 = scheme;
+
+    return await this.transport.send(this.cla, INS.GET_ADDR, p1, p2, bip44Path).then((response) => {
       const errorCodeData = response.subarray(-2);
       const errorCode = errorCodeData[0] * 256 + errorCodeData[1];
 
@@ -180,7 +169,13 @@ export class SubstrateApp {
     }, processErrorResponse);
   }
 
-  async signSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer, ins: INS_SIGN = INS.SIGN) {
+  async signSendChunk(
+    chunkIdx: number,
+    chunkNum: number,
+    chunk: Buffer,
+    scheme = SCHEME.ED25519,
+    ins: INS_SIGN = INS.SIGN,
+  ) {
     let payloadType = PAYLOAD_TYPE.ADD;
     if (chunkIdx === 1) {
       payloadType = PAYLOAD_TYPE.INIT;
@@ -189,8 +184,11 @@ export class SubstrateApp {
       payloadType = PAYLOAD_TYPE.LAST;
     }
 
+    let p2 = 0;
+    if (!isNaN(scheme)) p2 = scheme;
+
     return await this.transport
-      .send(this.cla, ins, payloadType, 0, chunk, [ERROR_CODE.NoError, 0x6984, 0x6a80])
+      .send(this.cla, ins, payloadType, p2, chunk, [ERROR_CODE.NoError, 0x6984, 0x6a80])
       .then((response) => {
         const errorCodeData = response.subarray(-2);
         const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
@@ -215,15 +213,15 @@ export class SubstrateApp {
     account: number,
     change: number,
     addressIndex: number,
+    message: Buffer,
     ins: INS_SIGN,
-    blob: Buffer,
-    metadata?: Buffer,
+    scheme = SCHEME.ED25519,
   ): Promise<ResponseSign> {
-    const chunks = SubstrateApp.signGetChunks(this.slip0044, account, change, addressIndex, blob, metadata);
-    return await this.signSendChunk(1, chunks.length, chunks[0], ins).then(async () => {
+    const chunks = SubstrateApp.signGetChunks(this.slip0044, account, change, addressIndex, message);
+    return await this.signSendChunk(1, chunks.length, chunks[0], scheme, ins).then(async () => {
       let result;
       for (let i = 1; i < chunks.length; i += 1) {
-        result = await this.signSendChunk(1 + i, chunks.length, chunks[i], ins);
+        result = await this.signSendChunk(1 + i, chunks.length, chunks[i], scheme, ins);
         if (result.return_code !== ERROR_CODE.NoError) {
           break;
         }
@@ -237,12 +235,12 @@ export class SubstrateApp {
     }, processErrorResponse);
   }
 
-  async sign(account: number, change: number, addressIndex: number, blob: Buffer) {
-    return await this.signImpl(account, change, addressIndex, INS.SIGN, blob);
+  async sign(account: number, change: number, addressIndex: number, message: Buffer, scheme = SCHEME.ED25519) {
+    return await this.signImpl(account, change, addressIndex, message, INS.SIGN, scheme);
   }
 
-  async signRaw(account: number, change: number, addressIndex: number, blob: Buffer) {
-    return await this.signImpl(account, change, addressIndex, INS.SIGN_RAW, blob);
+  async signRaw(account: number, change: number, addressIndex: number, message: Buffer, scheme = SCHEME.ED25519) {
+    return await this.signImpl(account, change, addressIndex, message, INS.SIGN_RAW, scheme);
   }
 
   /// Allow list related commands. They are NOT available on all apps
