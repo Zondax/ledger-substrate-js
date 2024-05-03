@@ -163,7 +163,7 @@ export class GenericApp {
     const p1 = showAddrInDevice ? P1_VALUES.SHOW_ADDRESS_IN_DEVICE : P1_VALUES.ONLY_RETRIEVE;
 
     try {
-      const response = await this.transport.send(this.cla, INS.GET_ADDR, p1, 0, bip44Path);
+      const response = await this.transport.send(this.cla, INS.GET_ADDR, p1, 0, payload);
       const errorCodeData = response.subarray(-2);
       const errorCode = errorCodeData[0] * 256 + errorCodeData[1];
 
