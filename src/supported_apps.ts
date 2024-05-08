@@ -17,6 +17,7 @@
 import { SubstrateApp } from "./substrate_app";
 import { type SubstrateAppParams } from "./common";
 import type Transport from "@ledgerhq/hw-transport";
+import { GenericApp } from "./generic_app";
 
 export function newSubstrateApp(transport: Transport, chainName: string) {
   const requestedApp = supportedApps.find((app: SubstrateAppParams) => {
@@ -24,6 +25,22 @@ export function newSubstrateApp(transport: Transport, chainName: string) {
   });
   if (requestedApp != null) {
     return new SubstrateApp(transport, requestedApp.cla, requestedApp.slip0044);
+  }
+  throw new Error(`Error: ${chainName} not supported`);
+}
+
+export function newMigrationGenericApp(transport: Transport, chainName: string, txMetadataSrvUrl: string) {
+  const requestedApp = supportedApps.find((app: SubstrateAppParams) => {
+    return app.name.toLowerCase() === chainName.toLowerCase();
+  });
+  if (requestedApp != null) {
+    return GenericApp.newMigrationApp(
+      transport,
+      requestedApp.cla,
+      requestedApp.slip0044,
+      requestedApp.name,
+      txMetadataSrvUrl,
+    );
   }
   throw new Error(`Error: ${chainName} not supported`);
 }

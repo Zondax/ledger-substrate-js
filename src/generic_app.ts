@@ -33,12 +33,24 @@ import {
   P1_VALUES,
 } from "./common";
 
+const PolkadotCLA = 0x90;
+const PolkadotSlip0044 = 0x80000162;
+
 interface TxMetadata {
   txMetadata: string;
 }
 
-export function newGenericApp(transport: Transport, chainTicker: string, txMetadataSrvUrl: string): GenericApp {
-  return GenericApp.new(transport, chainTicker, txMetadataSrvUrl);
+export function newGenericApp(transport: Transport, chainId: string, txMetadataSrvUrl: string): GenericApp {
+  return GenericApp.new(transport, chainId, txMetadataSrvUrl);
+}
+export function newMigrationApp(
+  transport: Transport,
+  chainId: string,
+  cla: number,
+  sip0044: number,
+  txMetadataSrvUrl: string,
+): GenericApp {
+  return GenericApp.newMigrationApp(transport, cla, sip0044, chainId, txMetadataSrvUrl);
 }
 
 export class GenericApp {
@@ -46,19 +58,27 @@ export class GenericApp {
   cla: number;
   slip0044: number;
   txMetadataSrvUrl: string;
-  chainTicker: string;
+  chainId: string;
 
-  static new(transport: Transport, chainTicker: string, txMetadataSrvUrl: string): GenericApp {
-    return new GenericApp(transport, 0x90, 0x80000162, chainTicker, txMetadataSrvUrl);
+  static new(transport: Transport, chainId: string, txMetadataSrvUrl: string): GenericApp {
+    return new GenericApp(transport, PolkadotCLA, PolkadotSlip0044, chainId, txMetadataSrvUrl);
   }
 
-  private constructor(
+  static newApp(transport: Transport, chainId: string, txMetadataSrvUrl: string): GenericApp {
+    return new GenericApp(transport, PolkadotCLA, PolkadotSlip0044, chainId, txMetadataSrvUrl);
+  }
+
+  static newMigrationApp(
     transport: Transport,
     cla: number,
     slip0044: number,
-    chainTicker: string,
+    chainId: string,
     txMetadataSrvUrl: string,
-  ) {
+  ): GenericApp {
+    return new GenericApp(transport, cla, slip0044, chainId, txMetadataSrvUrl);
+  }
+
+  private constructor(transport: Transport, cla: number, slip0044: number, chainId: string, txMetadataSrvUrl: string) {
     if (transport == null) {
       throw new Error("Transport has not been defined");
     }
@@ -66,13 +86,14 @@ export class GenericApp {
     this.cla = cla;
     this.slip0044 = slip0044;
     this.txMetadataSrvUrl = txMetadataSrvUrl;
-    this.chainTicker = chainTicker;
+    this.chainId = chainId;
   }
 
-  async getTxMetadata(txBlob: Buffer): Promise<Buffer> {
+  async getTxMetadata(callData: Buffer, signedExtensions: Buffer): Promise<Buffer> {
     const resp = await axios.post<TxMetadata>(this.txMetadataSrvUrl, {
-      txBlob: txBlob.toString("hex"),
-      chain: { id: this.chainTicker },
+      callData: callData.toString("hex"),
+      signedExtensions: signedExtensions.toString("hex"),
+      chain: { id: this.chainId },
     });
 
     return Buffer.from(resp.data.txMetadata, "hex");
@@ -245,9 +266,14 @@ export class GenericApp {
     }
   }
 
-  async sign(account: number, change: number, addressIndex: number, blob: Buffer) {
-    const txMetadata = await this.getTxMetadata(blob);
-    return await this.signImpl(account, change, addressIndex, INS.SIGN, blob, txMetadata);
+  async sign(account: number, change: number, addressIndex: number, callData: Buffer, signedExtensions: Buffer) {
+    const txMetadata = await this.getTxMetadata(callData, signedExtensions);
+    const txBlob = Buffer.concat([callData, signedExtensions]);
+    return await this.signImpl(account, change, addressIndex, INS.SIGN, txBlob, txMetadata);
+  }
+
+  async signAdvanced(account: number, change: number, addressIndex: number, txBlob: Buffer, txMetadata: Buffer) {
+    return await this.signImpl(account, change, addressIndex, INS.SIGN, txBlob, txMetadata);
   }
 
   async signRaw(account: number, change: number, addressIndex: number, blob: Buffer) {
