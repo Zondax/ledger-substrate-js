@@ -32,33 +32,57 @@ import {
   getSignReqChunks,
   P1_VALUES,
 } from "./common";
+import { supportedApps } from "./supported_apps";
+
+const GenericAppName = "Polkadot";
 
 interface TxMetadata {
   txMetadata: string;
 }
 
-export function newGenericApp(transport: Transport, chainTicker: string, txMetadataSrvUrl: string): GenericApp {
-  return GenericApp.new(transport, chainTicker, txMetadataSrvUrl);
+export function newPolkadotGenericApp(
+  transport: Transport,
+  chainId: string,
+  txMetadataSrvUrl: string,
+): PolkadotGenericApp {
+  return PolkadotGenericApp.newApp(transport, chainId, txMetadataSrvUrl);
+}
+export function newPolkadotMigrationApp(
+  transport: Transport,
+  chainId: string,
+  cla: number,
+  sip0044: number,
+  txMetadataSrvUrl: string,
+): PolkadotGenericApp {
+  return PolkadotGenericApp.newMigrationApp(transport, cla, sip0044, chainId, txMetadataSrvUrl);
 }
 
-export class GenericApp {
+export class PolkadotGenericApp {
   transport: Transport;
   cla: number;
   slip0044: number;
   txMetadataSrvUrl: string;
-  chainTicker: string;
+  chainId: string;
 
-  static new(transport: Transport, chainTicker: string, txMetadataSrvUrl: string): GenericApp {
-    return new GenericApp(transport, 0x90, 0x80000162, chainTicker, txMetadataSrvUrl);
+  static newApp(transport: Transport, chainId: string, txMetadataSrvUrl: string): PolkadotGenericApp {
+    const polkadotAppParams = supportedApps.find(({ name }) => name === GenericAppName);
+    if (polkadotAppParams === undefined) throw new Error("polkadot app params missed");
+
+    const { cla, slip0044 } = polkadotAppParams;
+    return new PolkadotGenericApp(transport, cla, slip0044, chainId, txMetadataSrvUrl);
   }
 
-  private constructor(
+  static newMigrationApp(
     transport: Transport,
     cla: number,
     slip0044: number,
-    chainTicker: string,
+    chainId: string,
     txMetadataSrvUrl: string,
-  ) {
+  ): PolkadotGenericApp {
+    return new PolkadotGenericApp(transport, cla, slip0044, chainId, txMetadataSrvUrl);
+  }
+
+  private constructor(transport: Transport, cla: number, slip0044: number, chainId: string, txMetadataSrvUrl: string) {
     if (transport == null) {
       throw new Error("Transport has not been defined");
     }
@@ -66,16 +90,21 @@ export class GenericApp {
     this.cla = cla;
     this.slip0044 = slip0044;
     this.txMetadataSrvUrl = txMetadataSrvUrl;
-    this.chainTicker = chainTicker;
+    this.chainId = chainId;
   }
 
   async getTxMetadata(txBlob: Buffer): Promise<Buffer> {
     const resp = await axios.post<TxMetadata>(this.txMetadataSrvUrl, {
       txBlob: txBlob.toString("hex"),
-      chain: { id: this.chainTicker },
+      chain: { id: this.chainId },
     });
 
-    return Buffer.from(resp.data.txMetadata, "hex");
+    let txMetadata = resp.data.txMetadata;
+    if (txMetadata.slice(0, 2) === "0x") {
+      txMetadata = txMetadata.slice(2);
+    }
+
+    return Buffer.from(txMetadata, "hex");
   }
 
   async getVersion(): Promise<ResponseVersion> {
@@ -245,12 +274,16 @@ export class GenericApp {
     }
   }
 
-  async sign(account: number, change: number, addressIndex: number, blob: Buffer) {
-    const txMetadata = await this.getTxMetadata(blob);
-    return await this.signImpl(account, change, addressIndex, INS.SIGN, blob, txMetadata);
+  async sign(account: number, change: number, addressIndex: number, txBlob: Buffer) {
+    const txMetadata = await this.getTxMetadata(txBlob);
+    return await this.signImpl(account, change, addressIndex, INS.SIGN, txBlob, txMetadata);
   }
 
-  async signRaw(account: number, change: number, addressIndex: number, blob: Buffer) {
-    return await this.signImpl(account, change, addressIndex, INS.SIGN_RAW, blob);
+  async signAdvanced(account: number, change: number, addressIndex: number, txBlob: Buffer, txMetadata: Buffer) {
+    return await this.signImpl(account, change, addressIndex, INS.SIGN, txBlob, txMetadata);
+  }
+
+  async signRaw(account: number, change: number, addressIndex: number, txBlob: Buffer) {
+    return await this.signImpl(account, change, addressIndex, INS.SIGN_RAW, txBlob);
   }
 }
