@@ -24,14 +24,12 @@ import { supportedApps } from "../src/supported_apps";
 import { AxiosError } from "axios";
 
 const TX_METADATA_SRV_URL = "https://api.zondax.ch/polkadot/transaction/metadata";
-const CHAIN_NAME = "Kusama";
-const CHAIN_TICKER = "ksm";
+const CHAIN_NAME = "Polkadot";
+const CHAIN_TICKER = "dot";
 const YOUR_PUBKEY = "d280b24dface41f31006e5a2783971fc5a66c862dd7d08f97603d2902b75e47a";
 const YOUR_ADDRESS = "HLKocKgeGjpXkGJU6VACtTYJK4ApTCfcGRw51E5jWntcsXv";
-const YOUR_CALL_DATA =
-  "0000d050f0c8c0a9706b7c0c4e439245a347627901c89d4791239533d1d2c961f1a72ad615c8530de078e565ba644b38b01bcad249e8c0";
-const YOUR_SIGNED_EXTENSIONS =
-  "a80aceb4befe330990a59f74ed976c933db269c64dda40104a0f001900000091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3a071db11cdbfd29285f25d402f1aee7a1c0384269c9c2edb476688d35e346998";
+const YOUR_BLOB =
+  "0000d050f0c8c0a9706b7c0c4e439245a347627901c89d4791239533d1d2c961f1a72ad615c8530de078e565ba644b38b01bcad249e8c0a80aceb4befe330990a59f74ed976c933db269c64dda40104a0f001900000091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3a071db11cdbfd29285f25d402f1aee7a1c0384269c9c2edb476688d35e346998";
 
 let transport = {};
 
@@ -113,9 +111,8 @@ describe("Integration", function () {
       // @ts-expect-error transport will be there
       const app = newGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
 
-      const callData = Buffer.from(YOUR_CALL_DATA, "hex");
-      const signedExtensions = Buffer.from(YOUR_SIGNED_EXTENSIONS, "hex");
-      const resp = await app.getTxMetadata(callData, signedExtensions);
+      const txBlob = Buffer.from(YOUR_BLOB, "hex");
+      const resp = await app.getTxMetadata(txBlob);
 
       expect(resp).toBeDefined();
     });
@@ -124,10 +121,9 @@ describe("Integration", function () {
       // @ts-expect-error transport will be there
       const app = newGenericApp(transport, "xxx", TX_METADATA_SRV_URL);
 
-      const callData = Buffer.from(YOUR_CALL_DATA, "hex");
-      const signedExtensions = Buffer.from(YOUR_SIGNED_EXTENSIONS, "hex");
+      const txBlob = Buffer.from(YOUR_BLOB, "hex");
       try {
-        await app.getTxMetadata(callData, signedExtensions);
+        await app.getTxMetadata(txBlob);
       } catch (e: any) {
         expect(e.response.status).toBe(404);
       }
@@ -137,10 +133,9 @@ describe("Integration", function () {
       // @ts-expect-error transport will be there
       const app = newGenericApp(transport, "ksm", "");
 
-      const callData = Buffer.from(YOUR_CALL_DATA, "hex");
-      const signedExtensions = Buffer.from(YOUR_SIGNED_EXTENSIONS, "hex");
+      const txBlob = Buffer.from(YOUR_BLOB, "hex");
       try {
-        await app.getTxMetadata(callData, signedExtensions);
+        await app.getTxMetadata(txBlob);
       } catch (e: any) {
         expect(e.code).toBe("ECONNREFUSED");
       }
@@ -154,9 +149,7 @@ describe("Integration", function () {
       return;
     }
 
-    const callData = Buffer.from(YOUR_CALL_DATA, "hex");
-    const signedExtensions = Buffer.from(YOUR_SIGNED_EXTENSIONS, "hex");
-    const txBlob = Buffer.concat([callData, signedExtensions]);
+    const txBlob = Buffer.from(YOUR_BLOB, "hex");
 
     // @ts-expect-error transport will be there
     const app = newGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
@@ -166,7 +159,7 @@ describe("Integration", function () {
     const pathIndex = 0x80000000;
 
     const responseAddr = await app.getAddress(pathAccount, pathChange, pathIndex, ss58prefix);
-    const responseSign = await app.sign(pathAccount, pathChange, pathIndex, callData, signedExtensions);
+    const responseSign = await app.sign(pathAccount, pathChange, pathIndex, txBlob);
 
     const pubkey = responseAddr.pubKey;
 

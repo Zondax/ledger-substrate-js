@@ -89,14 +89,18 @@ export class GenericApp {
     this.chainId = chainId;
   }
 
-  async getTxMetadata(callData: Buffer, signedExtensions: Buffer): Promise<Buffer> {
+  async getTxMetadata(txBlob: Buffer): Promise<Buffer> {
     const resp = await axios.post<TxMetadata>(this.txMetadataSrvUrl, {
-      callData: callData.toString("hex"),
-      signedExtensions: signedExtensions.toString("hex"),
+      txBlob: txBlob.toString("hex"),
       chain: { id: this.chainId },
     });
 
-    return Buffer.from(resp.data.txMetadata, "hex");
+    let txMetadata = resp.data.txMetadata;
+    if (txMetadata.slice(0, 2) === "0x") {
+      txMetadata = txMetadata.slice(2);
+    }
+
+    return Buffer.from(txMetadata, "hex");
   }
 
   async getVersion(): Promise<ResponseVersion> {
@@ -266,9 +270,8 @@ export class GenericApp {
     }
   }
 
-  async sign(account: number, change: number, addressIndex: number, callData: Buffer, signedExtensions: Buffer) {
-    const txMetadata = await this.getTxMetadata(callData, signedExtensions);
-    const txBlob = Buffer.concat([callData, signedExtensions]);
+  async sign(account: number, change: number, addressIndex: number, txBlob: Buffer) {
+    const txMetadata = await this.getTxMetadata(txBlob);
     return await this.signImpl(account, change, addressIndex, INS.SIGN, txBlob, txMetadata);
   }
 
@@ -276,7 +279,7 @@ export class GenericApp {
     return await this.signImpl(account, change, addressIndex, INS.SIGN, txBlob, txMetadata);
   }
 
-  async signRaw(account: number, change: number, addressIndex: number, blob: Buffer) {
-    return await this.signImpl(account, change, addressIndex, INS.SIGN_RAW, blob);
+  async signRaw(account: number, change: number, addressIndex: number, txBlob: Buffer) {
+    return await this.signImpl(account, change, addressIndex, INS.SIGN_RAW, txBlob);
   }
 }
