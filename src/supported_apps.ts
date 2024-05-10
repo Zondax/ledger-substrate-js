@@ -17,7 +17,7 @@
 import { SubstrateApp } from "./substrate_app";
 import { type SubstrateAppParams } from "./common";
 import type Transport from "@ledgerhq/hw-transport";
-import { GenericApp } from "./generic_app";
+import { PolkadotGenericApp } from "./generic_app";
 
 export function newSubstrateApp(transport: Transport, chainName: string) {
   const requestedApp = supportedApps.find((app: SubstrateAppParams) => {
@@ -34,7 +34,7 @@ export function newMigrationGenericApp(transport: Transport, chainName: string, 
     return app.name.toLowerCase() === chainName.toLowerCase();
   });
   if (requestedApp != null) {
-    return GenericApp.newMigrationApp(
+    return PolkadotGenericApp.newMigrationApp(
       transport,
       requestedApp.cla,
       requestedApp.slip0044,

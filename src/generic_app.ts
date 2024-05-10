@@ -32,40 +32,44 @@ import {
   getSignReqChunks,
   P1_VALUES,
 } from "./common";
+import { supportedApps } from "./supported_apps";
 
-const PolkadotCLA = 0x90;
-const PolkadotSlip0044 = 0x80000162;
+const GenericAppName = "Polkadot";
 
 interface TxMetadata {
   txMetadata: string;
 }
 
-export function newGenericApp(transport: Transport, chainId: string, txMetadataSrvUrl: string): GenericApp {
-  return GenericApp.new(transport, chainId, txMetadataSrvUrl);
+export function newPolkadotGenericApp(
+  transport: Transport,
+  chainId: string,
+  txMetadataSrvUrl: string,
+): PolkadotGenericApp {
+  return PolkadotGenericApp.newApp(transport, chainId, txMetadataSrvUrl);
 }
-export function newMigrationApp(
+export function newPolkadotMigrationApp(
   transport: Transport,
   chainId: string,
   cla: number,
   sip0044: number,
   txMetadataSrvUrl: string,
-): GenericApp {
-  return GenericApp.newMigrationApp(transport, cla, sip0044, chainId, txMetadataSrvUrl);
+): PolkadotGenericApp {
+  return PolkadotGenericApp.newMigrationApp(transport, cla, sip0044, chainId, txMetadataSrvUrl);
 }
 
-export class GenericApp {
+export class PolkadotGenericApp {
   transport: Transport;
   cla: number;
   slip0044: number;
   txMetadataSrvUrl: string;
   chainId: string;
 
-  static new(transport: Transport, chainId: string, txMetadataSrvUrl: string): GenericApp {
-    return new GenericApp(transport, PolkadotCLA, PolkadotSlip0044, chainId, txMetadataSrvUrl);
-  }
+  static newApp(transport: Transport, chainId: string, txMetadataSrvUrl: string): PolkadotGenericApp {
+    const polkadotAppParams = supportedApps.find(({ name }) => name === GenericAppName);
+    if (polkadotAppParams === undefined) throw new Error("polkadot app params missed");
 
-  static newApp(transport: Transport, chainId: string, txMetadataSrvUrl: string): GenericApp {
-    return new GenericApp(transport, PolkadotCLA, PolkadotSlip0044, chainId, txMetadataSrvUrl);
+    const { cla, slip0044 } = polkadotAppParams;
+    return new PolkadotGenericApp(transport, cla, slip0044, chainId, txMetadataSrvUrl);
   }
 
   static newMigrationApp(
@@ -74,8 +78,8 @@ export class GenericApp {
     slip0044: number,
     chainId: string,
     txMetadataSrvUrl: string,
-  ): GenericApp {
-    return new GenericApp(transport, cla, slip0044, chainId, txMetadataSrvUrl);
+  ): PolkadotGenericApp {
+    return new PolkadotGenericApp(transport, cla, slip0044, chainId, txMetadataSrvUrl);
   }
 
   private constructor(transport: Transport, cla: number, slip0044: number, chainId: string, txMetadataSrvUrl: string) {

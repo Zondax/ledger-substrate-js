@@ -19,9 +19,9 @@ import { blake2bFinal, blake2bInit, blake2bUpdate } from "blakejs";
 
 const ed25519 = require("ed25519-supercop");
 
-import { newGenericApp } from "../src/generic_app";
+import { newPolkadotGenericApp } from "../src/generic_app";
 import { supportedApps } from "../src/supported_apps";
-import { AxiosError } from "axios";
+import Transport from "@ledgerhq/hw-transport";
 
 const TX_METADATA_SRV_URL = "https://api.zondax.ch/polkadot/transaction/metadata";
 const CHAIN_NAME = "Polkadot";
@@ -31,7 +31,7 @@ const YOUR_ADDRESS = "HLKocKgeGjpXkGJU6VACtTYJK4ApTCfcGRw51E5jWntcsXv";
 const YOUR_BLOB =
   "0000d050f0c8c0a9706b7c0c4e439245a347627901c89d4791239533d1d2c961f1a72ad615c8530de078e565ba644b38b01bcad249e8c0a80aceb4befe330990a59f74ed976c933db269c64dda40104a0f001900000091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3a071db11cdbfd29285f25d402f1aee7a1c0384269c9c2edb476688d35e346998";
 
-let transport = {};
+let transport: Transport;
 
 jest.setTimeout(60000);
 
@@ -41,8 +41,7 @@ beforeAll(async () => {
 
 describe("Integration", function () {
   test("get version", async () => {
-    // @ts-expect-error transport will be there
-    const app = newGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
+    const app = newPolkadotGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
     const resp = await app.getVersion();
     console.log(resp);
 
@@ -62,8 +61,7 @@ describe("Integration", function () {
       return;
     }
 
-    // @ts-expect-error transport will be there
-    const app = newGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
+    const app = newPolkadotGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
 
     const pathAccount = 0x80000000;
     const pathChange = 0x80000000;
@@ -86,8 +84,7 @@ describe("Integration", function () {
       return;
     }
 
-    // @ts-expect-error transport will be there
-    const app = newGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
+    const app = newPolkadotGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
 
     const pathAccount = 0x80000000;
     const pathChange = 0x80000000;
@@ -108,8 +105,7 @@ describe("Integration", function () {
 
   describe("Tx Metadata", () => {
     test("Success", async () => {
-      // @ts-expect-error transport will be there
-      const app = newGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
+      const app = newPolkadotGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
 
       const txBlob = Buffer.from(YOUR_BLOB, "hex");
       const resp = await app.getTxMetadata(txBlob);
@@ -118,8 +114,7 @@ describe("Integration", function () {
     });
 
     test("Wrong/Invalid ticker", async () => {
-      // @ts-expect-error transport will be there
-      const app = newGenericApp(transport, "xxx", TX_METADATA_SRV_URL);
+      const app = newPolkadotGenericApp(transport, "xxx", TX_METADATA_SRV_URL);
 
       const txBlob = Buffer.from(YOUR_BLOB, "hex");
       try {
@@ -130,8 +125,7 @@ describe("Integration", function () {
     });
 
     test("Empty/Wrong service url", async () => {
-      // @ts-expect-error transport will be there
-      const app = newGenericApp(transport, "ksm", "");
+      const app = newPolkadotGenericApp(transport, "ksm", "");
 
       const txBlob = Buffer.from(YOUR_BLOB, "hex");
       try {
@@ -151,8 +145,7 @@ describe("Integration", function () {
 
     const txBlob = Buffer.from(YOUR_BLOB, "hex");
 
-    // @ts-expect-error transport will be there
-    const app = newGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
+    const app = newPolkadotGenericApp(transport, CHAIN_TICKER, TX_METADATA_SRV_URL);
 
     const pathAccount = 0x80000000;
     const pathChange = 0x80000000;
