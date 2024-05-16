@@ -1,5 +1,5 @@
-/** ******************************************************************************
- *  (c) 2019 - 2022 ZondaX AG
+/*******************************************************************************
+ *  (c) 2018 - 2024 Zondax AG
  *  (c) 2016-2017 Ledger
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
  *  limitations under the License.
  ******************************************************************************* */
 
-export * from "./legacy_apps";
-export * from "./generic_app";
-export { SubstrateApp } from "./substrate_app";
-export { newSubstrateApp, newMigrationGenericApp, supportedApps } from "./supported_apps";
+export * from './legacy_apps'
+export * from './generic_app'
+export { SubstrateApp } from './substrate_app'
+export { newSubstrateApp, newMigrationGenericApp, supportedApps } from './supported_apps'

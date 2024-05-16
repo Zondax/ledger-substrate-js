@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es2022",
+    "moduleResolution": "node",
+    "target": "es2020",
     "strict": true,
     "esModuleInterop": true,
     "declaration": true,
@@ -9,11 +10,11 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     "sourceMap": true,
-    "inlineSources": true,
-    "moduleResolution": "node"
+    "inlineSources": true
   },
   "ts-node": {
     "swc": true
   },
+  "exclude": ["./dist/**"],
   "include": ["src"]
 }

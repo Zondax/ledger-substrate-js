@@ -1,121 +1,118 @@
-/** ******************************************************************************
- *  (c) 2018 - 2022 Zondax AG
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- ******************************************************************************* */
+// TODO: Use mock transport
+// /** ******************************************************************************
+//  *  (c) 2018 - 2022 Zondax AG
+//  *
+//  *  Licensed under the Apache License, Version 2.0 (the "License");
+//  *  you may not use this file except in compliance with the License.
+//  *  You may obtain a copy of the License at
+//  *
+//  *      http://www.apache.org/licenses/LICENSE-2.0
+//  *
+//  *  Unless required by applicable law or agreed to in writing, software
+//  *  distributed under the License is distributed on an "AS IS" BASIS,
+//  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  *  See the License for the specific language governing permissions and
+//  *  limitations under the License.
+//  ******************************************************************************* */
+// import { blake2bFinal, blake2bInit, blake2bUpdate } from 'blakejs'
 
-import TransportNodeHid from "@ledgerhq/hw-transport-node-hid";
-import { blake2bFinal, blake2bInit, blake2bUpdate } from "blakejs";
+// import { MockTransport } from '@ledgerhq/hw-transport-mocker'
+// import { ed25519 } from '@noble/curves/ed25519'
 
-const ed25519 = require("ed25519-supercop");
+// import { newSubstrateApp } from '../src'
 
-import { newSubstrateApp } from "../src/supported_apps";
+// const CHAIN = 'Kusama'
+// const YOUR_PUBKEY = 'd280b24dface41f31006e5a2783971fc5a66c862dd7d08f97603d2902b75e47a'
+// const YOUR_ADDRESS = 'HLKocKgeGjpXkGJU6VACtTYJK4ApTCfcGRw51E5jWntcsXv'
+// const YOUR_BLOB =
+//   '040000313233343536373839303132333435363738393031323334353637383930313233158139ae28a3dfaac5fe1560a5e9e05cd5038d2433158139ae28a3dfaac5fe1560a5e9e05c362400000c000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafeb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe'
 
-const CHAIN = "Kusama";
-const YOUR_PUBKEY = "d280b24dface41f31006e5a2783971fc5a66c862dd7d08f97603d2902b75e47a";
-const YOUR_ADDRESS = "HLKocKgeGjpXkGJU6VACtTYJK4ApTCfcGRw51E5jWntcsXv";
-const YOUR_BLOB =
-  "040000313233343536373839303132333435363738393031323334353637383930313233158139ae28a3dfaac5fe1560a5e9e05cd5038d2433158139ae28a3dfaac5fe1560a5e9e05c362400000c000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafeb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe";
+// let transport = {}
 
-let transport = {};
+// jest.setTimeout(60000)
 
-jest.setTimeout(60000);
+// describe('Integration', function () {
+//   test('get version', async () => {
+//     // @ts-expect-error transport will be there
+//     const app = newSubstrateApp(transport, CHAIN)
+//     const resp = await app.getVersion()
+//     console.log(resp)
 
-beforeAll(async () => {
-  transport = await TransportNodeHid.create(1000);
-});
+//     expect(resp.return_code).toEqual(0x9000)
+//     expect(resp.error_message).toEqual('No errors')
+//     expect(resp).toHaveProperty('test_mode')
+//     expect(resp).toHaveProperty('major')
+//     expect(resp).toHaveProperty('minor')
+//     expect(resp).toHaveProperty('patch')
+//     expect(resp.test_mode).toEqual(false)
+//   })
 
-describe("Integration", function () {
-  test("get version", async () => {
-    // @ts-expect-error transport will be there
-    const app = newSubstrateApp(transport, CHAIN);
-    const resp = await app.getVersion();
-    console.log(resp);
+//   test('get address', async () => {
+//     // @ts-expect-error transport will be there
+//     const app = newSubstrateApp(transport, CHAIN)
 
-    expect(resp.return_code).toEqual(0x9000);
-    expect(resp.error_message).toEqual("No errors");
-    expect(resp).toHaveProperty("test_mode");
-    expect(resp).toHaveProperty("major");
-    expect(resp).toHaveProperty("minor");
-    expect(resp).toHaveProperty("patch");
-    expect(resp.test_mode).toEqual(false);
-  });
+//     const pathAccount = 0x80000000
+//     const pathChange = 0x80000000
+//     const pathIndex = 0x80000005
 
-  test("get address", async () => {
-    // @ts-expect-error transport will be there
-    const app = newSubstrateApp(transport, CHAIN);
+//     const response = await app.getAddress(pathAccount, pathChange, pathIndex)
+//     console.log(response)
 
-    const pathAccount = 0x80000000;
-    const pathChange = 0x80000000;
-    const pathIndex = 0x80000005;
+//     expect(response.return_code).toEqual(0x9000)
+//     expect(response.error_message).toEqual('No errors')
+//     expect(response).toHaveProperty('pubKey')
+//     expect(response.pubKey).toEqual(YOUR_PUBKEY)
+//     expect(response.address).toEqual(YOUR_ADDRESS)
+//   })
 
-    const response = await app.getAddress(pathAccount, pathChange, pathIndex);
-    console.log(response);
+//   test('show address', async () => {
+//     // @ts-expect-error transport will be there
+//     const app = newSubstrateApp(transport, CHAIN)
 
-    expect(response.return_code).toEqual(0x9000);
-    expect(response.error_message).toEqual("No errors");
-    expect(response).toHaveProperty("pubKey");
-    expect(response.pubKey).toEqual(YOUR_PUBKEY);
-    expect(response.address).toEqual(YOUR_ADDRESS);
-  });
+//     const pathAccount = 0x80000000
+//     const pathChange = 0x80000000
+//     const pathIndex = 0x80000005
+//     const response = await app.getAddress(pathAccount, pathChange, pathIndex, true)
 
-  test("show address", async () => {
-    // @ts-expect-error transport will be there
-    const app = newSubstrateApp(transport, CHAIN);
+//     console.log(response)
 
-    const pathAccount = 0x80000000;
-    const pathChange = 0x80000000;
-    const pathIndex = 0x80000005;
-    const response = await app.getAddress(pathAccount, pathChange, pathIndex, true);
+//     expect(response.return_code).toEqual(0x9000)
+//     expect(response.error_message).toEqual('No errors')
 
-    console.log(response);
+//     expect(response).toHaveProperty('address')
+//     expect(response).toHaveProperty('pubKey')
 
-    expect(response.return_code).toEqual(0x9000);
-    expect(response.error_message).toEqual("No errors");
+//     expect(response.pubKey).toEqual(YOUR_PUBKEY)
+//     expect(response.address).toEqual(YOUR_ADDRESS)
+//   })
 
-    expect(response).toHaveProperty("address");
-    expect(response).toHaveProperty("pubKey");
+//   test('sign2_and_verify', async () => {
+//     const txBlob = Buffer.from(YOUR_BLOB, 'hex')
 
-    expect(response.pubKey).toEqual(YOUR_PUBKEY);
-    expect(response.address).toEqual(YOUR_ADDRESS);
-  });
+//     // @ts-expect-error transport will be there
+//     const app = newSubstrateApp(transport, CHAIN)
 
-  test("sign2_and_verify", async () => {
-    const txBlob = Buffer.from(YOUR_BLOB, "hex");
+//     const pathAccount = 0x80000000
+//     const pathChange = 0x80000000
+//     const pathIndex = 0x80000000
 
-    // @ts-expect-error transport will be there
-    const app = newSubstrateApp(transport, CHAIN);
+//     const responseAddr = await app.getAddress(pathAccount, pathChange, pathIndex)
+//     const responseSign = await app.sign(pathAccount, pathChange, pathIndex, txBlob)
 
-    const pathAccount = 0x80000000;
-    const pathChange = 0x80000000;
-    const pathIndex = 0x80000000;
+//     const pubkey = responseAddr.pubKey
 
-    const responseAddr = await app.getAddress(pathAccount, pathChange, pathIndex);
-    const responseSign = await app.sign(pathAccount, pathChange, pathIndex, txBlob);
+//     console.log(responseAddr)
+//     console.log(responseSign)
 
-    const pubkey = responseAddr.pubKey;
+//     // Check signature is valid
+//     let prehash = txBlob
+//     if (txBlob.length > 256) {
+//       const context = blake2bInit(32)
+//       blake2bUpdate(context, txBlob)
+//       prehash = Buffer.from(blake2bFinal(context))
+//     }
 
-    console.log(responseAddr);
-    console.log(responseSign);
-
-    // Check signature is valid
-    let prehash = txBlob;
-    if (txBlob.length > 256) {
-      const context = blake2bInit(32);
-      blake2bUpdate(context, txBlob);
-      prehash = Buffer.from(blake2bFinal(context));
-    }
-    const valid = ed25519.verify(responseSign.signature.slice(1), prehash, pubkey);
-    expect(valid).toEqual(true);
-  });
-});
+//     const valid = await ed25519.verify(responseSign.signature.subarray(1), prehash, pubkey)
+//     expect(valid).toEqual(true)
+//   })
+// })
