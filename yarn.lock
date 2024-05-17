@@ -1119,10 +1119,10 @@
     "@typescript-eslint/types" "7.9.0"
     eslint-visitor-keys "^3.4.3"
 
-"@zondax/ledger-js@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@zondax/ledger-js/-/ledger-js-0.8.0.tgz#cca9182ce5bd89d00800d5db098193183ec477a1"
-  integrity sha512-G61wAtj5mBI3EbBe3wB2NXfA4fkBxjxexiCaLOa+akNNhYH0kWFImI7oWfQGMt+epQatvBLg5h0sgNLVge+GRQ==
+"@zondax/ledger-js@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@zondax/ledger-js/-/ledger-js-0.8.1.tgz#b4d09d7778592ce350f8646713ff3a9ee069f0ef"
+  integrity sha512-mr/lHdN73UzsY4FkUOAoCyP5GsxCTbCCKv+fQfE+ENOxI+iv5raFB+V7cCbhKuQdH6kdKhT+wYD2zA6Jv19rGQ==
   dependencies:
     "@ledgerhq/hw-transport" "6.30.6"
 

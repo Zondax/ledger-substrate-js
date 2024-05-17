@@ -33,12 +33,12 @@
     "format:check": "FORCE_COLOR=1 prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "test": "yarn build && ts-jest",
+    "test": "yarn build && jest .",
     "upgrade": "bunx npm-check-updates -i"
   },
   "dependencies": {
     "@ledgerhq/hw-transport": "6.30.6",
-    "@zondax/ledger-js": "^0.8.0",
+    "@zondax/ledger-js": "^0.8.1",
     "axios": "^1.6.8"
   },
   "devDependencies": {

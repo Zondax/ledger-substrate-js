@@ -1,4 +1,3 @@
-// TODO: Use mock transport
 // /** ******************************************************************************
 //  *  (c) 2018 - 2022 Zondax AG
 //  *
@@ -15,11 +14,10 @@
 //  *  limitations under the License.
 //  ******************************************************************************* */
 // import { blake2bFinal, blake2bInit, blake2bUpdate } from 'blakejs'
-
-// import { MockTransport } from '@ledgerhq/hw-transport-mocker'
 // import { ed25519 } from '@noble/curves/ed25519'
 
 // import { newSubstrateApp } from '../src'
+// import { openTransportReplayer, RecordStore } from '@ledgerhq/hw-transport-mocker'
 
 // const CHAIN = 'Kusama'
 // const YOUR_PUBKEY = 'd280b24dface41f31006e5a2783971fc5a66c862dd7d08f97603d2902b75e47a'
@@ -27,13 +25,22 @@
 // const YOUR_BLOB =
 //   '040000313233343536373839303132333435363738393031323334353637383930313233158139ae28a3dfaac5fe1560a5e9e05cd5038d2433158139ae28a3dfaac5fe1560a5e9e05c362400000c000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafeb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe'
 
-// let transport = {}
-
 // jest.setTimeout(60000)
 
 // describe('Integration', function () {
 //   test('get version', async () => {
-//     // @ts-expect-error transport will be there
+//     const store = RecordStore.fromString(`
+//     => e016000000
+//     <= 000000050107426974636f696e034254439000
+//     => e001000000
+//     <= 3110000405312e352e35042300000004312e37002013fe17e06cf2f710d33328aa46d1053f8fadd48dcaeca2c5512dd79e2158d5779000
+//   `,
+//       {
+//         autoSkipUnknownApdu: true,
+//       }
+//     );
+//     const transport = await openTransportReplayer(store)
+
 //     const app = newSubstrateApp(transport, CHAIN)
 //     const resp = await app.getVersion()
 //     console.log(resp)
@@ -47,72 +54,72 @@
 //     expect(resp.test_mode).toEqual(false)
 //   })
 
-//   test('get address', async () => {
-//     // @ts-expect-error transport will be there
-//     const app = newSubstrateApp(transport, CHAIN)
+// //   test('get address', async () => {
+// //     // @ts-expect-error transport will be there
+// //     const app = newSubstrateApp(transport, CHAIN)
 
-//     const pathAccount = 0x80000000
-//     const pathChange = 0x80000000
-//     const pathIndex = 0x80000005
+// //     const pathAccount = 0x80000000
+// //     const pathChange = 0x80000000
+// //     const pathIndex = 0x80000005
 
-//     const response = await app.getAddress(pathAccount, pathChange, pathIndex)
-//     console.log(response)
+// //     const response = await app.getAddress(pathAccount, pathChange, pathIndex)
+// //     console.log(response)
 
-//     expect(response.return_code).toEqual(0x9000)
-//     expect(response.error_message).toEqual('No errors')
-//     expect(response).toHaveProperty('pubKey')
-//     expect(response.pubKey).toEqual(YOUR_PUBKEY)
-//     expect(response.address).toEqual(YOUR_ADDRESS)
-//   })
+// //     expect(response.return_code).toEqual(0x9000)
+// //     expect(response.error_message).toEqual('No errors')
+// //     expect(response).toHaveProperty('pubKey')
+// //     expect(response.pubKey).toEqual(YOUR_PUBKEY)
+// //     expect(response.address).toEqual(YOUR_ADDRESS)
+// //   })
 
-//   test('show address', async () => {
-//     // @ts-expect-error transport will be there
-//     const app = newSubstrateApp(transport, CHAIN)
+// //   test('show address', async () => {
+// //     // @ts-expect-error transport will be there
+// //     const app = newSubstrateApp(transport, CHAIN)
 
-//     const pathAccount = 0x80000000
-//     const pathChange = 0x80000000
-//     const pathIndex = 0x80000005
-//     const response = await app.getAddress(pathAccount, pathChange, pathIndex, true)
+// //     const pathAccount = 0x80000000
+// //     const pathChange = 0x80000000
+// //     const pathIndex = 0x80000005
+// //     const response = await app.getAddress(pathAccount, pathChange, pathIndex, true)
 
-//     console.log(response)
+// //     console.log(response)
 
-//     expect(response.return_code).toEqual(0x9000)
-//     expect(response.error_message).toEqual('No errors')
+// //     expect(response.return_code).toEqual(0x9000)
+// //     expect(response.error_message).toEqual('No errors')
 
-//     expect(response).toHaveProperty('address')
-//     expect(response).toHaveProperty('pubKey')
+// //     expect(response).toHaveProperty('address')
+// //     expect(response).toHaveProperty('pubKey')
 
-//     expect(response.pubKey).toEqual(YOUR_PUBKEY)
-//     expect(response.address).toEqual(YOUR_ADDRESS)
-//   })
+// //     expect(response.pubKey).toEqual(YOUR_PUBKEY)
+// //     expect(response.address).toEqual(YOUR_ADDRESS)
+// //   })
 
-//   test('sign2_and_verify', async () => {
-//     const txBlob = Buffer.from(YOUR_BLOB, 'hex')
+// //   test('sign2_and_verify', async () => {
+// //     const txBlob = Buffer.from(YOUR_BLOB, 'hex')
 
-//     // @ts-expect-error transport will be there
-//     const app = newSubstrateApp(transport, CHAIN)
+// //     // @ts-expect-error transport will be there
+// //     const app = newSubstrateApp(transport, CHAIN)
 
-//     const pathAccount = 0x80000000
-//     const pathChange = 0x80000000
-//     const pathIndex = 0x80000000
+// //     const pathAccount = 0x80000000
+// //     const pathChange = 0x80000000
+// //     const pathIndex = 0x80000000
 
-//     const responseAddr = await app.getAddress(pathAccount, pathChange, pathIndex)
-//     const responseSign = await app.sign(pathAccount, pathChange, pathIndex, txBlob)
+// //     const responseAddr = await app.getAddress(pathAccount, pathChange, pathIndex)
+// //     const responseSign = await app.sign(pathAccount, pathChange, pathIndex, txBlob)
 
-//     const pubkey = responseAddr.pubKey
+// //     const pubkey = responseAddr.pubKey
 
-//     console.log(responseAddr)
-//     console.log(responseSign)
+// //     console.log(responseAddr)
+// //     console.log(responseSign)
 
-//     // Check signature is valid
-//     let prehash = txBlob
-//     if (txBlob.length > 256) {
-//       const context = blake2bInit(32)
-//       blake2bUpdate(context, txBlob)
-//       prehash = Buffer.from(blake2bFinal(context))
-//     }
+// //     // Check signature is valid
+// //     let prehash = txBlob
+// //     if (txBlob.length > 256) {
+// //       const context = blake2bInit(32)
+// //       blake2bUpdate(context, txBlob)
+// //       prehash = Buffer.from(blake2bFinal(context))
+// //     }
 
-//     const valid = await ed25519.verify(responseSign.signature.subarray(1), prehash, pubkey)
-//     expect(valid).toEqual(true)
-//   })
+// //     const valid = ed25519.verify(responseSign.signature.subarray(1), prehash, pubkey)
+// //     expect(valid).toEqual(true)
+// //   })
 // })

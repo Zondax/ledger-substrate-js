@@ -17,7 +17,6 @@
 import type Transport from '@ledgerhq/hw-transport'
 
 import { type SubstrateAppParams } from './common'
-import { PolkadotGenericApp } from './generic_app'
 import { SubstrateApp } from './substrate_app'
 
 export function newSubstrateApp(transport: Transport, chainName: string) {

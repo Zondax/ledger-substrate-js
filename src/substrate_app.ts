@@ -34,11 +34,20 @@ import {
   processErrorResponse,
 } from './common'
 
+/**
+ * Class representing a Substrate application.
+ */
 export class SubstrateApp implements ISubstrateAppLegacy {
   transport: Transport
   cla: number
   slip0044: number
 
+  /**
+   * Create a SubstrateApp instance.
+   * @param transport - The transport instance.
+   * @param cla - The CLA value.
+   * @param slip0044 - The SLIP-0044 value.
+   */
   constructor(transport: Transport, cla: number, slip0044: number) {
     if (transport == null) {
       throw new Error('Transport has not been defined')
@@ -48,6 +57,14 @@ export class SubstrateApp implements ISubstrateAppLegacy {
     this.slip0044 = slip0044
   }
 
+  /**
+   * Serialize the BIP44 path.
+   * @param slip0044 - The SLIP-0044 value.
+   * @param account - The account index.
+   * @param change - The change index.
+   * @param addressIndex - The address index.
+   * @returns The serialized path.
+   */
   static serializePath(slip0044: number, account: number, change: number, addressIndex: number) {
     if (!Number.isInteger(account)) throw new Error('Input must be an integer')
     if (!Number.isInteger(change)) throw new Error('Input must be an integer')
@@ -62,6 +79,11 @@ export class SubstrateApp implements ISubstrateAppLegacy {
     return buf
   }
 
+  /**
+   * Split a message into chunks.
+   * @param message - The message to split.
+   * @returns The message chunks.
+   */
   static GetChunks(message: Buffer) {
     const chunks = []
     const buffer = Buffer.from(message)
@@ -77,6 +99,15 @@ export class SubstrateApp implements ISubstrateAppLegacy {
     return chunks
   }
 
+  /**
+   * Get chunks for signing.
+   * @param slip0044 - The SLIP-0044 value.
+   * @param account - The account index.
+   * @param change - The change index.
+   * @param addressIndex - The address index.
+   * @param message - The message to sign.
+   * @returns The chunks for signing.
+   */
   static signGetChunks(slip0044: number, account: number, change: number, addressIndex: number, message: Buffer) {
     const chunks = []
     const bip44Path = SubstrateApp.serializePath(slip0044, account, change, addressIndex)
@@ -85,6 +116,10 @@ export class SubstrateApp implements ISubstrateAppLegacy {
     return chunks
   }
 
+  /**
+   * Get the version of the application.
+   * @returns The version response.
+   */
   async getVersion(): Promise<ResponseVersion> {
     try {
       return await getVersion(this.transport, this.cla)
@@ -93,6 +128,10 @@ export class SubstrateApp implements ISubstrateAppLegacy {
     }
   }
 
+  /**
+   * Get application information.
+   * @returns The application information.
+   */
   async appInfo() {
     return await this.transport.send(0xb0, 0x01, 0, 0).then(response => {
       const errorCodeData = response.subarray(-2)
@@ -126,23 +165,27 @@ export class SubstrateApp implements ISubstrateAppLegacy {
       return {
         return_code: returnCode,
         error_message: errorCodeToString(returnCode),
-        // //
         appName: appName === '' || 'err',
         appVersion: appVersion === '' || 'err',
         flagLen,
         flagsValue,
-        // eslint-disable-next-line no-bitwise
         flag_recovery: (flagsValue & 1) !== 0,
-        // eslint-disable-next-line no-bitwise
         flag_signed_mcu_code: (flagsValue & 2) !== 0,
-        // eslint-disable-next-line no-bitwise
         flag_onboarded: (flagsValue & 4) !== 0,
-        // eslint-disable-next-line no-bitwise
         flag_pin_validated: (flagsValue & 128) !== 0,
       }
     }, processErrorResponse)
   }
 
+  /**
+   * Get the address.
+   * @param account - The account index.
+   * @param change - The change index.
+   * @param addressIndex - The address index.
+   * @param [requireConfirmation=false] - Whether confirmation is required.
+   * @param [scheme=SCHEME.ED25519] - The scheme.
+   * @returns The address response.
+   */
   async getAddress(
     account: number,
     change: number,
@@ -171,6 +214,16 @@ export class SubstrateApp implements ISubstrateAppLegacy {
     }, processErrorResponse)
   }
 
+  /**
+   * Send a chunk for signing.
+   * @private
+   * @param chunkIdx - The chunk index.
+   * @param chunkNum - The total number of chunks.
+   * @param chunk - The chunk data.
+   * @param [scheme=SCHEME.ED25519] - The scheme.
+   * @param [ins=INS.SIGN] - The instruction.
+   * @returns The response.
+   */
   private async signSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer, scheme = SCHEME.ED25519, ins: INS_SIGN = INS.SIGN) {
     let payloadType = PAYLOAD_TYPE.ADD
     if (chunkIdx === 1) {
@@ -203,6 +256,17 @@ export class SubstrateApp implements ISubstrateAppLegacy {
     }, processErrorResponse)
   }
 
+  /**
+   * Implementation of the signing process.
+   * @private
+   * @param account - The account index.
+   * @param change - The change index.
+   * @param addressIndex - The address index.
+   * @param message - The message to sign.
+   * @param ins - The instruction.
+   * @param [scheme=SCHEME.ED25519] - The scheme.
+   * @returns The signing response.
+   */
   private async signImpl(
     account: number,
     change: number,
@@ -229,16 +293,36 @@ export class SubstrateApp implements ISubstrateAppLegacy {
     }, processErrorResponse)
   }
 
+  /**
+   * Sign a message.
+   * @param account - The account index.
+   * @param change - The change index.
+   * @param addressIndex - The address index.
+   * @param message - The message to sign.
+   * @param [scheme=SCHEME.ED25519] - The scheme.
+   * @returns The signing response.
+   */
   async sign(account: number, change: number, addressIndex: number, message: Buffer, scheme = SCHEME.ED25519) {
     return await this.signImpl(account, change, addressIndex, message, INS.SIGN, scheme)
   }
 
+  /**
+   * Sign a raw message.
+   * @param account - The account index.
+   * @param change - The change index.
+   * @param addressIndex - The address index.
+   * @param message - The message to sign.
+   * @param [scheme=SCHEME.ED25519] - The scheme.
+   * @returns The signing response.
+   */
   async signRaw(account: number, change: number, addressIndex: number, message: Buffer, scheme = SCHEME.ED25519) {
     return await this.signImpl(account, change, addressIndex, message, INS.SIGN_RAW, scheme)
   }
 
   /**
    * @deprecated This function is deprecated and will be removed in future versions.
+   * Get the allowlist public key.
+   * @returns The allowlist public key response.
    */
   async getAllowlistPubKey(): Promise<ResponseAllowlistPubKey> {
     return await this.transport.send(this.cla, INS.ALLOWLIST_GET_PUBKEY, 0, 0).then(response => {
@@ -266,6 +350,9 @@ export class SubstrateApp implements ISubstrateAppLegacy {
 
   /**
    * @deprecated This function is deprecated and will be removed in future versions.
+   * Set the allowlist public key.
+   * @param pk - The public key.
+   * @returns The response.
    */
   async setAllowlistPubKey(pk: Buffer) {
     return await this.transport.send(this.cla, INS.ALLOWLIST_SET_PUBKEY, 0, 0, pk).then(response => {
@@ -281,6 +368,8 @@ export class SubstrateApp implements ISubstrateAppLegacy {
 
   /**
    * @deprecated This function is deprecated and will be removed in future versions.
+   * Get the allowlist hash.
+   * @returns The allowlist hash response.
    */
   async getAllowlistHash(): Promise<ResponseAllowlistHash> {
     return await this.transport.send(this.cla, INS.ALLOWLIST_GET_HASH, 0, 0).then(response => {
@@ -308,6 +397,11 @@ export class SubstrateApp implements ISubstrateAppLegacy {
 
   /**
    * @deprecated This function is deprecated and will be removed in future versions.
+   * Send a chunk for uploading the allowlist.
+   * @param chunkIdx - The chunk index.
+   * @param chunkNum - The total number of chunks.
+   * @param chunk - The chunk data.
+   * @returns The response.
    */
   async uploadSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer) {
     let payloadType = PAYLOAD_TYPE.ADD
@@ -332,6 +426,9 @@ export class SubstrateApp implements ISubstrateAppLegacy {
 
   /**
    * @deprecated This function is deprecated and will be removed in future versions.
+   * Upload the allowlist.
+   * @param message - The allowlist message.
+   * @returns The response.
    */
   async uploadAllowlist(message: Buffer) {
     const chunks: Buffer[] = []
@@ -347,7 +444,6 @@ export class SubstrateApp implements ISubstrateAppLegacy {
       }
 
       for (let i = 1; i < chunks.length; i += 1) {
-        // eslint-disable-next-line no-await-in-loop,no-param-reassign
         result = await this.uploadSendChunk(1 + i, chunks.length, chunks[i])
         if (result.return_code !== ERROR_CODE.NoError) {
           break

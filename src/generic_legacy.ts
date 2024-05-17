@@ -15,20 +15,39 @@
  *  limitations under the License.
  ******************************************************************************* */
 import Transport from '@ledgerhq/hw-transport'
-import { LedgerError, ResponseError, numbersToBip32Path } from '@zondax/ledger-js'
+import { BIP32Path, LedgerError, ResponseError, numbersToBip32Path } from '@zondax/ledger-js'
 
-import { ISubstrateAppLegacy, ResponseAddress, ResponseBase, ResponseSign, ResponseVersion, SCHEME } from './common'
+import { ISubstrateAppLegacy, ResponseAddress, ResponseBase, ResponseSign, ResponseVersion, SCHEME, TransactionBlob } from './common'
 import { PolkadotGenericApp } from './generic_app'
 
+/**
+ * Class representing a legacy Polkadot generic application.
+ * Implements the ISubstrateAppLegacy interface.
+ * @deprecated Use PolkadotGenericApp from generic_app.ts instead.
+ */
 export class PolkadotGenericAppLegacy implements ISubstrateAppLegacy {
   genericApp: PolkadotGenericApp
   ss58prefix: number
 
+  /**
+   * Constructs a new PolkadotGenericAppLegacy instance.
+   * @param transport - The transport instance.
+   * @param ss58prefix - The SS58 prefix.
+   * @param txMetadataChainId - The chain ID in the transaction metadata service.
+   * @param txMetadataSrvUrl - The optional transaction metadata service URL.
+   * @deprecated Use PolkadotGenericApp constructor from generic_app.ts instead.
+   */
   constructor(transport: Transport, ss58prefix: number, txMetadataChainId: string, txMetadataSrvUrl: string | undefined) {
     this.genericApp = new PolkadotGenericApp(transport, txMetadataChainId, txMetadataSrvUrl)
     this.ss58prefix = ss58prefix
   }
 
+  /**
+   * Converts a ResponseError to a legacy ResponseBase format.
+   * @param e - The ResponseError instance.
+   * @returns The legacy ResponseBase object.
+   * @deprecated
+   */
   private convertToLegacyError(e: ResponseError): ResponseBase {
     return {
       error_message: e.errorMessage,
@@ -36,10 +55,23 @@ export class PolkadotGenericAppLegacy implements ISubstrateAppLegacy {
     }
   }
 
-  private convertLegacyPath(account: number, change: number, addressIndex: number) {
+  /**
+   * Converts account, change, and addressIndex to a BIP32Path.
+   * @param account - The account number.
+   * @param change - The change number.
+   * @param addressIndex - The address index.
+   * @returns The BIP32Path.
+   * @deprecated
+   */
+  private convertLegacyPath(account: number, change: number, addressIndex: number): BIP32Path {
     return numbersToBip32Path([0x8000002c, 0x80000162, account, change, addressIndex])
   }
 
+  /**
+   * Retrieves the version of the application.
+   * @returns A promise that resolves to a ResponseVersion object.
+   * @deprecated Use getVersion method from PolkadotGenericApp in generic_app.ts instead.
+   */
   async getVersion(): Promise<ResponseVersion> {
     try {
       const version = await this.genericApp.getVersion()
@@ -67,6 +99,11 @@ export class PolkadotGenericAppLegacy implements ISubstrateAppLegacy {
     }
   }
 
+  /**
+   * Retrieves application information.
+   * @returns A promise that resolves to an object containing application information.
+   * @deprecated Use appInfo method from PolkadotGenericApp in generic_app.ts instead.
+   */
   async appInfo(): Promise<any> {
     try {
       const info = await this.genericApp.appInfo()
@@ -84,6 +121,17 @@ export class PolkadotGenericAppLegacy implements ISubstrateAppLegacy {
     }
   }
 
+  /**
+   * Retrieves the address for a given account, change, and address index.
+   * @param account - The account number.
+   * @param change - The change number.
+   * @param addressIndex - The address index.
+   * @param requireConfirmation - Whether to require confirmation on the device.
+   * @param scheme - The cryptographic scheme.
+   * @returns A promise that resolves to a ResponseAddress object.
+   * @throws {ResponseError} If the scheme is not supported.
+   * @deprecated Use getAddress method from PolkadotGenericApp in generic_app.ts instead.
+   */
   async getAddress(
     account: number,
     change: number,
@@ -114,7 +162,18 @@ export class PolkadotGenericAppLegacy implements ISubstrateAppLegacy {
     }
   }
 
-  async sign(account: number, change: number, addressIndex: number, message: Buffer, scheme?: SCHEME): Promise<ResponseSign> {
+  /**
+   * Signs a transaction blob.
+   * @param account - The account number.
+   * @param change - The change number.
+   * @param addressIndex - The address index.
+   * @param message - The transaction blob.
+   * @param scheme - The cryptographic scheme.
+   * @returns A promise that resolves to a ResponseSign object.
+   * @throws {ResponseError} If the scheme is not supported.
+   * @deprecated Use sign method from PolkadotGenericApp in generic_app.ts instead.
+   */
+  async sign(account: number, change: number, addressIndex: number, message: TransactionBlob, scheme?: SCHEME): Promise<ResponseSign> {
     try {
       if (scheme !== SCHEME.ED25519) {
         throw ResponseError.fromReturnCode(LedgerError.AlgorithmNotSupported)
@@ -137,7 +196,18 @@ export class PolkadotGenericAppLegacy implements ISubstrateAppLegacy {
     }
   }
 
-  async signRaw(account: number, change: number, addressIndex: number, message: Buffer, scheme?: SCHEME): Promise<ResponseSign> {
+  /**
+   * Signs a raw transaction blob.
+   * @param account - The account number.
+   * @param change - The change number.
+   * @param addressIndex - The address index.
+   * @param message - The transaction blob.
+   * @param scheme - The cryptographic scheme.
+   * @returns A promise that resolves to a ResponseSign object.
+   * @throws {ResponseError} If the scheme is not supported.
+   * @deprecated Use signRaw method from PolkadotGenericApp in generic_app.ts instead.
+   */
+  async signRaw(account: number, change: number, addressIndex: number, message: TransactionBlob, scheme?: SCHEME): Promise<ResponseSign> {
     try {
       if (scheme !== SCHEME.ED25519) {
         throw ResponseError.fromReturnCode(LedgerError.AlgorithmNotSupported)

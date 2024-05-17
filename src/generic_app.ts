@@ -1,6 +1,5 @@
 /** ******************************************************************************
- *  (c) 2019 - 2022 Zondax AG
- *  (c) 2016-2017 Ledger
+ *  (c) 2019 - 2024 Zondax AG
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,12 +16,18 @@
 import axios from 'axios'
 
 import type Transport from '@ledgerhq/hw-transport'
-import BaseApp, { INSGeneric, LedgerError, numbersToBip32Path, processErrorResponse, processResponse } from '@zondax/ledger-js'
+import BaseApp, { BIP32Path, INSGeneric, LedgerError, processErrorResponse, processResponse } from '@zondax/ledger-js'
 import { ResponseError } from '@zondax/ledger-js/dist/responseError'
 
-import { GenericResponseSign, GenericeResponseAddress, P1_VALUES, TxMetadata } from './common'
-
-const GenericAppName = 'Polkadot'
+import {
+  GenericResponseSign,
+  GenericeResponseAddress,
+  P1_VALUES,
+  SS58Prefix,
+  TransactionBlob,
+  TransactionMetadataBlob,
+  TxMetadata,
+} from './common'
 
 export class PolkadotGenericApp extends BaseApp {
   static _INS = {
@@ -40,17 +45,17 @@ export class PolkadotGenericApp extends BaseApp {
     requiredPathLengths: [5],
   }
 
+  txMetadataChainId?: string
   txMetadataSrvUrl?: string
-  txMetadataChainId: string
 
   /**
    * Constructs a new PolkadotGenericApp instance.
-   * @param {Transport} transport - The transport instance.
-   * @param {string} txMetadataChainId - The chain ID in the transaction metadata service.
-   * @param {string} [txMetadataSrvUrl] - The optional transaction metadata service URL.
+   * @param transport - The transport instance.
+   * @param txMetadataChainId - The chain ID in the transaction metadata service.
+   * @param txMetadataSrvUrl - The optional transaction metadata service URL.
    * @throws {Error} - If the transport is not defined.
    */
-  constructor(transport: Transport, txMetadataChainId: string, txMetadataSrvUrl?: string) {
+  constructor(transport: Transport, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
     super(transport, PolkadotGenericApp._params)
     this.txMetadataSrvUrl = txMetadataSrvUrl
     this.txMetadataChainId = txMetadataChainId
@@ -62,18 +67,28 @@ export class PolkadotGenericApp extends BaseApp {
 
   /**
    * Retrieves transaction metadata from the metadata service.
-   * @param {Buffer} txBlob - The transaction blob.
-   * @returns {Promise<Buffer>} - The transaction metadata.
-   * @throws {Error} - If the txMetadataSrvUrl is not defined.
+   * @param txBlob - The transaction blob.
+   * @returns The transaction metadata.
+   * @throws {ResponseError} - If the txMetadataSrvUrl is not defined.
    */
-  async getTxMetadata(txBlob: Buffer): Promise<Buffer> {
-    if (this.txMetadataSrvUrl === undefined) {
-      throw new Error('txMetadataSrvUrl is not defined')
+  async getTxMetadata(txBlob: TransactionBlob, txMetadataChainId: string, txMetadataSrvUrl: string): Promise<TransactionMetadataBlob> {
+    if (!txMetadataSrvUrl) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataSrvUrl is not defined or is empty. The use of the method requires access to a metadata shortening service.'
+      )
     }
 
-    const resp = await axios.post<TxMetadata>(this.txMetadataSrvUrl, {
+    if (!txMetadataChainId) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataChainId is not defined or is empty. These values are configured in the metadata shortening service. Check the corresponding configuration in the service.'
+      )
+    }
+
+    const resp = await axios.post<TxMetadata>(txMetadataSrvUrl, {
       txBlob: txBlob.toString('hex'),
-      chain: { id: this.txMetadataChainId },
+      chain: { id: txMetadataChainId },
     })
 
     let txMetadata = resp.data.txMetadata
@@ -86,13 +101,13 @@ export class PolkadotGenericApp extends BaseApp {
 
   /**
    * Retrieves the address for a given BIP44 path and SS58 prefix.
-   * @param {string} bip44Path - The BIP44 path.
-   * @param {number} ss58prefix - The SS58 prefix, must be an integer up to 65535.
-   * @param {boolean} [showAddrInDevice=false] - Whether to show the address on the device.
-   * @returns {Promise<GenericeResponseAddress>} - The address response.
+   * @param bip44Path - The BIP44 path.
+   * @param ss58prefix - The SS58 prefix, must be an integer up to 65535.
+   * @param showAddrInDevice - Whether to show the address on the device.
+   * @returns The address response.
    * @throws {ResponseError} If the response from the device indicates an error.
    */
-  async getAddress(bip44Path: string, ss58prefix: number, showAddrInDevice = false): Promise<GenericeResponseAddress> {
+  async getAddress(bip44Path: BIP32Path, ss58prefix: SS58Prefix, showAddrInDevice = false): Promise<GenericeResponseAddress> {
     // needs to be integer, and up to 65535
     if (!Number.isInteger(ss58prefix) || ss58prefix < 0 || ss58prefix >> 16 !== 0) {
       throw new ResponseError(
@@ -139,7 +154,7 @@ export class PolkadotGenericApp extends BaseApp {
     return chunks
   }
 
-  private getSignReqChunks(path: string, txBlob: Buffer, metadata?: Buffer) {
+  private getSignReqChunks(path: BIP32Path, txBlob: TransactionBlob, metadata?: TransactionMetadataBlob) {
     const chunks: Buffer[] = []
     const bip44Path = this.serializePath(path)
 
@@ -159,13 +174,19 @@ export class PolkadotGenericApp extends BaseApp {
 
   /**
    * Signs a transaction blob.
-   * @param {string} path - The BIP44 path.
-   * @param {number} ins - The instruction for signing.
-   * @param {Buffer} blob - The transaction blob.
-   * @param {Buffer} [metadata] - The optional metadata.
-   * @returns {Promise<GenericResponseSign>} - The response containing the signature and status.
+   * @param path - The BIP44 path.
+   * @param ins - The instruction for signing.
+   * @param blob - The transaction blob.
+   * @param metadata - The optional metadata.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
    */
-  private async signImpl(path: string, ins: number, blob: Buffer, metadata?: Buffer): Promise<GenericResponseSign> {
+  private async signImpl(
+    path: BIP32Path,
+    ins: number,
+    blob: TransactionBlob,
+    metadata?: TransactionMetadataBlob
+  ): Promise<GenericResponseSign> {
     const chunks = this.getSignReqChunks(path, blob, metadata)
 
     try {
@@ -184,34 +205,82 @@ export class PolkadotGenericApp extends BaseApp {
   }
 
   /**
-   * Signs a transaction blob and retrieves the metadata.
-   * @param {string} path - The BIP44 path.
-   * @param {Buffer} txBlob - The transaction blob.
-   * @returns {Promise<GenericResponseSign>} - The response containing the signature and status.
+   * Signs a transaction blob retrieving the correct metadata from a metadata service.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
    */
-  async sign(path: string, txBlob: Buffer) {
-    const txMetadata = await this.getTxMetadata(txBlob)
+  async sign(path: BIP32Path, txBlob: TransactionBlob) {
+    if (!this.txMetadataSrvUrl) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataSrvUrl is not defined or is empty. The use of the method requires access to a metadata shortening service.'
+      )
+    }
+
+    if (!this.txMetadataChainId) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataChainId is not defined or is empty. These values are configured in the metadata shortening service. Check the corresponding configuration in the service.'
+      )
+    }
+
+    const txMetadata = await this.getTxMetadata(txBlob, this.txMetadataSrvUrl, this.txMetadataChainId)
     return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
   }
 
   /**
    * Signs a transaction blob with provided metadata.
-   * @param {string} path - The BIP44 path.
-   * @param {Buffer} txBlob - The transaction blob.
-   * @param {Buffer} txMetadata - The transaction metadata.
-   * @returns {Promise<GenericResponseSign>} - The response containing the signature and status.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @param txMetadataChainId - The optional chain ID for the transaction metadata service. This value temporarily overrides the one set in the constructor.
+   * @param txMetadataSrvUrl - The optional URL for the transaction metadata service. This value temporarily overrides the one set in the constructor.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
    */
-  async signAdvanced(path: string, txBlob: Buffer, txMetadata: Buffer) {
+  async signMigration(path: BIP32Path, txBlob: TransactionBlob, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
+    if (!this.txMetadataSrvUrl) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataSrvUrl is not defined or is empty. The use of the method requires access to a metadata shortening service.'
+      )
+    }
+
+    if (!this.txMetadataChainId) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataChainId is not defined or is empty. These values are configured in the metadata shortening service. Check the corresponding configuration in the service.'
+      )
+    }
+
+    const txMetadata = await this.getTxMetadata(
+      txBlob,
+      txMetadataChainId ?? this.txMetadataChainId,
+      txMetadataSrvUrl ?? this.txMetadataSrvUrl
+    )
     return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
+  }
+  /**
+   * Signs a raw transaction blob.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  async signRaw(path: BIP32Path, txBlob: TransactionBlob) {
+    return await this.signImpl(path, this.INS.SIGN_RAW, txBlob)
   }
 
   /**
-   * Signs a raw transaction blob.
-   * @param {string} path - The BIP44 path.
-   * @param {Buffer} txBlob - The transaction blob.
-   * @returns {Promise<GenericResponseSign>} - The response containing the signature and status.
+   * [Expert-only Method] Signs a transaction blob with provided metadata (this could be used also with a migration app)
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @param txMetadata - The transaction metadata.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
    */
-  async signRaw(path: string, txBlob: Buffer) {
-    return await this.signImpl(path, this.INS.SIGN_RAW, txBlob)
+  async signWithMetadata(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
+    return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
   }
 }

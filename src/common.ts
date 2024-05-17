@@ -17,6 +17,10 @@ import type Transport from '@ledgerhq/hw-transport'
  *  limitations under the License.
  ******************************************************************************* */
 
+export type TransactionMetadataBlob = Buffer
+export type TransactionBlob = Buffer
+export type SS58Prefix = number
+
 /**
  * @deprecated Moved to @zondax/ledger-js
  */
