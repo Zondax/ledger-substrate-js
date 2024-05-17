@@ -1,6 +1,5 @@
 /** ******************************************************************************
- *  (c) 2019 - 2022 ZondaX AG
- *  (c) 2016-2017 Ledger
+ *  (c) 2019 - 2024 Zondax AG
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,276 +13,274 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  ******************************************************************************* */
-import type Transport from "@ledgerhq/hw-transport";
-import axios from "axios";
+import axios from 'axios'
+
+import type Transport from '@ledgerhq/hw-transport'
+import BaseApp, { BIP32Path, INSGeneric, LedgerError, processErrorResponse, processResponse } from '@zondax/ledger-js'
+import { ResponseError } from '@zondax/ledger-js/dist/responseError'
 
 import {
-  errorCodeToString,
-  ERROR_CODE,
-  getVersion,
-  INS,
-  PAYLOAD_TYPE,
-  processErrorResponse,
-  type ResponseAddress,
-  type ResponseSign,
-  type ResponseVersion,
-  type INS_SIGN,
-  serializePath,
-  getSignReqChunks,
+  GenericResponseSign,
+  GenericeResponseAddress,
   P1_VALUES,
-} from "./common";
-import { supportedApps } from "./supported_apps";
+  SS58Prefix,
+  TransactionBlob,
+  TransactionMetadataBlob,
+  TxMetadata,
+} from './common'
 
-const GenericAppName = "Polkadot";
-
-interface TxMetadata {
-  txMetadata: string;
-}
-
-export function newPolkadotGenericApp(
-  transport: Transport,
-  chainId: string,
-  txMetadataSrvUrl: string,
-): PolkadotGenericApp {
-  return PolkadotGenericApp.newApp(transport, chainId, txMetadataSrvUrl);
-}
-export function newPolkadotMigrationApp(
-  transport: Transport,
-  chainId: string,
-  cla: number,
-  sip0044: number,
-  txMetadataSrvUrl: string,
-): PolkadotGenericApp {
-  return PolkadotGenericApp.newMigrationApp(transport, cla, sip0044, chainId, txMetadataSrvUrl);
-}
-
-export class PolkadotGenericApp {
-  transport: Transport;
-  cla: number;
-  slip0044: number;
-  txMetadataSrvUrl: string;
-  chainId: string;
-
-  static newApp(transport: Transport, chainId: string, txMetadataSrvUrl: string): PolkadotGenericApp {
-    const polkadotAppParams = supportedApps.find(({ name }) => name === GenericAppName);
-    if (polkadotAppParams === undefined) throw new Error("polkadot app params missed");
-
-    const { cla, slip0044 } = polkadotAppParams;
-    return new PolkadotGenericApp(transport, cla, slip0044, chainId, txMetadataSrvUrl);
+export class PolkadotGenericApp extends BaseApp {
+  static _INS = {
+    GET_VERSION: 0x00 as number,
+    GET_ADDR: 0x01 as number,
+    SIGN: 0x02 as number,
+    SIGN_RAW: 0x03 as number,
   }
 
-  static newMigrationApp(
-    transport: Transport,
-    cla: number,
-    slip0044: number,
-    chainId: string,
-    txMetadataSrvUrl: string,
-  ): PolkadotGenericApp {
-    return new PolkadotGenericApp(transport, cla, slip0044, chainId, txMetadataSrvUrl);
+  static _params = {
+    cla: 0xf9,
+    ins: { ...PolkadotGenericApp._INS } as INSGeneric,
+    p1Values: { ONLY_RETRIEVE: 0x00 as 0, SHOW_ADDRESS_IN_DEVICE: 0x01 as 1 },
+    chunkSize: 250,
+    requiredPathLengths: [5],
   }
 
-  private constructor(transport: Transport, cla: number, slip0044: number, chainId: string, txMetadataSrvUrl: string) {
-    if (transport == null) {
-      throw new Error("Transport has not been defined");
-    }
-    this.transport = transport;
-    this.cla = cla;
-    this.slip0044 = slip0044;
-    this.txMetadataSrvUrl = txMetadataSrvUrl;
-    this.chainId = chainId;
-  }
+  txMetadataChainId?: string
+  txMetadataSrvUrl?: string
 
-  async getTxMetadata(txBlob: Buffer): Promise<Buffer> {
-    const resp = await axios.post<TxMetadata>(this.txMetadataSrvUrl, {
-      txBlob: txBlob.toString("hex"),
-      chain: { id: this.chainId },
-    });
+  /**
+   * Constructs a new PolkadotGenericApp instance.
+   * @param transport - The transport instance.
+   * @param txMetadataChainId - The chain ID in the transaction metadata service.
+   * @param txMetadataSrvUrl - The optional transaction metadata service URL.
+   * @throws {Error} - If the transport is not defined.
+   */
+  constructor(transport: Transport, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
+    super(transport, PolkadotGenericApp._params)
+    this.txMetadataSrvUrl = txMetadataSrvUrl
+    this.txMetadataChainId = txMetadataChainId
 
-    let txMetadata = resp.data.txMetadata;
-    if (txMetadata.slice(0, 2) === "0x") {
-      txMetadata = txMetadata.slice(2);
-    }
-
-    return Buffer.from(txMetadata, "hex");
-  }
-
-  async getVersion(): Promise<ResponseVersion> {
-    return await getVersion(this.transport, this.cla);
-  }
-
-  async appInfo() {
-    try {
-      const response = await this.transport.send(0xb0, 0x01, 0, 0);
-      const errorCodeData = response.subarray(-2);
-      const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
-
-      let appName = "";
-      let appVersion = "";
-      let flagLen = 0;
-      let flagsValue = 0;
-
-      if (response[0] !== 1) {
-        // Ledger responds with format ID 1. There is no spec for any format != 1
-        return {
-          return_code: 0x9001,
-          error_message: "response format ID not recognized",
-        };
-      }
-
-      const appNameLen = response[1];
-      appName = response.subarray(2, 2 + appNameLen).toString("ascii");
-      let idx = 2 + appNameLen;
-      const appVersionLen = response[idx];
-      idx += 1;
-      appVersion = response.subarray(idx, idx + appVersionLen).toString("ascii");
-      idx += appVersionLen;
-      const appFlagsLen = response[idx];
-      idx += 1;
-      flagLen = appFlagsLen;
-      flagsValue = response[idx];
-
-      return {
-        return_code: returnCode,
-        error_message: errorCodeToString(returnCode),
-        // //
-        appName: appName === "" || "err",
-        appVersion: appVersion === "" || "err",
-        flagLen,
-        flagsValue,
-        // eslint-disable-next-line no-bitwise
-        flag_recovery: (flagsValue & 1) !== 0,
-        // eslint-disable-next-line no-bitwise
-        flag_signed_mcu_code: (flagsValue & 2) !== 0,
-        // eslint-disable-next-line no-bitwise
-        flag_onboarded: (flagsValue & 4) !== 0,
-        // eslint-disable-next-line no-bitwise
-        flag_issuer_trusted: (flagsValue & 8) !== 0,
-        // eslint-disable-next-line no-bitwise
-        flag_custom_ca_trusted: (flagsValue & 16) !== 0,
-        // eslint-disable-next-line no-bitwise
-        flag_hsm_initialized: (flagsValue & 32) !== 0,
-        // eslint-disable-next-line no-bitwise
-        flag_factory_filled: (flagsValue & 64) !== 0,
-        // eslint-disable-next-line no-bitwise
-        flag_pin_validated: (flagsValue & 128) !== 0,
-      };
-    } catch (e) {
-      return processErrorResponse(e);
+    if (!this.transport) {
+      throw new Error('Transport has not been defined')
     }
   }
 
-  async getAddress(
-    account: number,
-    change: number,
-    addressIndex: number,
-    ss58prefix: number,
-    showAddrInDevice = false,
-  ): Promise<ResponseAddress> {
+  /**
+   * Retrieves transaction metadata from the metadata service.
+   * @param txBlob - The transaction blob.
+   * @returns The transaction metadata.
+   * @throws {ResponseError} - If the txMetadataSrvUrl is not defined.
+   */
+  async getTxMetadata(txBlob: TransactionBlob, txMetadataChainId: string, txMetadataSrvUrl: string): Promise<TransactionMetadataBlob> {
+    if (!txMetadataSrvUrl) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataSrvUrl is not defined or is empty. The use of the method requires access to a metadata shortening service.'
+      )
+    }
+
+    if (!txMetadataChainId) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataChainId is not defined or is empty. These values are configured in the metadata shortening service. Check the corresponding configuration in the service.'
+      )
+    }
+
+    const resp = await axios.post<TxMetadata>(txMetadataSrvUrl, {
+      txBlob: txBlob.toString('hex'),
+      chain: { id: txMetadataChainId },
+    })
+
+    let txMetadata = resp.data.txMetadata
+    if (txMetadata.slice(0, 2) === '0x') {
+      txMetadata = txMetadata.slice(2)
+    }
+
+    return Buffer.from(txMetadata, 'hex')
+  }
+
+  /**
+   * Retrieves the address for a given BIP44 path and SS58 prefix.
+   * @param bip44Path - The BIP44 path.
+   * @param ss58prefix - The SS58 prefix, must be an integer up to 65535.
+   * @param showAddrInDevice - Whether to show the address on the device.
+   * @returns The address response.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   */
+  async getAddress(bip44Path: BIP32Path, ss58prefix: SS58Prefix, showAddrInDevice = false): Promise<GenericeResponseAddress> {
     // needs to be integer, and up to 65535
-    if (!Number.isInteger(ss58prefix) && ss58prefix >> 16 !== 0) {
-      throw new Error(`Unexpected ss58prefix ${ss58prefix}. Needs to be up to 2^16`);
+    if (!Number.isInteger(ss58prefix) || ss58prefix < 0 || ss58prefix >> 16 !== 0) {
+      throw new ResponseError(
+        LedgerError.ConditionsOfUseNotSatisfied,
+        `Unexpected ss58prefix ${ss58prefix}. Needs to be a non-negative integer up to 2^16`
+      )
     }
 
-    const bip44Path = serializePath(this.slip0044, account, change, addressIndex);
-    const payload = Buffer.alloc(bip44Path.length + 2);
-    bip44Path.copy(payload);
-    payload.writeUInt16LE(ss58prefix, payload.length - 2);
+    const bip44PathBuffer = this.serializePath(bip44Path)
+    const prefixBuffer = Buffer.alloc(2)
+    prefixBuffer.writeUInt16LE(ss58prefix)
+    const payload = Buffer.concat([bip44PathBuffer, prefixBuffer])
 
-    const p1 = showAddrInDevice ? P1_VALUES.SHOW_ADDRESS_IN_DEVICE : P1_VALUES.ONLY_RETRIEVE;
-
+    const p1 = showAddrInDevice ? P1_VALUES.SHOW_ADDRESS_IN_DEVICE : P1_VALUES.ONLY_RETRIEVE
     try {
-      const response = await this.transport.send(this.cla, INS.GET_ADDR, p1, 0, payload);
-      const errorCodeData = response.subarray(-2);
-      const errorCode = errorCodeData[0] * 256 + errorCodeData[1];
+      const responseBuffer = await this.transport.send(this.CLA, this.INS.GET_ADDR, p1, 0, payload)
+
+      const response = processResponse(responseBuffer)
+
+      const pubKey = response.readBytes(32).toString('hex')
+      const address = response.readBytes(response.length()).toString('ascii')
 
       return {
-        pubKey: response.subarray(0, 32).toString("hex"),
-        address: response.subarray(32, response.length - 2).toString("ascii"),
-        return_code: errorCode,
-        error_message: errorCodeToString(errorCode),
-      };
+        pubKey,
+        address,
+      } as GenericeResponseAddress
     } catch (e) {
-      return processErrorResponse(e);
+      throw processErrorResponse(e)
     }
   }
 
-  private async signSendChunk(chunkIdx: number, chunkNum: number, chunk: Buffer, ins: INS_SIGN = INS.SIGN) {
-    let payloadType = PAYLOAD_TYPE.ADD;
-    if (chunkIdx === 1) {
-      payloadType = PAYLOAD_TYPE.INIT;
-    }
-    if (chunkIdx === chunkNum) {
-      payloadType = PAYLOAD_TYPE.LAST;
-    }
+  private splitBufferToChunks(message: Buffer, chunkSize: number) {
+    const chunks = []
+    const buffer = Buffer.from(message)
 
-    try {
-      const response = await this.transport.send(this.cla, ins, payloadType, 0, chunk, [
-        ERROR_CODE.NoError,
-        ERROR_CODE.InvalidData,
-      ]);
-      const errorCodeData = response.subarray(-2);
-      const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
-      let errorMessage = errorCodeToString(returnCode);
-      let signature = null;
-
-      if (response.length > 2) {
-        if (returnCode === ERROR_CODE.InvalidData) {
-          errorMessage = response.subarray(0, response.length - 2).toString("ascii");
-        } else if (response.length > 2) {
-          signature = response.subarray(0, response.length - 2);
-        }
+    for (let i = 0; i < buffer.length; i += chunkSize) {
+      let end = i + chunkSize
+      if (i > buffer.length) {
+        end = buffer.length
       }
-
-      return {
-        signature,
-        return_code: returnCode,
-        error_message: errorMessage,
-      };
-    } catch (e) {
-      return processErrorResponse(e);
+      chunks.push(buffer.subarray(i, end))
     }
+
+    return chunks
   }
 
-  async signImpl(
-    account: number,
-    change: number,
-    addressIndex: number,
-    ins: INS_SIGN,
-    blob: Buffer,
-    metadata?: Buffer,
-  ): Promise<ResponseSign> {
-    const chunks = getSignReqChunks(this.slip0044, account, change, addressIndex, blob, metadata);
+  private getSignReqChunks(path: BIP32Path, txBlob: TransactionBlob, metadata?: TransactionMetadataBlob) {
+    const chunks: Buffer[] = []
+    const bip44Path = this.serializePath(path)
+
+    const blobLen = Buffer.alloc(2)
+    blobLen.writeUInt16LE(txBlob.length)
+
+    chunks.push(Buffer.concat([bip44Path, blobLen]))
+
+    if (metadata == null) {
+      chunks.push(...this.splitBufferToChunks(txBlob, this.CHUNK_SIZE))
+    } else {
+      chunks.push(...this.splitBufferToChunks(Buffer.concat([txBlob, metadata]), this.CHUNK_SIZE))
+    }
+
+    return chunks
+  }
+
+  /**
+   * Signs a transaction blob.
+   * @param path - The BIP44 path.
+   * @param ins - The instruction for signing.
+   * @param blob - The transaction blob.
+   * @param metadata - The optional metadata.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  private async signImpl(
+    path: BIP32Path,
+    ins: number,
+    blob: TransactionBlob,
+    metadata?: TransactionMetadataBlob
+  ): Promise<GenericResponseSign> {
+    const chunks = this.getSignReqChunks(path, blob, metadata)
 
     try {
-      let result = await this.signSendChunk(1, chunks.length, chunks[0], ins);
+      let result = await this.signSendChunk(ins, 1, chunks.length, chunks[0])
 
       for (let i = 1; i < chunks.length; i += 1) {
-        result = await this.signSendChunk(1 + i, chunks.length, chunks[i], ins);
-        if (result.return_code !== ERROR_CODE.NoError) {
-          break;
-        }
+        result = await this.signSendChunk(ins, 1 + i, chunks.length, chunks[i])
       }
 
       return {
-        return_code: result.return_code,
-        error_message: result.error_message,
-        signature: result.signature,
-      };
+        signature: result.readBytes(result.length()),
+      }
     } catch (e) {
-      return processErrorResponse(e);
+      throw processErrorResponse(e)
     }
   }
 
-  async sign(account: number, change: number, addressIndex: number, txBlob: Buffer) {
-    const txMetadata = await this.getTxMetadata(txBlob);
-    return await this.signImpl(account, change, addressIndex, INS.SIGN, txBlob, txMetadata);
+  /**
+   * Signs a transaction blob retrieving the correct metadata from a metadata service.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  async sign(path: BIP32Path, txBlob: TransactionBlob) {
+    if (!this.txMetadataSrvUrl) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataSrvUrl is not defined or is empty. The use of the method requires access to a metadata shortening service.'
+      )
+    }
+
+    if (!this.txMetadataChainId) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataChainId is not defined or is empty. These values are configured in the metadata shortening service. Check the corresponding configuration in the service.'
+      )
+    }
+
+    const txMetadata = await this.getTxMetadata(txBlob, this.txMetadataSrvUrl, this.txMetadataChainId)
+    return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
   }
 
-  async signAdvanced(account: number, change: number, addressIndex: number, txBlob: Buffer, txMetadata: Buffer) {
-    return await this.signImpl(account, change, addressIndex, INS.SIGN, txBlob, txMetadata);
+  /**
+   * Signs a transaction blob with provided metadata.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @param txMetadataChainId - The optional chain ID for the transaction metadata service. This value temporarily overrides the one set in the constructor.
+   * @param txMetadataSrvUrl - The optional URL for the transaction metadata service. This value temporarily overrides the one set in the constructor.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  async signMigration(path: BIP32Path, txBlob: TransactionBlob, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
+    if (!this.txMetadataSrvUrl) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataSrvUrl is not defined or is empty. The use of the method requires access to a metadata shortening service.'
+      )
+    }
+
+    if (!this.txMetadataChainId) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataChainId is not defined or is empty. These values are configured in the metadata shortening service. Check the corresponding configuration in the service.'
+      )
+    }
+
+    const txMetadata = await this.getTxMetadata(
+      txBlob,
+      txMetadataChainId ?? this.txMetadataChainId,
+      txMetadataSrvUrl ?? this.txMetadataSrvUrl
+    )
+    return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
+  }
+  /**
+   * Signs a raw transaction blob.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  async signRaw(path: BIP32Path, txBlob: TransactionBlob) {
+    return await this.signImpl(path, this.INS.SIGN_RAW, txBlob)
   }
 
-  async signRaw(account: number, change: number, addressIndex: number, txBlob: Buffer) {
-    return await this.signImpl(account, change, addressIndex, INS.SIGN_RAW, txBlob);
+  /**
+   * [Expert-only Method] Signs a transaction blob with provided metadata (this could be used also with a migration app)
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @param txMetadata - The transaction metadata.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  async signWithMetadata(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
+    return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
   }
 }
