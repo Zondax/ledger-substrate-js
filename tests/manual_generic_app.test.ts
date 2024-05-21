@@ -1,4 +1,5 @@
 // TODO: Use mock transport
+
 /** ******************************************************************************
  *  (c) 2018 - 2022 Zondax AG
  *
@@ -19,8 +20,8 @@ import { blake2bFinal, blake2bInit, blake2bUpdate } from 'blakejs'
 import Transport from '@ledgerhq/hw-transport'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 
-import { PolkadotGenericApp } from '../src/generic_app'
-import { supportedApps } from '../src/supported_apps'
+import { PolkadotGenericApp } from '../src'
+import { supportedApps } from '../src'
 
 const PATH = "m/44'/354'/0'/0'/0'"
 const TX_METADATA_SRV_URL = 'https://api.zondax.ch/polkadot/transaction/metadata'
@@ -33,15 +34,13 @@ const YOUR_BLOB =
 
 let transport: Transport
 
-jest.setTimeout(60000)
 
-beforeAll(async () => {
-  transport = await TransportNodeHid.create(1000)
-})
 
-test('skip manual', async () => {})
+describe.skip('Integration', function () {
+  beforeAll(async () => {
+    transport = await TransportNodeHid.create(1000)
+  })
 
-xdescribe('Integration', function () {
   test('get version', async () => {
     const app = new PolkadotGenericApp(transport, CHAIN_ID, TX_METADATA_SRV_URL)
     const resp = await app.getVersion()

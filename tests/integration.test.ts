@@ -123,6 +123,3 @@
 // //     expect(valid).toEqual(true)
 // //   })
 // })
-
-
-test('skip manual', async () => {})
