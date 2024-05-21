@@ -259,11 +259,7 @@ export class PolkadotGenericApp extends BaseApp {
       )
     }
 
-    const txMetadata = await this.getTxMetadata(
-      txBlob,
-      txMetadataChainId,
-      txMetadataSrvUrl
-    )
+    const txMetadata = await this.getTxMetadata(txBlob, txMetadataChainId, txMetadataSrvUrl)
     return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
   }
   /**

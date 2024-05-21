@@ -132,7 +132,6 @@ xdescribe('Integration', function () {
     console.log(responseSign)
   })
 
-
   /*
   // TODO only valid on westend (running locally) now. Enable it again whenever metadata is supported on public nodes.
   test('sign2_and_verify', async () => {
