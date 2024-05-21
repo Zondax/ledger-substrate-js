@@ -16,7 +16,7 @@
 import axios from 'axios'
 
 import type Transport from '@ledgerhq/hw-transport'
-import BaseApp, { BIP32Path, INSGeneric, LedgerError, processErrorResponse, processResponse, ResponseError } from '@zondax/ledger-js'
+import BaseApp, { BIP32Path, INSGeneric, LedgerError, ResponseError, processErrorResponse, processResponse } from '@zondax/ledger-js'
 
 import {
   GenericResponseSign,

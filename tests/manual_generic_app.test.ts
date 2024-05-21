@@ -34,7 +34,6 @@ const YOUR_BLOB =
 
 let transport: Transport
 
-
 // These tests are meant to be run with a real device connected. They are meant to facilitate manual testing
 describe.skip('Integration', function () {
   beforeAll(async () => {
