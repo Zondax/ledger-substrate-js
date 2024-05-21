@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@ledgerhq/hw-transport": "6.30.6",
-    "@zondax/ledger-js": "^0.8.1",
+    "@zondax/ledger-js": "^0.8.2",
     "axios": "^1.6.8"
   },
   "devDependencies": {
