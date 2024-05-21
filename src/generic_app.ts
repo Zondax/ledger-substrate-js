@@ -68,27 +68,32 @@ export class PolkadotGenericApp extends BaseApp {
   /**
    * Retrieves transaction metadata from the metadata service.
    * @param txBlob - The transaction blob.
+   * @param txMetadataChainId - The optional chain ID for the transaction metadata service. This value temporarily overrides the one set in the constructor.
+   * @param txMetadataSrvUrl - The optional URL for the transaction metadata service. This value temporarily overrides the one set in the constructor.
    * @returns The transaction metadata.
    * @throws {ResponseError} - If the txMetadataSrvUrl is not defined.
    */
-  async getTxMetadata(txBlob: TransactionBlob, txMetadataChainId: string, txMetadataSrvUrl: string): Promise<TransactionMetadataBlob> {
-    if (!txMetadataSrvUrl) {
+  async getTxMetadata(txBlob: TransactionBlob, txMetadataChainId?: string, txMetadataSrvUrl?: string): Promise<TransactionMetadataBlob> {
+    const txMetadataChainIdVal = txMetadataChainId ?? this.txMetadataChainId
+    const txMetadataSrvUrlVal = txMetadataSrvUrl ?? this.txMetadataSrvUrl
+
+    if (!txMetadataChainIdVal) {
       throw new ResponseError(
         LedgerError.GenericError,
         'txMetadataSrvUrl is not defined or is empty. The use of the method requires access to a metadata shortening service.'
       )
     }
 
-    if (!txMetadataChainId) {
+    if (!txMetadataSrvUrlVal) {
       throw new ResponseError(
         LedgerError.GenericError,
         'txMetadataChainId is not defined or is empty. These values are configured in the metadata shortening service. Check the corresponding configuration in the service.'
       )
     }
 
-    const resp = await axios.post<TxMetadata>(txMetadataSrvUrl, {
+    const resp = await axios.post<TxMetadata>(txMetadataSrvUrlVal, {
       txBlob: txBlob.toString('hex'),
-      chain: { id: txMetadataChainId },
+      chain: { id: txMetadataChainIdVal },
     })
 
     let txMetadata = resp.data.txMetadata
@@ -226,7 +231,7 @@ export class PolkadotGenericApp extends BaseApp {
       )
     }
 
-    const txMetadata = await this.getTxMetadata(txBlob, this.txMetadataSrvUrl, this.txMetadataChainId)
+    const txMetadata = await this.getTxMetadata(txBlob)
     return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
   }
 
@@ -256,8 +261,8 @@ export class PolkadotGenericApp extends BaseApp {
 
     const txMetadata = await this.getTxMetadata(
       txBlob,
-      txMetadataChainId ?? this.txMetadataChainId,
-      txMetadataSrvUrl ?? this.txMetadataSrvUrl
+      txMetadataChainId,
+      txMetadataSrvUrl
     )
     return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
   }
