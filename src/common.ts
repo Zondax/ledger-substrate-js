@@ -196,7 +196,7 @@ function isDict(v: any) {
 export function processErrorResponse(response: any) {
   if (response != null) {
     if (isDict(response)) {
-      if (Object.prototype.hasOwnProperty.call(response, 'statusCode')) {
+      if (Object.prototype.hasOwnProperty.call(response, 'returnCode')) {
         return {
           return_code: response.statusCode,
           error_message: errorCodeToString(response.statusCode),
