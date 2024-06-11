@@ -230,12 +230,48 @@ export function processErrorResponse(response: any) {
   }
 }
 
+async function getVersionBig(response: Buffer) {
+  const errorCodeData = response.subarray(-2)
+  const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
+
+  if (response.length !== 20) {
+    return {
+      return_code: ERROR_CODE.InvalidData,
+      error_message: errorCodeToString(ERROR_CODE.InvalidData),
+    }
+  }
+
+  const major = (response[1] << 24) | (response[2] << 16) | (response[3] << 8) | response[4]
+  const minor = (response[5] << 24) | (response[6] << 16) | (response[7] << 8) | response[8]
+  const patch = (response[9] << 24) | (response[10] << 16) | (response[11] << 8) | response[12]
+
+  const deviceLocked = response[13] === 1
+  // eslint-disable-next-line no-bitwise
+  const targetId = (response[14] << 24) + (response[15] << 16) + (response[16] << 8) + (response[17] << 0)
+
+  return {
+    return_code: returnCode,
+    error_message: errorCodeToString(returnCode),
+    // ///
+    test_mode: response[0] !== 0,
+    major,
+    minor,
+    patch,
+    deviceLocked,
+    target_id: targetId.toString(16),
+  }
+}
+
 export async function getVersion(transport: Transport, cla: number) {
   try {
     const response = await transport.send(cla, INS.GET_VERSION, 0, 0)
+    // Some chains will return the version using uint32 fields for major, minor and patch
+    if (response.length === 20) {
+      return getVersionBig(response)
+    }
+
     const errorCodeData = response.subarray(-2)
     const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
-
     // 12 bytes + 2 error code
     if (response.length !== 14) {
       return {
