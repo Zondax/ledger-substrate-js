@@ -308,4 +308,4 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x800002b3,
     ss58_addr_type: 5845,
   }
-];
+]
