@@ -297,10 +297,10 @@ export const supportedApps: SubstrateAppParams[] = [
     ss58_addr_type: 255,
   },
   {
-  name: 'Avail',
-  cla: 0xbc,
-  slip0044: 0x800002c5,
-  ss58_addr_type: 42,
+    name: 'Avail',
+    cla: 0xbc,
+    slip0044: 0x800002c5,
+    ss58_addr_type: 42,
   },
   {
     name: "Tangle",
