@@ -1,7 +1,0 @@
-.cache
-.git
-node_modules
-public
-build
-dist
-tests

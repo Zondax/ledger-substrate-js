@@ -1,7 +1,7 @@
-import type Transport from "@ledgerhq/hw-transport";
+import type Transport from '@ledgerhq/hw-transport'
 
 /** ******************************************************************************
- *  (c) 2019 - 2022 ZondaX AG
+ *  (c) 2019 - 2022 Zondax AG
  *  (c) 2016-2017 Ledger
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,15 @@ import type Transport from "@ledgerhq/hw-transport";
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  ******************************************************************************* */
-export const CHUNK_SIZE = 250;
+
+export type TransactionMetadataBlob = Buffer
+export type TransactionBlob = Buffer
+export type SS58Prefix = number
+
+/**
+ * @deprecated Moved to @zondax/ledger-js
+ */
+export const CHUNK_SIZE = 250
 
 export const enum INS {
   GET_VERSION = 0x00,
@@ -25,14 +33,29 @@ export const enum INS {
   SIGN_RAW = 0x03,
 
   // Allow list related commands
+  /**
+   * @deprecated
+   */
   ALLOWLIST_GET_PUBKEY = 0x90,
+  /**
+   * @deprecated
+   */
   ALLOWLIST_SET_PUBKEY = 0x91,
+  /**
+   * @deprecated
+   */
   ALLOWLIST_GET_HASH = 0x92,
+  /**
+   * @deprecated
+   */
   ALLOWLIST_UPLOAD = 0x93,
 }
 
-export type INS_SIGN = INS.SIGN | INS.SIGN_RAW;
+export type INS_SIGN = INS.SIGN | INS.SIGN_RAW
 
+/**
+ * @deprecated Moved to @zondax/ledger-js
+ */
 export const enum PAYLOAD_TYPE {
   INIT = 0x00,
   ADD = 0x01,
@@ -46,132 +69,187 @@ export const enum P1_VALUES {
 
 export const enum SCHEME {
   ED25519 = 0x00,
+  /**
+   * @deprecated This is deprecated and will be removed in future versions.
+   */
   SR25519 = 0x01,
 }
 
 export const enum ERROR_CODE {
   NoError = 0x9000,
+  InvalidData = 0x6984,
 }
 
+/**
+ * @deprecated Moved to @zondax/ledger-js
+ */
 export const ERROR_DESCRIPTION: Record<number, string> = {
-  1: "U2F: Unknown",
-  2: "U2F: Bad request",
-  3: "U2F: Configuration unsupported",
-  4: "U2F: Device Ineligible",
-  5: "U2F: Timeout",
-  14: "Timeout",
-  0x9000: "No errors",
-  0x9001: "Device is busy",
-  0x6802: "Error deriving keys",
-  0x6400: "Execution Error",
-  0x6700: "Wrong Length",
-  0x6982: "Empty Buffer",
-  0x6983: "Output buffer too small",
-  0x6984: "Data is invalid",
-  0x6985: "Conditions not satisfied",
-  0x6986: "Transaction rejected",
-  0x6a80: "Bad key handle",
-  0x6b00: "Invalid P1/P2",
-  0x6d00: "Instruction not supported",
-  0x6e01: "App does not seem to be open",
-  0x6f00: "Unknown error",
-  0x6f01: "Sign/verify error",
-};
+  1: 'U2F: Unknown',
+  2: 'U2F: Bad request',
+  3: 'U2F: Configuration unsupported',
+  4: 'U2F: Device Ineligible',
+  5: 'U2F: Timeout',
+  14: 'Timeout',
+  0x9000: 'No errors',
+  0x9001: 'Device is busy',
+  0x6802: 'Error deriving keys',
+  0x6400: 'Execution Error',
+  0x6700: 'Wrong Length',
+  0x6982: 'Empty Buffer',
+  0x6983: 'Output buffer too small',
+  0x6984: 'Data is invalid',
+  0x6985: 'Conditions not satisfied',
+  0x6986: 'Transaction rejected',
+  0x6a80: 'Bad key handle',
+  0x6b00: 'Invalid P1/P2',
+  0x6d00: 'Instruction not supported',
+  0x6e01: 'App does not seem to be open',
+  0x6f00: 'Unknown error',
+  0x6f01: 'Sign/verify error',
+}
 
+/**
+ * @deprecated
+ */
 export interface SubstrateAppParams {
-  name: string;
-  cla: number;
-  slip0044: number;
-  ss58_addr_type: number;
+  name: string
+  cla: number
+  slip0044: number
+  ss58_addr_type: number
 }
 
+/**
+ * @deprecated
+ */
 export interface ResponseBase {
-  error_message: string;
-  return_code: number;
+  error_message: string
+  return_code: number
 }
 
+/**
+ * @deprecated
+ */
 export interface ResponseAddress extends ResponseBase {
-  address: string;
-  pubKey: string;
+  address: string
+  pubKey: string
 }
 
+export interface GenericeResponseAddress {
+  address: string
+  pubKey: string
+}
+
+/**
+ * @deprecated
+ */
 export interface ResponseVersion extends ResponseBase {
-  device_locked: boolean;
-  major: number;
-  minor: number;
-  patch: number;
-  test_mode: boolean;
+  device_locked: boolean
+  major: number
+  minor: number
+  patch: number
+  test_mode: boolean
 }
 
+/**
+ * @deprecated
+ */
 export interface ResponseAllowlistPubKey extends ResponseBase {
-  pubKey: string;
+  pubKey: string
 }
 
+/**
+ * @deprecated
+ */
 export interface ResponseAllowlistHash extends ResponseBase {
-  hash: Buffer;
+  hash: Buffer
 }
 
+/**
+ * @deprecated
+ */
 export interface ResponseSign extends ResponseBase {
-  signature: Buffer;
+  signature: Buffer
 }
 
+export interface GenericResponseSign {
+  signature: Buffer
+}
+
+/**
+ * @deprecated Moved to @zondax/ledger-js
+ */
 export function errorCodeToString(statusCode: number) {
-  if (statusCode in ERROR_DESCRIPTION) return ERROR_DESCRIPTION[statusCode];
-  return `Unknown Status Code: ${statusCode}`;
+  if (statusCode in ERROR_DESCRIPTION) return ERROR_DESCRIPTION[statusCode]
+  return `Unknown Status Code: ${statusCode}`
 }
 
+/**
+ * @deprecated  Moved to @zondax/ledger-js
+ */
 function isDict(v: any) {
-  return typeof v === "object" && v !== null && !(v instanceof Array) && !(v instanceof Date);
+  return typeof v === 'object' && v !== null && !(v instanceof Array) && !(v instanceof Date)
 }
 
+/**
+ * @deprecated  Moved to @zondax/ledger-js
+ */
 export function processErrorResponse(response: any) {
   if (response != null) {
     if (isDict(response)) {
-      if (Object.prototype.hasOwnProperty.call(response, "statusCode")) {
+      if (Object.prototype.hasOwnProperty.call(response, 'returnCode')) {
+        return {
+          return_code: response.returnCode,
+          error_message: errorCodeToString(response.returnCode),
+        }
+      }
+
+      if (Object.prototype.hasOwnProperty.call(response, 'statusCode')) {
         return {
           return_code: response.statusCode,
           error_message: errorCodeToString(response.statusCode),
-        };
+        }
       }
 
       if (
-        Object.prototype.hasOwnProperty.call(response, "return_code") &&
-        Object.prototype.hasOwnProperty.call(response, "error_message")
+        Object.prototype.hasOwnProperty.call(response, 'return_code') &&
+        Object.prototype.hasOwnProperty.call(response, 'error_message')
       ) {
-        return response;
+        return response
       }
     }
+
     return {
       return_code: 0xffff,
       error_message: response.toString(),
-    };
+    }
   }
 
   return {
     return_code: 0xffff,
     error_message: response.toString(),
-  };
+  }
 }
 
 export async function getVersion(transport: Transport, cla: number) {
-  return await transport.send(cla, INS.GET_VERSION, 0, 0).then((response) => {
-    const errorCodeData = response.subarray(-2);
-    const returnCode = errorCodeData[0] * 256 + errorCodeData[1];
+  try {
+    const response = await transport.send(cla, INS.GET_VERSION, 0, 0)
+    const errorCodeData = response.subarray(-2)
+    const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
 
     // 12 bytes + 2 error code
     if (response.length !== 14) {
       return {
-        return_code: 0x6984,
-        error_message: errorCodeToString(0x6984),
-      };
+        return_code: ERROR_CODE.InvalidData,
+        error_message: errorCodeToString(ERROR_CODE.InvalidData),
+      }
     }
 
-    const major = response[1] * 256 + response[2];
-    const minor = response[3] * 256 + response[4];
-    const patch = response[5] * 256 + response[6];
-    const deviceLocked = response[7] === 1;
+    const major = response[1] * 256 + response[2]
+    const minor = response[3] * 256 + response[4]
+    const patch = response[5] * 256 + response[6]
+    const deviceLocked = response[7] === 1
     // eslint-disable-next-line no-bitwise
-    const targetId = (response[8] << 24) + (response[9] << 16) + (response[10] << 8) + (response[11] << 0);
+    const targetId = (response[8] << 24) + (response[9] << 16) + (response[10] << 8) + (response[11] << 0)
 
     return {
       return_code: returnCode,
@@ -183,6 +261,56 @@ export async function getVersion(transport: Transport, cla: number) {
       patch,
       deviceLocked,
       target_id: targetId.toString(16),
-    };
-  }, processErrorResponse);
+    }
+  } catch (e) {
+    return processErrorResponse(e)
+  }
+}
+
+/**
+ * @deprecated This function is deprecated and will be removed in future versions.
+ */
+export function serializePath(slip0044: number, account: number, change: number, addressIndex: number) {
+  if (!Number.isInteger(account)) throw new Error('Input must be an integer')
+  if (!Number.isInteger(change)) throw new Error('Input must be an integer')
+  if (!Number.isInteger(addressIndex)) throw new Error('Input must be an integer')
+
+  const buf = Buffer.alloc(20)
+  buf.writeUInt32LE(0x8000002c, 0)
+  buf.writeUInt32LE(slip0044, 4)
+  buf.writeUInt32LE(account, 8)
+  buf.writeUInt32LE(change, 12)
+  buf.writeUInt32LE(addressIndex, 16)
+  return buf
+}
+
+/**
+ * @deprecated This interface has been extracted from the legacy implementation
+ * it is to ensure backwards compatibility with the old implementation
+ */
+export interface ISubstrateAppLegacy {
+  // constructor(transport: Transport, cla: number, slip0044: number) {
+  //   if (transport == null) {
+  //     throw new Error("Transport has not been defined");
+  //   }
+  //   this.transport = transport;
+  //   this.cla = cla;
+  //   this.slip0044 = slip0044;
+  // }
+
+  getVersion(): Promise<ResponseVersion>
+  appInfo(): Promise<any>
+  getAddress(
+    account: number,
+    change: number,
+    addressIndex: number,
+    requireConfirmation?: boolean,
+    scheme?: SCHEME
+  ): Promise<ResponseAddress>
+  sign(account: number, change: number, addressIndex: number, message: Buffer, scheme?: SCHEME): Promise<ResponseSign>
+  signRaw(account: number, change: number, addressIndex: number, message: Buffer, scheme?: SCHEME): Promise<ResponseSign>
+}
+
+export interface TxMetadata {
+  txMetadata: string
 }

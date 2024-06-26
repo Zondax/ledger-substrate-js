@@ -1,7 +1,6 @@
 # ledger-substrate (JS Integration)
 
-![zondax_light](docs/zondax_light.png#gh-light-mode-only)
-![zondax_dark](docs/zondax_dark.png#gh-dark-mode-only)
+![zondax_light](docs/zondax_light.png#gh-light-mode-only) ![zondax_dark](docs/zondax_dark.png#gh-dark-mode-only)
 
 [![Main](https://github.com/Zondax/ledger-substrate-js/workflows/Main/badge.svg)](https://github.com/Zondax/ledger-substrate-js/actions?query=workflow%3AMain)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -20,12 +19,34 @@ using the official Substrate Ledger apps in recovery mode.
 | getAddress | pubkey + address | path + ( showInDevice ) |
 | sign       | signed message   | path + message          |
 
-getAddress command requires that you set the derivation path (account, change, index) and has an option parameter to display the address on the device. By default, it will retrieve the information without confirmation from the user.
+getAddress command requires that you set the derivation path (account, change, index) and has an option parameter to
+display the address on the device. By default, it will retrieve the information without confirmation from the user.
+
+# Migrating to the Generic App
+
+### Steps to Migrate
+
+1. **Update the Package**: Ensure you are using the latest version of the package (version 0.42.0 or higher).
+2. **Create a Generic App**:
+
+- Import the `newGenericApp` function.
+- Provide the following new arguments:
+  - **chainTicker**: This is the ticker symbol of the chain where you intend to sign transactions.
+  - **txMetadataSrvUrl**: This is the URL for the generic app API service, which generates the transaction metadata needed for signing transactions on the device. Zondax provides a live demo of this service [here](https://api.zondax.ch/polkadot/transaction/metadata).
+
+3. **Configure Address Retrieval**:
+
+- When using the `getAddress` method, include the new required argument:
+  - **ss58prefix**: This is the ss58 prefix for the chain for which you want to retrieve or display addresses.
+
+### Additional Resources
+
+- The generic app API service repository is available on [Github](https://github.com/Zondax/ledger-polkadot-generic-api).
 
 # Add new chain
 
-If you want to add support for your chain, you just need to create a PR in this repository adding the parameters that belong to the chain.
-Go to [supported APPs](./src/supported_apps.ts) and add a new entry at the end of the file.
+If you want to add support for your chain, you just need to create a PR in this repository adding the parameters that
+belong to the chain. Go to [supported APPs](./src/supported_apps.ts) and add a new entry at the end of the file.
 
 ```
 {
@@ -36,15 +57,18 @@ Go to [supported APPs](./src/supported_apps.ts) and add a new entry at the end o
 },
 ```
 
-Take the last used CLA and pick the following number. This is just an ID for the app that is used in APDU protocol. This is probably the easiest way to get a free CLA.
+Take the last used CLA and pick the following number. This is just an ID for the app that is used in APDU protocol. This
+is probably the easiest way to get a free CLA.
 
-For Slip0044 parameter, you might want to [register here](https://github.com/satoshilabs/slips/blob/master/slip-0044.md) as well.
+For Slip0044 parameter, you might want to [register here](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)
+as well.
 
 SS58 prefix have no limitation whatsoever, you just have to set an uint16 number that is used in your chain.
 
 # Testing with real devices
 
-It is possible to test this package with a real Ledger Nano device. To accomplish that, you will need to follow these steps:
+It is possible to test this package with a real Ledger Nano device. To accomplish that, you will need to follow these
+steps:
 
 - Install the application in the Ledger device
 - Install the dependencies from this project
@@ -57,9 +81,11 @@ yarn test
 
 ## Example:
 
-Visit and download the [latest release](https://github.com/Zondax/ledger-kusama/releases/latest) from repository (in this case Kusama).
+Visit and download the [latest release](https://github.com/Zondax/ledger-kusama/releases/latest) from repository (in
+this case Kusama).
 
-Download the installer script for your device but bear in mind that NanoX does not allow side loading applications. Give execution permission and run the script.
+Download the installer script for your device but bear in mind that NanoX does not allow side loading applications. Give
+execution permission and run the script.
 
 ```shell script
 chmod +x installer_nano_device.sh
@@ -79,4 +105,5 @@ Run tests and you will see how this module communicates with your device.
 
 # Who we are?
 
-We are Zondax, a company pioneering blockchain services. If you want to know more about us, please visit us at [zondax.ch](https://zondax.ch)
+We are Zondax, a company pioneering blockchain services. If you want to know more about us, please visit us at
+[zondax.ch](https://zondax.ch)
