@@ -26,13 +26,14 @@ display the address on the device. By default, it will retrieve the information 
 
 ### Steps to Migrate
 
-1. **Update the Package**: Ensure you are using the latest version of the package (version 0.42.0 or higher).
+1. **Update the Package**: Ensure you are using the latest version of the package (version 0.44.0 or higher).
 2. **Create a Generic App**:
 
-- Import the `newGenericApp` function.
+- Import the `PolkadotGenericAppLegacy` class.
 - Provide the following new arguments:
-  - **chainTicker**: This is the ticker symbol of the chain where you intend to sign transactions.
-  - **txMetadataSrvUrl**: This is the URL for the generic app API service, which generates the transaction metadata needed for signing transactions on the device. Zondax provides a live demo of this service [here](https://api.zondax.ch/polkadot/transaction/metadata).
+  - **txMetadataChainId**: This is the id of the chain where you intend to sign transactions. This should match the chain id configured at the generic app API service.
+  - **txMetadataSrvUrl**: This is the URL for the generic app API service, which generates the transaction metadata needed for signing transactions on the device. Zondax provides a live demo of this service. The url is:
+    - https://api.zondax.ch/polkadot/transaction/metadata
 
 3. **Configure Address Retrieval**:
 
@@ -43,7 +44,9 @@ display the address on the device. By default, it will retrieve the information 
 
 - The generic app API service repository is available on [Github](https://github.com/Zondax/ledger-polkadot-generic-api).
 
-# Add new chain
+# Add new chain 
+
+:warning::warning: This was meaningful when the new polkadot app was not published yet. As long as you chain supports the runtime version v15, there is no need for creating a new class for you app. :warning::warning:
 
 If you want to add support for your chain, you just need to create a PR in this repository adding the parameters that
 belong to the chain. Go to [supported APPs](./src/supported_apps.ts) and add a new entry at the end of the file.
