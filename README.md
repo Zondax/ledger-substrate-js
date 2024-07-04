@@ -46,8 +46,6 @@ display the address on the device. By default, it will retrieve the information 
 
 # Add new chain
 
-:warning::warning: This was meaningful when the new polkadot app was not published yet. As long as you chain supports the runtime version v15, there is no need for creating a new class for you app. :warning::warning:
-
 If you want to add support for your chain, you just need to create a PR in this repository adding the parameters that
 belong to the chain. Go to [supported APPs](./src/supported_apps.ts) and add a new entry at the end of the file.
 
