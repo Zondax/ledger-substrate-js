@@ -44,7 +44,7 @@ display the address on the device. By default, it will retrieve the information 
 
 - The generic app API service repository is available on [Github](https://github.com/Zondax/ledger-polkadot-generic-api).
 
-# Add new chain 
+# Add new chain
 
 :warning::warning: This was meaningful when the new polkadot app was not published yet. As long as you chain supports the runtime version v15, there is no need for creating a new class for you app. :warning::warning:
 
