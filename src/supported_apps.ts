@@ -302,4 +302,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x800002c5,
     ss58_addr_type: 42,
   },
+  {
+    name: 'Entropy',
+    cla: 0xbd,
+    slip0044: 0x80000520,
+    ss58_addr_type: 42,
+  },
 ]
