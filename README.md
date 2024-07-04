@@ -26,13 +26,14 @@ display the address on the device. By default, it will retrieve the information 
 
 ### Steps to Migrate
 
-1. **Update the Package**: Ensure you are using the latest version of the package (version 0.42.0 or higher).
+1. **Update the Package**: Ensure you are using the latest version of the package (version 0.44.0 or higher).
 2. **Create a Generic App**:
 
-- Import the `newGenericApp` function.
+- Import the `PolkadotGenericAppLegacy` class.
 - Provide the following new arguments:
-  - **chainTicker**: This is the ticker symbol of the chain where you intend to sign transactions.
-  - **txMetadataSrvUrl**: This is the URL for the generic app API service, which generates the transaction metadata needed for signing transactions on the device. Zondax provides a live demo of this service [here](https://api.zondax.ch/polkadot/transaction/metadata).
+  - **txMetadataChainId**: This is the id of the chain where you intend to sign transactions. This should match the chain id configured at the generic app API service.
+  - **txMetadataSrvUrl**: This is the URL for the generic app API service, which generates the transaction metadata needed for signing transactions on the device. Zondax provides a live demo of this service. The url is:
+    - https://api.zondax.ch/polkadot/transaction/metadata
 
 3. **Configure Address Retrieval**:
 
