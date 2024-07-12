@@ -73,6 +73,7 @@ export const enum SCHEME {
    * @deprecated This is deprecated and will be removed in future versions.
    */
   SR25519 = 0x01,
+  ECDSA = 0x02,
 }
 
 export const enum ERROR_CODE {
