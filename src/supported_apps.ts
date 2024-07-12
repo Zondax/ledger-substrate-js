@@ -308,4 +308,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x80000520,
     ss58_addr_type: 42,
   },
+  {
+    name: 'Peaq',
+    cla: 0x61,
+    slip0044: 0x80000d0a,
+    ss58_addr_type: 42,
+  },
 ]
