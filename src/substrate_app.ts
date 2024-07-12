@@ -205,9 +205,14 @@ export class SubstrateApp implements ISubstrateAppLegacy {
       const errorCodeData = response.subarray(-2)
       const errorCode = errorCodeData[0] * 256 + errorCodeData[1]
 
+      let pubkeyLen = 32
+      if (scheme == SCHEME.ECDSA) {
+        pubkeyLen = 33
+      }
+
       return {
-        pubKey: response.subarray(0, 32).toString('hex'),
-        address: response.subarray(32, response.length - 2).toString('ascii'),
+        pubKey: response.subarray(0, pubkeyLen).toString('hex'),
+        address: response.subarray(pubkeyLen, response.length - 2).toString('ascii'),
         return_code: errorCode,
         error_message: errorCodeToString(errorCode),
       }
