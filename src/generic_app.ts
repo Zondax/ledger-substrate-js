@@ -79,14 +79,14 @@ export class PolkadotGenericApp extends BaseApp {
     if (!txMetadataChainIdVal) {
       throw new ResponseError(
         LedgerError.GenericError,
-        'txMetadataSrvUrl is not defined or is empty. The use of the method requires access to a metadata shortening service.'
+        'txMetadataChainId is not defined or is empty. The use of the method requires access to a metadata shortening service.'
       )
     }
 
     if (!txMetadataSrvUrlVal) {
       throw new ResponseError(
         LedgerError.GenericError,
-        'txMetadataChainId is not defined or is empty. These values are configured in the metadata shortening service. Check the corresponding configuration in the service.'
+        'txMetadataSrvUrl is not defined or is empty. These values are configured in the metadata shortening service. Check the corresponding configuration in the service.'
       )
     }
 

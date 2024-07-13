@@ -34,6 +34,7 @@ display the address on the device. By default, it will retrieve the information 
   - **txMetadataChainId**: This is the id of the chain where you intend to sign transactions. This should match the chain id configured at the generic app API service.
   - **txMetadataSrvUrl**: This is the URL for the generic app API service, which generates the transaction metadata needed for signing transactions on the device. Zondax provides a live demo of this service. The url is:
     - https://api.zondax.ch/polkadot/transaction/metadata
+- Important Note: The expected bip32Path spec requires the following format - `m/44'/{slip44}'/{account}'/0'/{addressIndex}'`
 
 3. **Configure Address Retrieval**:
 
