@@ -237,20 +237,34 @@ export async function getVersion(transport: Transport, cla: number) {
     const errorCodeData = response.subarray(-2)
     const returnCode = errorCodeData[0] * 256 + errorCodeData[1]
 
-    // 12 bytes + 2 error code
-    if (response.length !== 14) {
+    // 12 bytes + 2 error code (2 bytes per value on version)
+    // 18 bytes + 2 error code (4 bytes per value on version)
+    if (response.length !== 14 && response.length !== 20) {
       return {
         return_code: ERROR_CODE.InvalidData,
         error_message: errorCodeToString(ERROR_CODE.InvalidData),
       }
     }
 
-    const major = response[1] * 256 + response[2]
-    const minor = response[3] * 256 + response[4]
-    const patch = response[5] * 256 + response[6]
-    const deviceLocked = response[7] === 1
+    let major, minor, patch, deviceLocked, targetId
+
+    if (response.length === 14) {
+      // 12 bytes + 2 error code (2 bytes per value on version)
+      major = response.readUInt16BE(1)
+      minor = response.readUInt16BE(3)
+      patch = response.readUInt16BE(5)
+      deviceLocked = response[7] === 1
+      targetId = (response[8] << 24) + (response[9] << 16) + (response[10] << 8) + (response[11] << 0)
+    } else {
+      // 18 bytes + 2 error code (4 bytes per value on version)
+      major = response.readUInt32BE(1)
+      minor = response.readUInt32BE(5)
+      patch = response.readUInt32BE(9)
+      deviceLocked = response[13] === 1
+      targetId = (response[14] << 24) + (response[15] << 16) + (response[16] << 8) + (response[17] << 0)
+    }
+
     // eslint-disable-next-line no-bitwise
-    const targetId = (response[8] << 24) + (response[9] << 16) + (response[10] << 8) + (response[11] << 0)
 
     return {
       return_code: returnCode,
