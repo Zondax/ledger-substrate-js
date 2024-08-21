@@ -314,4 +314,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x8000003c,
     ss58_addr_type: 42,
   },
+  {
+    name: 'DENTNet',
+    cla: 0xf9,
+    slip0044: 0x800002de,
+    ss58_addr_type: 9807,
+  },
 ]
