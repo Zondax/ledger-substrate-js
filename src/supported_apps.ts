@@ -314,4 +314,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x8000003c,
     ss58_addr_type: 42,
   },
+    {
+    name: 'Encointer',
+    cla: 0x62,
+    slip0044: 0x800001b2,
+    ss58_addr_type: 2,
+  },
 ]
