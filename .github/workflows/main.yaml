@@ -34,7 +34,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           scope: '@zondax'
 
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
 
       - run: bun install
 
