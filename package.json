@@ -48,7 +48,7 @@
     "@swc/core": "^1.6.5",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/jest": "29.5.12",
-    "@types/node": "^20.14.9",
+    "@types/node": "^22.10.1",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.14.1",
     "bip32": "^4.0.0",
