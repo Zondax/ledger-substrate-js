@@ -320,4 +320,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x80000162,
     ss58_addr_type: 42,
   },
+  {
+    name: 'Vara',
+    cla: 0xc0,
+    slip0044: 0x80001370,
+    ss58_addr_type: 137,
+  },
 ]
