@@ -54,6 +54,12 @@ export const enum INS {
 export type INS_SIGN = INS.SIGN | INS.SIGN_RAW
 
 /**
+ * Address lengths for different schemes
+ */
+export const ED25519_PUBKEY_LEN = 32
+export const ECDSA_PUBKEY_LEN = 33
+
+/**
  * @deprecated Moved to @zondax/ledger-js
  */
 export const enum PAYLOAD_TYPE {

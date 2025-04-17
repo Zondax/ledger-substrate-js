@@ -19,9 +19,12 @@ import type Transport from '@ledgerhq/hw-transport'
 import BaseApp, { BIP32Path, INSGeneric, LedgerError, ResponseError, processErrorResponse, processResponse } from '@zondax/ledger-js'
 
 import {
+  ECDSA_PUBKEY_LEN,
+  ED25519_PUBKEY_LEN,
   GenericResponseSign,
   GenericeResponseAddress,
   P1_VALUES,
+  SCHEME,
   SS58Prefix,
   TransactionBlob,
   TransactionMetadataBlob,
@@ -108,10 +111,16 @@ export class PolkadotGenericApp extends BaseApp {
    * @param bip44Path - The BIP44 path.
    * @param ss58prefix - The SS58 prefix, must be an integer up to 65535.
    * @param showAddrInDevice - Whether to show the address on the device.
+   * @param scheme - The scheme to use for the address. Default is ED25519.
    * @returns The address response.
    * @throws {ResponseError} If the response from the device indicates an error.
    */
-  async getAddress(bip44Path: BIP32Path, ss58prefix: SS58Prefix, showAddrInDevice = false): Promise<GenericeResponseAddress> {
+  async getAddress(
+    bip44Path: BIP32Path,
+    ss58prefix: SS58Prefix,
+    showAddrInDevice = false,
+    scheme = SCHEME.ED25519
+  ): Promise<GenericeResponseAddress> {
     // needs to be integer, and up to 65535
     if (!Number.isInteger(ss58prefix) || ss58prefix < 0 || ss58prefix >> 16 !== 0) {
       throw new ResponseError(
@@ -123,16 +132,28 @@ export class PolkadotGenericApp extends BaseApp {
     const bip44PathBuffer = this.serializePath(bip44Path)
     const prefixBuffer = Buffer.alloc(2)
     prefixBuffer.writeUInt16LE(ss58prefix)
-    const payload = Buffer.concat([bip44PathBuffer, prefixBuffer])
+
+    let payload = bip44PathBuffer
+    if (scheme === SCHEME.ED25519) {
+      payload = Buffer.concat([payload, prefixBuffer])
+    }
 
     const p1 = showAddrInDevice ? P1_VALUES.SHOW_ADDRESS_IN_DEVICE : P1_VALUES.ONLY_RETRIEVE
     try {
-      const responseBuffer = await this.transport.send(this.CLA, this.INS.GET_ADDR, p1, 0, payload)
+      const responseBuffer = await this.transport.send(this.CLA, this.INS.GET_ADDR, p1, scheme ?? SCHEME.ED25519, payload)
 
       const response = processResponse(responseBuffer)
 
-      const pubKey = response.readBytes(32).toString('hex')
-      const address = response.readBytes(response.length()).toString('ascii')
+      const currentScheme = (scheme ?? SCHEME.ED25519) as number
+      const pubKeyLen = currentScheme === SCHEME.ECDSA ? ECDSA_PUBKEY_LEN : ED25519_PUBKEY_LEN
+      const pubKey = response.readBytes(pubKeyLen).toString('hex')
+
+      let address = ''
+      if (currentScheme === SCHEME.ECDSA) {
+        address = response.readBytes(response.length()).toString('hex')
+      } else {
+        address = response.readBytes(response.length()).toString('ascii')
+      }
 
       return {
         pubKey,
@@ -141,6 +162,14 @@ export class PolkadotGenericApp extends BaseApp {
     } catch (e) {
       throw processErrorResponse(e)
     }
+  }
+
+  async getAddress_ecdsa(bip44Path: BIP32Path, showAddrInDevice = false) {
+    return this.getAddress(bip44Path, 0, showAddrInDevice, SCHEME.ECDSA)
+  }
+
+  async getAddress_ed25519(bip44Path: BIP32Path, ss58prefix: SS58Prefix, showAddrInDevice = false) {
+    return this.getAddress(bip44Path, ss58prefix, showAddrInDevice)
   }
 
   private splitBufferToChunks(message: Buffer, chunkSize: number) {
