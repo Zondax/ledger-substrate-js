@@ -30,7 +30,7 @@ describe('KeyDerivation', function () {
     const expected_pk = 'ffbc10f71d63e0da1b9e7ee2eb4037466551dc32b9d4641aafd73a65970fae42'
 
     expect(output?.pk.toString('hex')).toEqual(expected_pk)
-    expect(output?.address.toString('hex')).toEqual(expected_address)
+    expect(output?.address).toEqual(expected_address)
   })
 
   test('Kusama non-hardened', () => {
@@ -44,7 +44,7 @@ describe('KeyDerivation', function () {
     const expected_pk = '9aacddd17054070103ad37ee76610d1adaa7f8e0d02b76fb91391eec8a2470af'
 
     expect(output?.pk.toString('hex')).toEqual(expected_pk)
-    expect(output?.address.toString('hex')).toEqual(expected_address)
+    expect(output?.address).toEqual(expected_address)
   })
 
   test('Polkadot', () => {
@@ -58,6 +58,6 @@ describe('KeyDerivation', function () {
     const expected_pk = 'e1b4d72d27b3e91b9b6116555b4ea17138ddc12ca7cdbab30e2e0509bd848419'
 
     expect(output?.pk.toString('hex')).toEqual(expected_pk)
-    expect(output?.address.toString('hex')).toEqual(expected_address)
+    expect(output?.address).toEqual(expected_address)
   })
 })
