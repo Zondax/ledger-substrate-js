@@ -1,3 +1,5 @@
+import bs58 from 'bs58'
+
 /** ******************************************************************************
  *  (c) 2019 - 2022 Zondax AG
  *  (c) 2016-2017 Ledger
@@ -18,7 +20,7 @@
 const bip39 = require('bip39')
 const hash = require('hash.js')
 const bip32ed25519 = require('bip32-ed25519')
-const bs58 = require('bs58')
+
 const blake = require('blakejs')
 
 const HDPATH_0_DEFAULT = 0x8000002c

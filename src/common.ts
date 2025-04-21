@@ -31,7 +31,6 @@ export const enum INS {
   GET_ADDR = 0x01,
   SIGN = 0x02,
   SIGN_RAW = 0x03,
-
   // Allow list related commands
   /**
    * @deprecated
@@ -52,6 +51,12 @@ export const enum INS {
 }
 
 export type INS_SIGN = INS.SIGN | INS.SIGN_RAW
+
+/**
+ * Address lengths for different schemes
+ */
+export const ED25519_PUBKEY_LEN = 32
+export const ECDSA_PUBKEY_LEN = 33
 
 /**
  * @deprecated Moved to @zondax/ledger-js
@@ -174,6 +179,12 @@ export interface ResponseSign extends ResponseBase {
 
 export interface GenericResponseSign {
   signature: Buffer
+}
+
+export interface GenericResponseSignEcdsa {
+  r: Buffer
+  s: Buffer
+  v: Buffer
 }
 
 /**

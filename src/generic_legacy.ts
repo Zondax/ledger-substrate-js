@@ -180,7 +180,7 @@ export class PolkadotGenericAppLegacy implements ISubstrateAppLegacy {
       }
 
       const bip44Path = this.convertLegacyPath(account, change, addressIndex)
-      const signature = await this.genericApp.sign(bip44Path, message)
+      const signature = await this.genericApp.signEd25519(bip44Path, message)
       const legacyError = this.convertToLegacyError(ResponseError.fromReturnCode(LedgerError.NoErrors))
 
       return {
@@ -214,7 +214,7 @@ export class PolkadotGenericAppLegacy implements ISubstrateAppLegacy {
       }
 
       const bip44Path = this.convertLegacyPath(account, change, addressIndex)
-      const signature = await this.genericApp.signRaw(bip44Path, message)
+      const signature = await this.genericApp.signRawEd25519(bip44Path, message)
       const legacyError = this.convertToLegacyError(ResponseError.fromReturnCode(LedgerError.NoErrors))
 
       return {
