@@ -22,6 +22,7 @@ import {
   ECDSA_PUBKEY_LEN,
   ED25519_PUBKEY_LEN,
   GenericResponseSign,
+  GenericResponseSignEcdsa,
   GenericeResponseAddress,
   P1_VALUES,
   SCHEME,
@@ -37,6 +38,8 @@ export class PolkadotGenericApp extends BaseApp {
     GET_ADDR: 0x01 as number,
     SIGN: 0x02 as number,
     SIGN_RAW: 0x03 as number,
+    SIGN_ECDSA: 0x04 as number,
+    SIGN_RAW_ECDSA: 0x05 as number,
   }
 
   static _params = {
@@ -107,6 +110,7 @@ export class PolkadotGenericApp extends BaseApp {
   }
 
   /**
+   * @deprecated Use getAddressEcdsa or getAddressEd25519 instead. This method will be removed in a future version.
    * Retrieves the address for a given BIP44 path and SS58 prefix.
    * @param bip44Path - The BIP44 path.
    * @param ss58prefix - The SS58 prefix, must be an integer up to 65535.
@@ -127,6 +131,10 @@ export class PolkadotGenericApp extends BaseApp {
         LedgerError.ConditionsOfUseNotSatisfied,
         `Unexpected ss58prefix ${ss58prefix}. Needs to be a non-negative integer up to 2^16`
       )
+    }
+
+    if (scheme != SCHEME.ECDSA && scheme != SCHEME.ED25519) {
+      throw new ResponseError(LedgerError.ConditionsOfUseNotSatisfied, `Unexpected scheme ${scheme}. Needs to be ECDSA (2) or ED25519 (0)`)
     }
 
     const bip44PathBuffer = this.serializePath(bip44Path)
@@ -164,11 +172,26 @@ export class PolkadotGenericApp extends BaseApp {
     }
   }
 
-  async getAddress_ecdsa(bip44Path: BIP32Path, showAddrInDevice = false) {
+  /**
+   * Retrieves the address for a given BIP44 path using the ECDSA scheme.
+   * @param bip44Path - The BIP44 path.
+   * @param showAddrInDevice - Whether to show the address on the device.
+   * @returns The address response.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   */
+  async getAddressEcdsa(bip44Path: BIP32Path, showAddrInDevice = false) {
     return this.getAddress(bip44Path, 0, showAddrInDevice, SCHEME.ECDSA)
   }
 
-  async getAddress_ed25519(bip44Path: BIP32Path, ss58prefix: SS58Prefix, showAddrInDevice = false) {
+  /**
+   * Retrieves the address for a given BIP44 path and SS58 prefix using the ED25519 scheme.
+   * @param bip44Path - The BIP44 path.
+   * @param ss58prefix - The SS58 prefix.
+   * @param showAddrInDevice - Whether to show the address on the device.
+   * @returns The address response.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   */
+  async getAddressEd25519(bip44Path: BIP32Path, ss58prefix: SS58Prefix, showAddrInDevice = false) {
     return this.getAddress(bip44Path, ss58prefix, showAddrInDevice)
   }
 
@@ -214,7 +237,7 @@ export class PolkadotGenericApp extends BaseApp {
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  private async signImpl(
+  private async signImplEd25519(
     path: BIP32Path,
     ins: number,
     blob: TransactionBlob,
@@ -238,13 +261,66 @@ export class PolkadotGenericApp extends BaseApp {
   }
 
   /**
+   * Signs a transaction blob using the ECDSA scheme.
+   * @param path - The BIP44 path.
+   * @param ins - The instruction for signing.
+   * @param blob - The transaction blob.
+   * @param metadata - The optional metadata.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  private async signImplEcdsa(
+    path: BIP32Path,
+    ins: number,
+    blob: TransactionBlob,
+    metadata?: TransactionMetadataBlob
+  ): Promise<GenericResponseSignEcdsa> {
+    const chunks = this.getSignReqChunks(path, blob, metadata)
+
+    try {
+      let result = await this.signSendChunk(ins, 1, chunks.length, chunks[0])
+
+      for (let i = 1; i < chunks.length; i += 1) {
+        result = await this.signSendChunk(ins, 1 + i, chunks.length, chunks[i])
+      }
+
+      return {
+        r: result.readBytes(32),
+        s: result.readBytes(32),
+        v: result.readBytes(1),
+      }
+    } catch (e) {
+      throw processErrorResponse(e)
+    }
+  }
+
+  /**
+   * @deprecated Use signEcdsa or signEd25519 instead. This method will be removed in a future version.
    * Signs a transaction blob retrieving the correct metadata from a metadata service.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @param scheme - The scheme to use for the signing. Default is ED25519.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  async sign(path: BIP32Path, txBlob: TransactionBlob, scheme = SCHEME.ED25519) {
+    if (scheme != SCHEME.ECDSA && scheme != SCHEME.ED25519) {
+      throw new ResponseError(LedgerError.ConditionsOfUseNotSatisfied, `Unexpected scheme ${scheme}. Needs to be ECDSA (2) or ED25519 (0)`)
+    }
+    if (scheme === SCHEME.ECDSA) {
+      return await this.signEcdsa(path, txBlob)
+    }
+    return await this.signEd25519(path, txBlob)
+  }
+
+  /**
+   * Signs a transaction blob using the ED25519 scheme.
    * @param path - The BIP44 path.
    * @param txBlob - The transaction blob.
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async sign(path: BIP32Path, txBlob: TransactionBlob) {
+  async signEd25519(path: BIP32Path, txBlob: TransactionBlob) {
     if (!this.txMetadataSrvUrl) {
       throw new ResponseError(
         LedgerError.GenericError,
@@ -260,7 +336,33 @@ export class PolkadotGenericApp extends BaseApp {
     }
 
     const txMetadata = await this.getTxMetadata(txBlob)
-    return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
+    return await this.signImplEd25519(path, this.INS.SIGN, txBlob, txMetadata)
+  }
+
+  /**
+   * Signs a transaction blob using the ECDSA scheme.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  async signEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
+    if (!this.txMetadataSrvUrl) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataSrvUrl is not defined or is empty. The use of the method requires access to a metadata shortening service.'
+      )
+    }
+
+    if (!this.txMetadataChainId) {
+      throw new ResponseError(
+        LedgerError.GenericError,
+        'txMetadataChainId is not defined or is empty. These values are configured in the metadata shortening service. Check the corresponding configuration in the service.'
+      )
+    }
+
+    const txMetadata = await this.getTxMetadata(txBlob)
+    return await this.signImplEcdsa(path, this.INS.SIGN_ECDSA, txBlob, txMetadata)
   }
 
   /**
@@ -288,20 +390,51 @@ export class PolkadotGenericApp extends BaseApp {
     }
 
     const txMetadata = await this.getTxMetadata(txBlob, txMetadataChainId, txMetadataSrvUrl)
-    return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
+    return await this.signImplEd25519(path, this.INS.SIGN, txBlob, txMetadata)
   }
   /**
+   * @deprecated Use signRawEcdsa or signRawEd25519 instead. This method will be removed in a future version.
    * Signs a raw transaction blob.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @param scheme - The scheme to use for the signing. Default is ED25519.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  async signRaw(path: BIP32Path, txBlob: TransactionBlob, scheme = SCHEME.ED25519) {
+    if (scheme != SCHEME.ECDSA && scheme != SCHEME.ED25519) {
+      throw new ResponseError(LedgerError.ConditionsOfUseNotSatisfied, `Unexpected scheme ${scheme}. Needs to be ECDSA (2) or ED25519 (0)`)
+    }
+    if (scheme === SCHEME.ECDSA) {
+      return await this.signRawEcdsa(path, txBlob)
+    }
+    return await this.signRawEd25519(path, txBlob)
+  }
+
+  /**
+   * Signs a raw transaction blob using the ED25519 scheme.
    * @param path - The BIP44 path.
    * @param txBlob - The transaction blob.
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async signRaw(path: BIP32Path, txBlob: TransactionBlob) {
-    return await this.signImpl(path, this.INS.SIGN_RAW, txBlob)
+  async signRawEd25519(path: BIP32Path, txBlob: TransactionBlob) {
+    return await this.signImplEd25519(path, this.INS.SIGN_RAW, txBlob)
   }
 
   /**
+   * Signs a raw transaction blob using the ECDSA scheme.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  async signRawEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
+    return await this.signImplEcdsa(path, this.INS.SIGN_RAW_ECDSA, txBlob)
+  }
+
+  /**
+   * @deprecated Use signWithMetadataEd25519 or signWithMetadataEcdsa instead. This method will be removed in a future version.
    * [Expert-only Method] Signs a transaction blob with provided metadata (this could be used also with a migration app)
    * @param path - The BIP44 path.
    * @param txBlob - The transaction blob.
@@ -309,7 +442,37 @@ export class PolkadotGenericApp extends BaseApp {
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async signWithMetadata(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
-    return await this.signImpl(path, this.INS.SIGN, txBlob, txMetadata)
+  async signWithMetadata(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob, scheme: SCHEME) {
+    if (scheme != SCHEME.ECDSA && scheme != SCHEME.ED25519) {
+      throw new ResponseError(LedgerError.ConditionsOfUseNotSatisfied, `Unexpected scheme ${scheme}. Needs to be ECDSA (2) or ED25519 (0)`)
+    }
+    if (scheme === SCHEME.ECDSA) {
+      return await this.signWithMetadataEcdsa(path, txBlob, txMetadata)
+    }
+    return await this.signWithMetadataEd25519(path, txBlob, txMetadata)
+  }
+
+  /**
+   * Signs a transaction blob with provided metadata using the ECDSA scheme.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @param txMetadata - The transaction metadata.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  async signWithMetadataEcdsa(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
+    return await this.signImplEcdsa(path, this.INS.SIGN_ECDSA, txBlob, txMetadata)
+  }
+
+  /**
+   * Signs a transaction blob with provided metadata using the ED25519 scheme.
+   * @param path - The BIP44 path.
+   * @param txBlob - The transaction blob.
+   * @param txMetadata - The transaction metadata.
+   * @throws {ResponseError} If the response from the device indicates an error.
+   * @returns The response containing the signature and status.
+   */
+  async signWithMetadataEd25519(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
+    return await this.signImplEd25519(path, this.INS.SIGN, txBlob, txMetadata)
   }
 }
