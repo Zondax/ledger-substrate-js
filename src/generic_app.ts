@@ -246,10 +246,10 @@ export class PolkadotGenericApp extends BaseApp {
     const chunks = this.getSignReqChunks(path, blob, metadata)
 
     try {
-      let result = await this.signSendChunk(ins, 1, chunks.length, chunks[0])
+      let result = await this.sendGenericChunk(ins, SCHEME.ED25519, 1, chunks.length, chunks[0])
 
       for (let i = 1; i < chunks.length; i += 1) {
-        result = await this.signSendChunk(ins, 1 + i, chunks.length, chunks[i])
+        result = await this.sendGenericChunk(ins, SCHEME.ED25519, 1 + i, chunks.length, chunks[i])
       }
 
       return {
@@ -278,10 +278,10 @@ export class PolkadotGenericApp extends BaseApp {
     const chunks = this.getSignReqChunks(path, blob, metadata)
 
     try {
-      let result = await this.signSendChunk(ins, 1, chunks.length, chunks[0])
+      let result = await this.sendGenericChunk(ins, SCHEME.ECDSA, 1, chunks.length, chunks[0])
 
       for (let i = 1; i < chunks.length; i += 1) {
-        result = await this.signSendChunk(ins, 1 + i, chunks.length, chunks[i])
+        result = await this.sendGenericChunk(ins, SCHEME.ECDSA, 1 + i, chunks.length, chunks[i])
       }
 
       return {
@@ -430,7 +430,7 @@ export class PolkadotGenericApp extends BaseApp {
    * @returns The response containing the signature and status.
    */
   async signRawEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
-    return await this.signImplEcdsa(path, this.INS.SIGN_RAW_ECDSA, txBlob)
+    return await this.signImplEcdsa(path, this.INS.SIGN_RAW, txBlob)
   }
 
   /**
@@ -461,7 +461,7 @@ export class PolkadotGenericApp extends BaseApp {
    * @returns The response containing the signature and status.
    */
   async signWithMetadataEcdsa(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
-    return await this.signImplEcdsa(path, this.INS.SIGN_ECDSA, txBlob, txMetadata)
+    return await this.signImplEcdsa(path, this.INS.SIGN, txBlob, txMetadata)
   }
 
   /**

@@ -31,8 +31,6 @@ export const enum INS {
   GET_ADDR = 0x01,
   SIGN = 0x02,
   SIGN_RAW = 0x03,
-  SIGN_ECDSA = 0x04,
-  SIGN_RAW_ECDSA = 0x05,
   // Allow list related commands
   /**
    * @deprecated
