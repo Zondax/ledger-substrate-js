@@ -38,8 +38,6 @@ export class PolkadotGenericApp extends BaseApp {
     GET_ADDR: 0x01 as number,
     SIGN: 0x02 as number,
     SIGN_RAW: 0x03 as number,
-    SIGN_ECDSA: 0x04 as number,
-    SIGN_RAW_ECDSA: 0x05 as number,
   }
 
   static _params = {
@@ -362,7 +360,7 @@ export class PolkadotGenericApp extends BaseApp {
     }
 
     const txMetadata = await this.getTxMetadata(txBlob)
-    return await this.signImplEcdsa(path, this.INS.SIGN_ECDSA, txBlob, txMetadata)
+    return await this.signImplEcdsa(path, this.INS.SIGN, txBlob, txMetadata)
   }
 
   /**
