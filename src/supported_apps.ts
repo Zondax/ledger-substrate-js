@@ -320,4 +320,10 @@ export const supportedApps: SubstrateAppParams[] = [
     slip0044: 0x80000162,
     ss58_addr_type: 42,
   },
+  {
+    name: 'Mythos',
+    cla: 0xbf,
+    slip0044: 0x8000003c,
+    ss58_addr_type: 42,
+  },
 ]
