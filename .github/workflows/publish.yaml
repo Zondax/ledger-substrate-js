@@ -40,7 +40,6 @@ jobs:
 
       - run: bun install
 
-      - run: mv README-npm.md README.md
       - run: bun run build
 
       - name: Get latest release version number
