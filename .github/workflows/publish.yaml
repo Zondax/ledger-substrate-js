@@ -40,8 +40,17 @@ jobs:
 
       - run: bun install
 
-      - run: mv README-npm.md README.md
       - run: bun run build
+
+      - name: Prepare README for npm
+        run: |
+          # Create a new README with the modified content
+          {
+              head -n 2 README.md
+              echo "![zondax](docs/zondax_light.png)"
+              tail -n +4 README.md
+          } > README.md.tmp
+          mv README.md.tmp README.md
 
       - name: Get latest release version number
         id: get_version

@@ -181,12 +181,6 @@ export interface GenericResponseSign {
   signature: Buffer
 }
 
-export interface GenericResponseSignEcdsa {
-  r: Buffer
-  s: Buffer
-  v: Buffer
-}
-
 /**
  * @deprecated Moved to @zondax/ledger-js
  */

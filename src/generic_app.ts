@@ -22,7 +22,6 @@ import {
   ECDSA_PUBKEY_LEN,
   ED25519_PUBKEY_LEN,
   GenericResponseSign,
-  GenericResponseSignEcdsa,
   GenericeResponseAddress,
   P1_VALUES,
   SCHEME,
@@ -265,14 +264,18 @@ export class PolkadotGenericApp extends BaseApp {
    * @param blob - The transaction blob.
    * @param metadata - The optional metadata.
    * @throws {ResponseError} If the response from the device indicates an error.
-   * @returns The response containing the signature and status.
+   * @returns The response containing the signature and status. For ECDSA, the signature is in RSV format:
+   * - R: First 32 bytes (signature.slice(0, 32))
+   * - S: Next 32 bytes (signature.slice(32, 64))
+   * - V: Last byte (signature.slice(64, 65))
+   * @see parseEcdsaSignature - Use this utility function to easily parse the signature into R, S, V components
    */
   private async signImplEcdsa(
     path: BIP32Path,
     ins: number,
     blob: TransactionBlob,
     metadata?: TransactionMetadataBlob
-  ): Promise<GenericResponseSignEcdsa> {
+  ): Promise<GenericResponseSign> {
     const chunks = this.getSignReqChunks(path, blob, metadata)
 
     try {
@@ -283,9 +286,7 @@ export class PolkadotGenericApp extends BaseApp {
       }
 
       return {
-        r: result.readBytes(32),
-        s: result.readBytes(32),
-        v: result.readBytes(1),
+        signature: result.readBytes(result.length()),
       }
     } catch (e) {
       throw processErrorResponse(e)
@@ -342,7 +343,11 @@ export class PolkadotGenericApp extends BaseApp {
    * @param path - The BIP44 path.
    * @param txBlob - The transaction blob.
    * @throws {ResponseError} If the response from the device indicates an error.
-   * @returns The response containing the signature and status.
+   * @returns The response containing the signature and status. For ECDSA, the signature is in RSV format:
+   * - R: First 32 bytes (signature.slice(0, 32))
+   * - S: Next 32 bytes (signature.slice(32, 64))
+   * - V: Last byte (signature.slice(64, 65))
+   * @see parseEcdsaSignature - Use this utility function to easily parse the signature into R, S, V components
    */
   async signEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
     if (!this.txMetadataSrvUrl) {
@@ -425,7 +430,11 @@ export class PolkadotGenericApp extends BaseApp {
    * @param path - The BIP44 path.
    * @param txBlob - The transaction blob.
    * @throws {ResponseError} If the response from the device indicates an error.
-   * @returns The response containing the signature and status.
+   * @returns The response containing the signature and status. For ECDSA, the signature is in RSV format:
+   * - R: First 32 bytes (signature.slice(0, 32))
+   * - S: Next 32 bytes (signature.slice(32, 64))
+   * - V: Last byte (signature.slice(64, 65))
+   * @see parseEcdsaSignature - Use this utility function to easily parse the signature into R, S, V components
    */
   async signRawEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
     return await this.signImplEcdsa(path, this.INS.SIGN_RAW, txBlob)
@@ -440,7 +449,7 @@ export class PolkadotGenericApp extends BaseApp {
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async signWithMetadata(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob, scheme: SCHEME) {
+  async signWithMetadata(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob, scheme = SCHEME.ED25519) {
     if (scheme != SCHEME.ECDSA && scheme != SCHEME.ED25519) {
       throw new ResponseError(LedgerError.ConditionsOfUseNotSatisfied, `Unexpected scheme ${scheme}. Needs to be ECDSA (2) or ED25519 (0)`)
     }
@@ -456,7 +465,11 @@ export class PolkadotGenericApp extends BaseApp {
    * @param txBlob - The transaction blob.
    * @param txMetadata - The transaction metadata.
    * @throws {ResponseError} If the response from the device indicates an error.
-   * @returns The response containing the signature and status.
+   * @returns The response containing the signature and status. For ECDSA, the signature is in RSV format:
+   * - R: First 32 bytes (signature.slice(0, 32))
+   * - S: Next 32 bytes (signature.slice(32, 64))
+   * - V: Last byte (signature.slice(64, 65))
+   * @see parseEcdsaSignature - Use this utility function to easily parse the signature into R, S, V components
    */
   async signWithMetadataEcdsa(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
     return await this.signImplEcdsa(path, this.INS.SIGN, txBlob, txMetadata)
@@ -472,5 +485,23 @@ export class PolkadotGenericApp extends BaseApp {
    */
   async signWithMetadataEd25519(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
     return await this.signImplEd25519(path, this.INS.SIGN, txBlob, txMetadata)
+  }
+
+  /**
+   * Utility function to convert ECDSA signature response into RSV structure
+   * @param signature - The ECDSA signature buffer from the device response
+   * @returns Object containing R, S, and V components of the ECDSA signature
+   * @throws {Error} If signature length is not 65 bytes (expected for ECDSA RSV format)
+   */
+  static parseEcdsaSignature(signature: Buffer): { r: string; s: string; v: string } {
+    if (signature.length !== 65) {
+      throw new Error('Invalid ECDSA signature length. Expected 65 bytes for RSV format')
+    }
+
+    return {
+      r: signature.slice(0, 32).toString('hex'),
+      s: signature.slice(32, 64).toString('hex'),
+      v: signature.slice(64, 65).toString('hex'),
+    }
   }
 }
