@@ -440,7 +440,7 @@ export class PolkadotGenericApp extends BaseApp {
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async signWithMetadata(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob, scheme: SCHEME) {
+  async signWithMetadata(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob, scheme = SCHEME.ED25519) {
     if (scheme != SCHEME.ECDSA && scheme != SCHEME.ED25519) {
       throw new ResponseError(LedgerError.ConditionsOfUseNotSatisfied, `Unexpected scheme ${scheme}. Needs to be ECDSA (2) or ED25519 (0)`)
     }
