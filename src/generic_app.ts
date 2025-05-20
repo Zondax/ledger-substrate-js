@@ -268,6 +268,7 @@ export class PolkadotGenericApp extends BaseApp {
    * - R: First 32 bytes (signature.slice(0, 32))
    * - S: Next 32 bytes (signature.slice(32, 64))
    * - V: Last byte (signature.slice(64, 65))
+   * @see parseEcdsaSignature - Use this utility function to easily parse the signature into R, S, V components
    */
   private async signImplEcdsa(
     path: BIP32Path,
@@ -346,6 +347,7 @@ export class PolkadotGenericApp extends BaseApp {
    * - R: First 32 bytes (signature.slice(0, 32))
    * - S: Next 32 bytes (signature.slice(32, 64))
    * - V: Last byte (signature.slice(64, 65))
+   * @see parseEcdsaSignature - Use this utility function to easily parse the signature into R, S, V components
    */
   async signEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
     if (!this.txMetadataSrvUrl) {
@@ -432,6 +434,7 @@ export class PolkadotGenericApp extends BaseApp {
    * - R: First 32 bytes (signature.slice(0, 32))
    * - S: Next 32 bytes (signature.slice(32, 64))
    * - V: Last byte (signature.slice(64, 65))
+   * @see parseEcdsaSignature - Use this utility function to easily parse the signature into R, S, V components
    */
   async signRawEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
     return await this.signImplEcdsa(path, this.INS.SIGN_RAW, txBlob)
@@ -466,6 +469,7 @@ export class PolkadotGenericApp extends BaseApp {
    * - R: First 32 bytes (signature.slice(0, 32))
    * - S: Next 32 bytes (signature.slice(32, 64))
    * - V: Last byte (signature.slice(64, 65))
+   * @see parseEcdsaSignature - Use this utility function to easily parse the signature into R, S, V components
    */
   async signWithMetadataEcdsa(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
     return await this.signImplEcdsa(path, this.INS.SIGN, txBlob, txMetadata)
@@ -481,5 +485,23 @@ export class PolkadotGenericApp extends BaseApp {
    */
   async signWithMetadataEd25519(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
     return await this.signImplEd25519(path, this.INS.SIGN, txBlob, txMetadata)
+  }
+
+  /**
+   * Utility function to convert ECDSA signature response into RSV structure
+   * @param signature - The ECDSA signature buffer from the device response
+   * @returns Object containing R, S, and V components of the ECDSA signature
+   * @throws {Error} If signature length is not 65 bytes (expected for ECDSA RSV format)
+   */
+  static parseEcdsaSignature(signature: Buffer): { r: string; s: string; v: string } {
+    if (signature.length !== 65) {
+      throw new Error('Invalid ECDSA signature length. Expected 65 bytes for RSV format')
+    }
+
+    return {
+      r: signature.slice(0, 32).toString('hex'),
+      s: signature.slice(32, 64).toString('hex'),
+      v: signature.slice(64, 65).toString('hex'),
+    }
   }
 }

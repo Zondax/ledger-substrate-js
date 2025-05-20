@@ -46,6 +46,12 @@ using the official Substrate Ledger apps in recovery mode.
 | signWithMetadataEcdsa   | { signature: Buffer } | path + txBlob + txMetadata                               | Metadata signing with ECDSA. Signature is in RSV format: R (32 bytes) + S (32 bytes) + V (1 byte) |
 | signMigration           | { signature: Buffer } | path + txBlob + (txMetadataChainId) + (txMetadataSrvUrl) | Migration-specific signing                                                                        |
 
+## Utility Functions
+
+| Operation           | Response                            | Input             | Notes                                                                                   |
+| ------------------- | ----------------------------------- | ----------------- | --------------------------------------------------------------------------------------- |
+| parseEcdsaSignature | { r: string, s: string, v: string } | signature: Buffer | Utility to parse ECDSA signatures into R, S, V components. Input must be 65 bytes long. |
+
 # Substrate apps Available commands
 
 | Operation  | Response                                                                                                                                | Command                                                            |
