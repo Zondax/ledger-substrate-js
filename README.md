@@ -6,18 +6,55 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![npm version](https://badge.fury.io/js/%40zondax%2Fledger-substrate.svg)](https://badge.fury.io/js/%40zondax%2Fledger-substrate)
 
-This package provides a basic client library to communicate with Substrate Apps running in a Ledger Nano S/S+/X devices
+This package provides a basic client library to communicate with Substrate Apps running in a Ledger Nano S/S+/X, Flex and Stax devices
 Additionally, it provides a hd_key_derivation function to retrieve the keys that Ledger apps generate with
 BIP32-ED25519. Warning: the hd_key_derivation function is not audited and depends on external packages. We recommend
 using the official Substrate Ledger apps in recovery mode.
 
-# Available commands
+# Generic app Available commands
 
-| Operation  | Response         | Command                 |
-| ---------- | ---------------- | ----------------------- |
-| getVersion | app version      | ---------------         |
-| getAddress | pubkey + address | path + ( showInDevice ) |
-| sign       | signed message   | path + message          |
+## Address Operations
+
+| Operation         | Response                            | Command                                           | Notes                                  |
+| ----------------- | ----------------------------------- | ------------------------------------------------- | -------------------------------------- |
+| getAddress        | { pubKey: string, address: string } | path + ss58prefix + (showAddrInDevice) + (scheme) | Deprecated, use specific methods below |
+| getAddressEd25519 | { pubKey: string, address: string } | path + ss58prefix + (showAddrInDevice)            | Uses ED25519 scheme                    |
+| getAddressEcdsa   | { pubKey: string, address: string } | path + (showAddrInDevice)                         | Uses ECDSA scheme                      |
+
+## Signing Operations
+
+| Operation   | Response              | Command                          | Notes                                                                                   |
+| ----------- | --------------------- | -------------------------------- | --------------------------------------------------------------------------------------- |
+| sign        | { signature: Buffer } | path + txBlob + Optional(scheme) | Deprecated, use specific methods below                                                  |
+| signEd25519 | { signature: Buffer } | path + txBlob                    | Uses ED25519 scheme                                                                     |
+| signEcdsa   | { signature: Buffer } | path + txBlob                    | Uses ECDSA scheme. Signature is in RSV format: R (32 bytes) + S (32 bytes) + V (1 byte) |
+
+## Raw Signing Operations
+
+| Operation      | Response              | Command                          | Notes                                                                                        |
+| -------------- | --------------------- | -------------------------------- | -------------------------------------------------------------------------------------------- |
+| signRaw        | { signature: Buffer } | path + txBlob + Optional(scheme) | Deprecated, use specific methods below                                                       |
+| signRawEd25519 | { signature: Buffer } | path + txBlob                    | Raw signing with ED25519                                                                     |
+| signRawEcdsa   | { signature: Buffer } | path + txBlob                    | Raw signing with ECDSA. Signature is in RSV format: R (32 bytes) + S (32 bytes) + V (1 byte) |
+
+## Metadata Signing Operations
+
+| Operation               | Response              | Command                                                  | Notes                                                                                             |
+| ----------------------- | --------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| signWithMetadata        | { signature: Buffer } | path + txBlob + txMetadata + Optional(scheme)            | Deprecated, use specific methods below                                                            |
+| signWithMetadataEd25519 | { signature: Buffer } | path + txBlob + txMetadata                               | Metadata signing with ED25519                                                                     |
+| signWithMetadataEcdsa   | { signature: Buffer } | path + txBlob + txMetadata                               | Metadata signing with ECDSA. Signature is in RSV format: R (32 bytes) + S (32 bytes) + V (1 byte) |
+| signMigration           | { signature: Buffer } | path + txBlob + (txMetadataChainId) + (txMetadataSrvUrl) | Migration-specific signing                                                                        |
+
+# Substrate apps Available commands
+
+| Operation  | Response                                                                                                                                | Command                                                            |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| getVersion | { device_locked: boolean, major: number, minor: number, patch: number, test_mode: boolean, error_message: string, return_code: number } |
+| appInfo    | { error_message: string, return_code: number, ...appInfo }                                                                              |
+| getAddress | { address: string, pubKey: string, error_message: string, return_code: number }                                                         | account + change + addressIndex + (requireConfirmation) + (scheme) |
+| sign       | { signature: Buffer, error_message: string, return_code: number }                                                                       | account + change + addressIndex + message + (scheme)               |
+| signRaw    | { signature: Buffer, error_message: string, return_code: number }                                                                       | account + change + addressIndex + message + (scheme)               |
 
 getAddress command requires that you set the derivation path (account, change, index) and has an option parameter to
 display the address on the device. By default, it will retrieve the information without confirmation from the user.
@@ -33,7 +70,7 @@ display the address on the device. By default, it will retrieve the information 
 - Provide the following new arguments:
   - **txMetadataChainId**: This is the id of the chain where you intend to sign transactions. This should match the chain id configured at the generic app API service.
   - **txMetadataSrvUrl**: This is the URL for the generic app API service, which generates the transaction metadata needed for signing transactions on the device. Zondax provides a live demo of this service. The url is:
-    - https://api.zondax.ch/polkadot/transaction/metadata
+    - <https://api.zondax.ch/polkadot/transaction/metadata>
 
 3. **Configure Address Retrieval**:
 
@@ -45,6 +82,8 @@ display the address on the device. By default, it will retrieve the information 
 - The generic app API service repository is available on [Github](https://github.com/Zondax/ledger-polkadot-generic-api).
 
 # Add new chain
+
+If you are using Generic App, there is no need to add your chain in the supported apps.
 
 If you want to add support for your chain, you just need to create a PR in this repository adding the parameters that
 belong to the chain. Go to [supported APPs](./src/supported_apps.ts) and add a new entry at the end of the file.
@@ -80,7 +119,7 @@ yarn install
 yarn test
 ```
 
-## Example:
+## Example
 
 Visit and download the [latest release](https://github.com/Zondax/ledger-kusama/releases/latest) from repository (in
 this case Kusama).

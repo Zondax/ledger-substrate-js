@@ -264,7 +264,10 @@ export class PolkadotGenericApp extends BaseApp {
    * @param blob - The transaction blob.
    * @param metadata - The optional metadata.
    * @throws {ResponseError} If the response from the device indicates an error.
-   * @returns The response containing the signature and status.
+   * @returns The response containing the signature and status. For ECDSA, the signature is in RSV format:
+   * - R: First 32 bytes (signature.slice(0, 32))
+   * - S: Next 32 bytes (signature.slice(32, 64))
+   * - V: Last byte (signature.slice(64, 65))
    */
   private async signImplEcdsa(
     path: BIP32Path,
@@ -339,7 +342,10 @@ export class PolkadotGenericApp extends BaseApp {
    * @param path - The BIP44 path.
    * @param txBlob - The transaction blob.
    * @throws {ResponseError} If the response from the device indicates an error.
-   * @returns The response containing the signature in RSV format.
+   * @returns The response containing the signature and status. For ECDSA, the signature is in RSV format:
+   * - R: First 32 bytes (signature.slice(0, 32))
+   * - S: Next 32 bytes (signature.slice(32, 64))
+   * - V: Last byte (signature.slice(64, 65))
    */
   async signEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
     if (!this.txMetadataSrvUrl) {
@@ -422,7 +428,10 @@ export class PolkadotGenericApp extends BaseApp {
    * @param path - The BIP44 path.
    * @param txBlob - The transaction blob.
    * @throws {ResponseError} If the response from the device indicates an error.
-   * @returns The response containing the signature and status.
+   * @returns The response containing the signature and status. For ECDSA, the signature is in RSV format:
+   * - R: First 32 bytes (signature.slice(0, 32))
+   * - S: Next 32 bytes (signature.slice(32, 64))
+   * - V: Last byte (signature.slice(64, 65))
    */
   async signRawEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
     return await this.signImplEcdsa(path, this.INS.SIGN_RAW, txBlob)
@@ -453,7 +462,10 @@ export class PolkadotGenericApp extends BaseApp {
    * @param txBlob - The transaction blob.
    * @param txMetadata - The transaction metadata.
    * @throws {ResponseError} If the response from the device indicates an error.
-   * @returns The response containing the signature and status.
+   * @returns The response containing the signature and status. For ECDSA, the signature is in RSV format:
+   * - R: First 32 bytes (signature.slice(0, 32))
+   * - S: Next 32 bytes (signature.slice(32, 64))
+   * - V: Last byte (signature.slice(64, 65))
    */
   async signWithMetadataEcdsa(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
     return await this.signImplEcdsa(path, this.INS.SIGN, txBlob, txMetadata)

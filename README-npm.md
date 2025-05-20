@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![npm version](https://badge.fury.io/js/%40zondax%2Fledger-substrate.svg)](https://badge.fury.io/js/%40zondax%2Fledger-substrate)
 
-This package provides a basic client library to communicate with Substrate Apps running in a Ledger Nano S/S+/X devices
+This package provides a basic client library to communicate with Substrate Apps running in a Ledger Nano S/S+/X, Flex and Stax devices
 Additionally, it provides a hd_key_derivation function to retrieve the keys that Ledger apps generate with
 BIP32-ED25519. Warning: the hd_key_derivation function is not audited and depends on external packages. We recommend
 using the official Substrate Ledger apps in recovery mode.
@@ -23,28 +23,28 @@ using the official Substrate Ledger apps in recovery mode.
 
 ## Signing Operations
 
-| Operation   | Response              | Command                          | Notes                                           |
-| ----------- | --------------------- | -------------------------------- | ----------------------------------------------- |
-| sign        | { signature: Buffer } | path + txBlob + Optional(scheme) | Deprecated, use specific methods below          |
-| signEd25519 | { signature: Buffer } | path + txBlob                    | Uses ED25519 scheme                             |
-| signEcdsa   | { signature: Buffer } | path + txBlob                    | Uses ECDSA scheme signature contains RSV fields |
+| Operation   | Response              | Command                          | Notes                                                                                   |
+| ----------- | --------------------- | -------------------------------- | --------------------------------------------------------------------------------------- |
+| sign        | { signature: Buffer } | path + txBlob + Optional(scheme) | Deprecated, use specific methods below                                                  |
+| signEd25519 | { signature: Buffer } | path + txBlob                    | Uses ED25519 scheme                                                                     |
+| signEcdsa   | { signature: Buffer } | path + txBlob                    | Uses ECDSA scheme. Signature is in RSV format: R (32 bytes) + S (32 bytes) + V (1 byte) |
 
 ## Raw Signing Operations
 
-| Operation      | Response              | Command                          | Notes                                                |
-| -------------- | --------------------- | -------------------------------- | ---------------------------------------------------- |
-| signRaw        | { signature: Buffer } | path + txBlob + Optional(scheme) | Deprecated, use specific methods below               |
-| signRawEd25519 | { signature: Buffer } | path + txBlob                    | Raw signing with ED25519                             |
-| signRawEcdsa   | { signature: Buffer } | path + txBlob                    | Raw signing with ECDSA signature contains RSV fields |
+| Operation      | Response              | Command                          | Notes                                                                                        |
+| -------------- | --------------------- | -------------------------------- | -------------------------------------------------------------------------------------------- |
+| signRaw        | { signature: Buffer } | path + txBlob + Optional(scheme) | Deprecated, use specific methods below                                                       |
+| signRawEd25519 | { signature: Buffer } | path + txBlob                    | Raw signing with ED25519                                                                     |
+| signRawEcdsa   | { signature: Buffer } | path + txBlob                    | Raw signing with ECDSA. Signature is in RSV format: R (32 bytes) + S (32 bytes) + V (1 byte) |
 
 ## Metadata Signing Operations
 
-| Operation               | Response              | Command                                                  | Notes                                                     |
-| ----------------------- | --------------------- | -------------------------------------------------------- | --------------------------------------------------------- |
-| signWithMetadata        | { signature: Buffer } | path + txBlob + txMetadata + Optional(scheme)            | Deprecated, use specific methods below                    |
-| signWithMetadataEd25519 | { signature: Buffer } | path + txBlob + txMetadata                               | Metadata signing with ED25519                             |
-| signWithMetadataEcdsa   | { signature: Buffer } | path + txBlob + txMetadata                               | Metadata signing with ECDSA signature contains RSV fields |
-| signMigration           | { signature: Buffer } | path + txBlob + (txMetadataChainId) + (txMetadataSrvUrl) | Migration-specific signing                                |
+| Operation               | Response              | Command                                                  | Notes                                                                                             |
+| ----------------------- | --------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| signWithMetadata        | { signature: Buffer } | path + txBlob + txMetadata + Optional(scheme)            | Deprecated, use specific methods below                                                            |
+| signWithMetadataEd25519 | { signature: Buffer } | path + txBlob + txMetadata                               | Metadata signing with ED25519                                                                     |
+| signWithMetadataEcdsa   | { signature: Buffer } | path + txBlob + txMetadata                               | Metadata signing with ECDSA. Signature is in RSV format: R (32 bytes) + S (32 bytes) + V (1 byte) |
+| signMigration           | { signature: Buffer } | path + txBlob + (txMetadataChainId) + (txMetadataSrvUrl) | Migration-specific signing                                                                        |
 
 # Substrate apps Available commands
 
