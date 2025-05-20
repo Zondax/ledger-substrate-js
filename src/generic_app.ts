@@ -22,7 +22,6 @@ import {
   ECDSA_PUBKEY_LEN,
   ED25519_PUBKEY_LEN,
   GenericResponseSign,
-  GenericResponseSignEcdsa,
   GenericeResponseAddress,
   P1_VALUES,
   SCHEME,
@@ -272,7 +271,7 @@ export class PolkadotGenericApp extends BaseApp {
     ins: number,
     blob: TransactionBlob,
     metadata?: TransactionMetadataBlob
-  ): Promise<GenericResponseSignEcdsa> {
+  ): Promise<GenericResponseSign> {
     const chunks = this.getSignReqChunks(path, blob, metadata)
 
     try {
@@ -283,9 +282,7 @@ export class PolkadotGenericApp extends BaseApp {
       }
 
       return {
-        r: result.readBytes(32),
-        s: result.readBytes(32),
-        v: result.readBytes(1),
+        signature: result.readBytes(result.length()),
       }
     } catch (e) {
       throw processErrorResponse(e)
@@ -342,7 +339,7 @@ export class PolkadotGenericApp extends BaseApp {
    * @param path - The BIP44 path.
    * @param txBlob - The transaction blob.
    * @throws {ResponseError} If the response from the device indicates an error.
-   * @returns The response containing the signature and status.
+   * @returns The response containing the signature in RSV format.
    */
   async signEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
     if (!this.txMetadataSrvUrl) {
