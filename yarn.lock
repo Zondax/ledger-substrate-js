@@ -642,6 +642,16 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@ledgerhq/devices@8.4.5":
+  version "8.4.5"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-8.4.5.tgz#8a48372c8bf7c04bf0ca760cfe141acb2e3747fb"
+  integrity sha512-wzfX7JRfTPXJl+4BUXxwUFUGghtqQA6V1I6xNxGfXKHjd51rjijL+9xcfZ1oj66dNNm9wiCBBZhMXXusYDUjWg==
+  dependencies:
+    "@ledgerhq/errors" "^6.21.0"
+    "@ledgerhq/logs" "^6.12.0"
+    rxjs "^7.8.1"
+    semver "^7.3.5"
+
 "@ledgerhq/devices@^8.3.0", "@ledgerhq/devices@^8.4.0", "@ledgerhq/devices@^8.4.2":
   version "8.4.2"
   resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-8.4.2.tgz#f1c56194cf1343d56cad49c8feba92ad93432e14"
@@ -657,12 +667,17 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-6.18.0.tgz#d55d6a57430d7a86532a9033ce0b45103264c620"
   integrity sha512-L3jQWAGyooxRDk/MRlW2v4Ji9+kloBtdmz9wBkHaj2j0n+05rweJSV3GHw9oye1BYMbVFqFffmT4H3hlXlCasw==
 
+"@ledgerhq/errors@^6.21.0":
+  version "6.21.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-6.21.0.tgz#93a745157b36e892ded6ba76781d8ca662666a95"
+  integrity sha512-2k5veG9eu+1X5oBVhKSWzA6RE+TWOTSJnytjEhPBTZB6h2ixMrCUMWF5+OAWXiI1EiSNsvGGk19XO87qpZiVTw==
+
 "@ledgerhq/hw-transport-mocker@^6.29.0":
-  version "6.29.2"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-mocker/-/hw-transport-mocker-6.29.2.tgz#7de3f67fc58bd65b2323ba2c992a8da00aaf8b90"
-  integrity sha512-s+YcMy0Bna6r1Sm6qiawrd8FBE6AJhUTIUqBxP9n7OuzaIGKdf/Y++16PWfNE1rBuzplbzBDRBLAa4XnQ8uCEA==
+  version "6.29.5"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-mocker/-/hw-transport-mocker-6.29.5.tgz#38eadd4ffe4c533504dd5b9eddf52722f8c23031"
+  integrity sha512-klzzO9sVnOtU6Y345TfTxPFV8zSPJ8wFHLRl+pRBPIg+agudzZTn3REyLUuyqzZmRSiimBp5YsOgl5lN4nEffA==
   dependencies:
-    "@ledgerhq/hw-transport" "^6.31.2"
+    "@ledgerhq/hw-transport" "^6.31.5"
     "@ledgerhq/logs" "^6.12.0"
     rxjs "^7.8.1"
 
@@ -711,13 +726,13 @@
     "@ledgerhq/logs" "^6.12.0"
     events "^3.3.0"
 
-"@ledgerhq/hw-transport@^6.31.2":
-  version "6.31.2"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-6.31.2.tgz#79c95f7928a64a0e3b5bc4ea7b5be04b9f738322"
-  integrity sha512-B27UIzMzm2IXPGYnEB95R7eHxpXBkTBHh6MUJJQZVknt8LilEz1tfpTYUdzAKDGQ+Z5MZyYb01Eh3Zqm3kn3uw==
+"@ledgerhq/hw-transport@^6.31.2", "@ledgerhq/hw-transport@^6.31.5":
+  version "6.31.5"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-6.31.5.tgz#985122b018fa30e92fcf23261d6e7c077774a9bf"
+  integrity sha512-P7nyHU2EnotdWfN9XUKvCw4sllbERNmzb7ruyljqyiBuUfdDvzLJVFgVhu6j+8Y9cGxPysf3i3QtImFsZwKkdQ==
   dependencies:
-    "@ledgerhq/devices" "^8.4.2"
-    "@ledgerhq/errors" "^6.18.0"
+    "@ledgerhq/devices" "8.4.5"
+    "@ledgerhq/errors" "^6.21.0"
     "@ledgerhq/logs" "^6.12.0"
     events "^3.3.0"
 
