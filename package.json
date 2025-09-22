@@ -44,7 +44,7 @@
   "devDependencies": {
     "@ledgerhq/hw-transport-mocker": "^6.29.0",
     "@ledgerhq/hw-transport-node-hid": "^6.29.0",
-    "@noble/curves": "^1",
+    "@noble/curves": "^2",
     "@swc/core": "^1.6.5",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/jest": "29.5.12",
