@@ -1,3 +1,5 @@
+import { Buffer as BufferPolyfill } from 'buffer/'
+
 import type Transport from '@ledgerhq/hw-transport'
 
 /** ******************************************************************************
@@ -17,8 +19,34 @@ import type Transport from '@ledgerhq/hw-transport'
  *  limitations under the License.
  ******************************************************************************* */
 
+// Use global Buffer if available (Node.js), otherwise use polyfill (browser)
+const BufferImpl = typeof Buffer !== 'undefined' ? Buffer : BufferPolyfill
+
+/** Input type for transaction blobs - accepts Buffer, Uint8Array, or hex string */
+export type TransactionBlobInput = Buffer | Uint8Array | string
+/** Input type for transaction metadata - accepts Buffer, Uint8Array, or hex string */
+export type TransactionMetadataBlobInput = Buffer | Uint8Array | string
+
+// Keep original types for backwards compatibility
 export type TransactionMetadataBlob = Buffer
 export type TransactionBlob = Buffer
+
+/**
+ * Converts various input types to Buffer
+ * @param input - Buffer, Uint8Array, or hex string
+ * @returns Buffer
+ */
+export function toBuffer(input: Buffer | Uint8Array | string): Buffer {
+  if (BufferImpl.isBuffer(input)) {
+    return input as Buffer
+  }
+  if (input instanceof Uint8Array) {
+    return BufferImpl.from(input) as Buffer
+  }
+  // Assume hex string
+  const hex = input.startsWith('0x') ? input.slice(2) : input
+  return BufferImpl.from(hex, 'hex') as Buffer
+}
 export type SS58Prefix = number
 
 /**
