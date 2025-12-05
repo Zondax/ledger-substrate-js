@@ -51,7 +51,7 @@
     "@types/node": "^20.14.9",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.14.1",
-    "bip32": "^4.0.0",
+    "bip32": "^5.0.0",
     "bip32-ed25519": "https://github.com/Zondax/bip32-ed25519",
     "bip39": "^3.1.0",
     "blakejs": "^1.2.1",
