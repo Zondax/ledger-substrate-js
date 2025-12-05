@@ -107,8 +107,6 @@ export class PolkadotGenericApp extends BaseApp {
   }
 
   /**
-   * @deprecated Use getAddressEcdsa or getAddressEd25519 instead. This method will be removed in a future version.
-   * Retrieves the address for a given BIP44 path and SS58 prefix.
    * @param bip44Path - The BIP44 path.
    * @param ss58prefix - The SS58 prefix, must be an integer up to 65535.
    * @param showAddrInDevice - Whether to show the address on the device.
@@ -499,9 +497,9 @@ export class PolkadotGenericApp extends BaseApp {
     }
 
     return {
-      r: signature.slice(0, 32).toString('hex'),
-      s: signature.slice(32, 64).toString('hex'),
-      v: signature.slice(64, 65).toString('hex'),
+      r: signature.subarray(0, 32).toString('hex'),
+      s: signature.subarray(32, 64).toString('hex'),
+      v: signature.subarray(64, 65).toString('hex'),
     }
   }
 }

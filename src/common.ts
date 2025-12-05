@@ -269,8 +269,6 @@ export async function getVersion(transport: Transport, cla: number) {
       targetId = (response[14] << 24) + (response[15] << 16) + (response[16] << 8) + (response[17] << 0)
     }
 
-    // eslint-disable-next-line no-bitwise
-
     return {
       return_code: returnCode,
       error_message: errorCodeToString(returnCode),

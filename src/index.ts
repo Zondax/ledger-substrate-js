@@ -15,8 +15,4 @@
  *  limitations under the License.
  ******************************************************************************* */
 
-export * from './legacy_apps'
 export * from './generic_app'
-export * from './generic_legacy'
-export { SubstrateApp } from './substrate_app'
-export { newSubstrateApp, supportedApps } from './supported_apps'
