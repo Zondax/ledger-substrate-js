@@ -3190,9 +3190,9 @@ jest-runtime@^29.7.0:
     strip-bom "^4.0.0"
 
 jest-serial-runner@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/jest-serial-runner/-/jest-serial-runner-1.2.1.tgz#0f5f8dbe6f077119bd1fdd7e8518f92353c194d5"
-  integrity sha512-d59fF+7HdjNvQEL7B4WyFE+f8q5tGzlNUqtOnxTrT1ofun7O6/Lgm/j255BBgCY2fmSue/34M7Xy9+VWRByP0Q==
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/jest-serial-runner/-/jest-serial-runner-1.2.2.tgz#ad6e29655246cfe5391ffb36291c85448c840695"
+  integrity sha512-LKdzq44gBSBmVOisTCXrF+JA83TWyyLS+9Pw4jcUHUlh67OIq90HfiTVq7yq2MuUgG1HGsV0Edr04Xy1He+tGw==
 
 jest-snapshot@^29.7.0:
   version "29.7.0"
