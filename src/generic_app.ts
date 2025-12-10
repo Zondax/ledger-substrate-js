@@ -27,8 +27,11 @@ import {
   SCHEME,
   SS58Prefix,
   TransactionBlob,
+  TransactionBlobInput,
   TransactionMetadataBlob,
+  TransactionMetadataBlobInput,
   TxMetadata,
+  toBuffer,
 } from './common'
 
 export class PolkadotGenericApp extends BaseApp {
@@ -69,13 +72,17 @@ export class PolkadotGenericApp extends BaseApp {
 
   /**
    * Retrieves transaction metadata from the metadata service.
-   * @param txBlob - The transaction blob.
+   * @param txBlob - The transaction blob (Buffer, Uint8Array, or hex string).
    * @param txMetadataChainId - The optional chain ID for the transaction metadata service. This value temporarily overrides the one set in the constructor.
    * @param txMetadataSrvUrl - The optional URL for the transaction metadata service. This value temporarily overrides the one set in the constructor.
    * @returns The transaction metadata.
    * @throws {ResponseError} - If the txMetadataSrvUrl is not defined.
    */
-  async getTxMetadata(txBlob: TransactionBlob, txMetadataChainId?: string, txMetadataSrvUrl?: string): Promise<TransactionMetadataBlob> {
+  async getTxMetadata(
+    txBlob: TransactionBlobInput,
+    txMetadataChainId?: string,
+    txMetadataSrvUrl?: string
+  ): Promise<TransactionMetadataBlob> {
     const txMetadataChainIdVal = txMetadataChainId ?? this.txMetadataChainId
     const txMetadataSrvUrlVal = txMetadataSrvUrl ?? this.txMetadataSrvUrl
 
@@ -93,8 +100,9 @@ export class PolkadotGenericApp extends BaseApp {
       )
     }
 
+    const txBlobBuffer = toBuffer(txBlob)
     const resp = await axios.post<TxMetadata>(txMetadataSrvUrlVal, {
-      txBlob: txBlob.toString('hex'),
+      txBlob: txBlobBuffer.toString('hex'),
       chain: { id: txMetadataChainIdVal },
     })
 
@@ -295,12 +303,12 @@ export class PolkadotGenericApp extends BaseApp {
    * @deprecated Use signEcdsa or signEd25519 instead. This method will be removed in a future version.
    * Signs a transaction blob retrieving the correct metadata from a metadata service.
    * @param path - The BIP44 path.
-   * @param txBlob - The transaction blob.
+   * @param txBlob - The transaction blob (Buffer, Uint8Array, or hex string).
    * @param scheme - The scheme to use for the signing. Default is ED25519.
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async sign(path: BIP32Path, txBlob: TransactionBlob, scheme = SCHEME.ED25519) {
+  async sign(path: BIP32Path, txBlob: TransactionBlobInput, scheme = SCHEME.ED25519) {
     if (scheme != SCHEME.ECDSA && scheme != SCHEME.ED25519) {
       throw new ResponseError(LedgerError.ConditionsOfUseNotSatisfied, `Unexpected scheme ${scheme}. Needs to be ECDSA (2) or ED25519 (0)`)
     }
@@ -313,11 +321,11 @@ export class PolkadotGenericApp extends BaseApp {
   /**
    * Signs a transaction blob using the ED25519 scheme.
    * @param path - The BIP44 path.
-   * @param txBlob - The transaction blob.
+   * @param txBlob - The transaction blob (Buffer, Uint8Array, or hex string).
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async signEd25519(path: BIP32Path, txBlob: TransactionBlob) {
+  async signEd25519(path: BIP32Path, txBlob: TransactionBlobInput) {
     if (!this.txMetadataSrvUrl) {
       throw new ResponseError(
         LedgerError.GenericError,
@@ -332,14 +340,15 @@ export class PolkadotGenericApp extends BaseApp {
       )
     }
 
-    const txMetadata = await this.getTxMetadata(txBlob)
-    return await this.signImplEd25519(path, this.INS.SIGN, txBlob, txMetadata)
+    const txBlobBuffer = toBuffer(txBlob)
+    const txMetadata = await this.getTxMetadata(txBlobBuffer)
+    return await this.signImplEd25519(path, this.INS.SIGN, txBlobBuffer, txMetadata)
   }
 
   /**
    * Signs a transaction blob using the ECDSA scheme.
    * @param path - The BIP44 path.
-   * @param txBlob - The transaction blob.
+   * @param txBlob - The transaction blob (Buffer, Uint8Array, or hex string).
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status. For ECDSA, the signature is in RSV format:
    * - R: First 32 bytes (signature.slice(0, 32))
@@ -347,7 +356,7 @@ export class PolkadotGenericApp extends BaseApp {
    * - V: Last byte (signature.slice(64, 65))
    * @see parseEcdsaSignature - Use this utility function to easily parse the signature into R, S, V components
    */
-  async signEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
+  async signEcdsa(path: BIP32Path, txBlob: TransactionBlobInput) {
     if (!this.txMetadataSrvUrl) {
       throw new ResponseError(
         LedgerError.GenericError,
@@ -362,20 +371,21 @@ export class PolkadotGenericApp extends BaseApp {
       )
     }
 
-    const txMetadata = await this.getTxMetadata(txBlob)
-    return await this.signImplEcdsa(path, this.INS.SIGN, txBlob, txMetadata)
+    const txBlobBuffer = toBuffer(txBlob)
+    const txMetadata = await this.getTxMetadata(txBlobBuffer)
+    return await this.signImplEcdsa(path, this.INS.SIGN, txBlobBuffer, txMetadata)
   }
 
   /**
    * Signs a transaction blob with provided metadata.
    * @param path - The BIP44 path.
-   * @param txBlob - The transaction blob.
+   * @param txBlob - The transaction blob (Buffer, Uint8Array, or hex string).
    * @param txMetadataChainId - The optional chain ID for the transaction metadata service. This value temporarily overrides the one set in the constructor.
    * @param txMetadataSrvUrl - The optional URL for the transaction metadata service. This value temporarily overrides the one set in the constructor.
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async signMigration(path: BIP32Path, txBlob: TransactionBlob, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
+  async signMigration(path: BIP32Path, txBlob: TransactionBlobInput, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
     if (!this.txMetadataSrvUrl) {
       throw new ResponseError(
         LedgerError.GenericError,
@@ -390,19 +400,20 @@ export class PolkadotGenericApp extends BaseApp {
       )
     }
 
-    const txMetadata = await this.getTxMetadata(txBlob, txMetadataChainId, txMetadataSrvUrl)
-    return await this.signImplEd25519(path, this.INS.SIGN, txBlob, txMetadata)
+    const txBlobBuffer = toBuffer(txBlob)
+    const txMetadata = await this.getTxMetadata(txBlobBuffer, txMetadataChainId, txMetadataSrvUrl)
+    return await this.signImplEd25519(path, this.INS.SIGN, txBlobBuffer, txMetadata)
   }
   /**
    * @deprecated Use signRawEcdsa or signRawEd25519 instead. This method will be removed in a future version.
    * Signs a raw transaction blob.
    * @param path - The BIP44 path.
-   * @param txBlob - The transaction blob.
+   * @param txBlob - The transaction blob (Buffer, Uint8Array, or hex string).
    * @param scheme - The scheme to use for the signing. Default is ED25519.
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async signRaw(path: BIP32Path, txBlob: TransactionBlob, scheme = SCHEME.ED25519) {
+  async signRaw(path: BIP32Path, txBlob: TransactionBlobInput, scheme = SCHEME.ED25519) {
     if (scheme != SCHEME.ECDSA && scheme != SCHEME.ED25519) {
       throw new ResponseError(LedgerError.ConditionsOfUseNotSatisfied, `Unexpected scheme ${scheme}. Needs to be ECDSA (2) or ED25519 (0)`)
     }
@@ -415,18 +426,19 @@ export class PolkadotGenericApp extends BaseApp {
   /**
    * Signs a raw transaction blob using the ED25519 scheme.
    * @param path - The BIP44 path.
-   * @param txBlob - The transaction blob.
+   * @param txBlob - The transaction blob (Buffer, Uint8Array, or hex string).
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async signRawEd25519(path: BIP32Path, txBlob: TransactionBlob) {
-    return await this.signImplEd25519(path, this.INS.SIGN_RAW, txBlob)
+  async signRawEd25519(path: BIP32Path, txBlob: TransactionBlobInput) {
+    const txBlobBuffer = toBuffer(txBlob)
+    return await this.signImplEd25519(path, this.INS.SIGN_RAW, txBlobBuffer)
   }
 
   /**
    * Signs a raw transaction blob using the ECDSA scheme.
    * @param path - The BIP44 path.
-   * @param txBlob - The transaction blob.
+   * @param txBlob - The transaction blob (Buffer, Uint8Array, or hex string).
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status. For ECDSA, the signature is in RSV format:
    * - R: First 32 bytes (signature.slice(0, 32))
@@ -434,20 +446,21 @@ export class PolkadotGenericApp extends BaseApp {
    * - V: Last byte (signature.slice(64, 65))
    * @see parseEcdsaSignature - Use this utility function to easily parse the signature into R, S, V components
    */
-  async signRawEcdsa(path: BIP32Path, txBlob: TransactionBlob) {
-    return await this.signImplEcdsa(path, this.INS.SIGN_RAW, txBlob)
+  async signRawEcdsa(path: BIP32Path, txBlob: TransactionBlobInput) {
+    const txBlobBuffer = toBuffer(txBlob)
+    return await this.signImplEcdsa(path, this.INS.SIGN_RAW, txBlobBuffer)
   }
 
   /**
    * @deprecated Use signWithMetadataEd25519 or signWithMetadataEcdsa instead. This method will be removed in a future version.
    * [Expert-only Method] Signs a transaction blob with provided metadata (this could be used also with a migration app)
    * @param path - The BIP44 path.
-   * @param txBlob - The transaction blob.
-   * @param txMetadata - The transaction metadata.
+   * @param txBlob - The transaction blob (Buffer, Uint8Array, or hex string).
+   * @param txMetadata - The transaction metadata (Buffer, Uint8Array, or hex string).
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async signWithMetadata(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob, scheme = SCHEME.ED25519) {
+  async signWithMetadata(path: BIP32Path, txBlob: TransactionBlobInput, txMetadata: TransactionMetadataBlobInput, scheme = SCHEME.ED25519) {
     if (scheme != SCHEME.ECDSA && scheme != SCHEME.ED25519) {
       throw new ResponseError(LedgerError.ConditionsOfUseNotSatisfied, `Unexpected scheme ${scheme}. Needs to be ECDSA (2) or ED25519 (0)`)
     }
@@ -460,8 +473,8 @@ export class PolkadotGenericApp extends BaseApp {
   /**
    * Signs a transaction blob with provided metadata using the ECDSA scheme.
    * @param path - The BIP44 path.
-   * @param txBlob - The transaction blob.
-   * @param txMetadata - The transaction metadata.
+   * @param txBlob - The transaction blob (Buffer, Uint8Array, or hex string).
+   * @param txMetadata - The transaction metadata (Buffer, Uint8Array, or hex string).
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status. For ECDSA, the signature is in RSV format:
    * - R: First 32 bytes (signature.slice(0, 32))
@@ -469,20 +482,24 @@ export class PolkadotGenericApp extends BaseApp {
    * - V: Last byte (signature.slice(64, 65))
    * @see parseEcdsaSignature - Use this utility function to easily parse the signature into R, S, V components
    */
-  async signWithMetadataEcdsa(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
-    return await this.signImplEcdsa(path, this.INS.SIGN, txBlob, txMetadata)
+  async signWithMetadataEcdsa(path: BIP32Path, txBlob: TransactionBlobInput, txMetadata: TransactionMetadataBlobInput) {
+    const txBlobBuffer = toBuffer(txBlob)
+    const txMetadataBuffer = toBuffer(txMetadata)
+    return await this.signImplEcdsa(path, this.INS.SIGN, txBlobBuffer, txMetadataBuffer)
   }
 
   /**
    * Signs a transaction blob with provided metadata using the ED25519 scheme.
    * @param path - The BIP44 path.
-   * @param txBlob - The transaction blob.
-   * @param txMetadata - The transaction metadata.
+   * @param txBlob - The transaction blob (Buffer, Uint8Array, or hex string).
+   * @param txMetadata - The transaction metadata (Buffer, Uint8Array, or hex string).
    * @throws {ResponseError} If the response from the device indicates an error.
    * @returns The response containing the signature and status.
    */
-  async signWithMetadataEd25519(path: BIP32Path, txBlob: TransactionBlob, txMetadata: TransactionMetadataBlob) {
-    return await this.signImplEd25519(path, this.INS.SIGN, txBlob, txMetadata)
+  async signWithMetadataEd25519(path: BIP32Path, txBlob: TransactionBlobInput, txMetadata: TransactionMetadataBlobInput) {
+    const txBlobBuffer = toBuffer(txBlob)
+    const txMetadataBuffer = toBuffer(txMetadata)
+    return await this.signImplEd25519(path, this.INS.SIGN, txBlobBuffer, txMetadataBuffer)
   }
 
   /**

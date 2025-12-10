@@ -16,3 +16,4 @@
  ******************************************************************************* */
 
 export * from './generic_app'
+export { toBuffer, type TransactionBlobInput, type TransactionMetadataBlobInput } from './common'
