@@ -1,0 +1,7 @@
+[tools]
+node = "22"  # Use Node.js 22 LTS instead of latest
+pnpm = "latest"
+bun = "latest"
+
+[tasks.ci_postinstall]
+run = "pnpm install --frozen-lockfile"
