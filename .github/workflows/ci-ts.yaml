@@ -1,0 +1,46 @@
+name: CI-ts
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+  schedule:
+    - cron: "0 0 * * *" # Daily at midnight UTC
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  ts-checks:
+    uses: zondax/_workflows/.github/workflows/_checks-ts.yaml@v5
+    with:
+      package_manager: pnpm
+      node_version: "22"
+      enable_tests: false  # Disable tests here since they need Docker
+      enable_coverage: false
+      test_command: "test"
+      lint_command: "check"
+      format_command: "check"
+
+  test-with-docker:
+    runs-on: ubuntu-latest
+    needs: ts-checks
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup mise
+        uses: jdx/mise-action@v3
+        env:
+          MISE_NODE_VERSION: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run tests with Docker
+        run: pnpm test
+        env:
+          DISPLAY: :99
