@@ -1,73 +1,24 @@
-name: 'Publish packages'
+name: Publish NPM Package
 
 on:
   release:
-    types:
-      - published
-      - edited
-    tags:
-      - "v[0-9]+(\\.[0-9]+)*"
+    types: [created]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
-  configure:
-    runs-on: zondax-runners
-    outputs:
-      datetime: ${{ steps.get-datetime.outputs.datetime }}
-    steps:
-      - id: get-datetime
-        run: echo "datetime=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
-
-  publish_npm_package:
-    runs-on: zondax-runners
-    container:
-      image: node:20-bookworm
-      env:
-        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        HEAD_BRANCH_NAME: ${{ github.head_ref }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          submodules: true
-
-      - name: Install node
-        uses: actions/setup-node@v6
-        with:
-          registry-url: 'https://registry.npmjs.org'
-          scope: '@zondax'
-
-      - uses: oven-sh/setup-bun@v1
-
-      - run: bun install
-
-      - run: bun run build
-
-      - name: Prepare README for npm
-        run: |
-          # Create a new README with the modified content
-          {
-              head -n 2 README.md
-              echo "![zondax](docs/zondax_light.png)"
-              tail -n +4 README.md
-          } > README.md.tmp
-          mv README.md.tmp README.md
-
-      - name: Get latest release version number
-        id: get_version
-        uses: battila7/get-version-action@v2
-
-      - name: Show version
-        run: echo ${{ steps.get_version.outputs.version }}
-
-      - name: Update tag
-        run: |
-          npm --allow-same-version --no-git-tag-version version ${{ steps.get_version.outputs.version }}
-
-      - name: Publish package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_PUBLISH_AUTO }}
-          NODE_REPO_SERVER: 'https://registry.npmjs.org'
-        run: |
-          npm config set registry $NODE_REPO_SERVER
-          npm config set //registry.npmjs.org/:_authToken $NODE_AUTH_TOKEN
-          npm publish
+  publish-npm:
+    uses: zondax/_workflows/.github/workflows/_publish-npm.yaml@v5
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      timeout_minutes: 15
+      dry_run: false
+      github_app_auth: false

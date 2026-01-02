@@ -2,8 +2,3 @@
 /node_modules/
 /output/
 /dist/
-
-node_modules
-.yarn/*
-!.yarn/releases
-!.yarn/plugins
