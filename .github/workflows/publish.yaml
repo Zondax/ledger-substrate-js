@@ -1,6 +1,10 @@
 name: Publish NPM Package
 
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   release:
     types: [created]
 
@@ -14,11 +18,11 @@ permissions:
 
 jobs:
   publish-npm:
-    uses: zondax/_workflows/.github/workflows/_publish-npm.yaml@v5
+    uses: zondax/_workflows/.github/workflows/_publish-npm.yaml@v7
     permissions:
       contents: read
-      id-token: write
+      id-token: write # Required for OIDC trusted publishing - must be in caller!
     with:
       timeout_minutes: 15
-      dry_run: false
+      dry_run: ${{ github.event_name != 'release' }}
       github_app_auth: false
