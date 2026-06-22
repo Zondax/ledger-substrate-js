@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@ledgerhq/hw-transport':
-        specifier: 6.35.3
-        version: 6.35.3
+        specifier: 6.35.4
+        version: 6.35.4
       '@zondax/ledger-js':
         specifier: ^1.3.1
         version: 1.3.1
@@ -439,9 +439,6 @@ packages:
   '@ledgerhq/devices@8.14.2':
     resolution: {integrity: sha512-T3pnfrsQEC/eJU0XHIqWI6qww+CL1k3NumR2XGWlMz8lVpoZ9HhcuGoCkMevp+8SWmymgyNIIFue3jlNA5KiMw==}
 
-  '@ledgerhq/devices@8.15.0':
-    resolution: {integrity: sha512-pHrjZzC81ER6BDKjIzTzubLynFzS15CQ7EQeEfrbrSisc3BFLGrnC7+cXdGWK7eTRAkwH7Uw3M2QM/mbjfhwlw==}
-
   '@ledgerhq/devices@8.15.1':
     resolution: {integrity: sha512-o4XEHiwPytnZxYUnOC5JoHX5TPDJpeMXPfXjwhsXVJ9LAbahxQWzC37Iuzk8ZY/oC2yDptzqjs/qNP2y9D9vCA==}
 
@@ -468,9 +465,6 @@ packages:
 
   '@ledgerhq/hw-transport@6.35.2':
     resolution: {integrity: sha512-eSXFFqMDAB2Ra/5uqmlru0cUyc2XDQPEKf4ITWHeMms2fHhETw9lcgAEl61vszkiz0RLUVB4VQsLJjj7O8kCvg==}
-
-  '@ledgerhq/hw-transport@6.35.3':
-    resolution: {integrity: sha512-FLR4/2mV6srMaic3cr/kweD9RQhpv4+8Q6T6P4PPOyScuz84siH+8NXLgREIeh328W/FxEGG2norjS+tOQW0vA==}
 
   '@ledgerhq/hw-transport@6.35.4':
     resolution: {integrity: sha512-FMVxiniQp0pgSIEBX9CjXYBuIAH9BTm3OcrN+/2LqkB8QBeFZdiwmO4BeN9nc2aWspe9z6kxN3SuUyouedNokA==}
@@ -968,7 +962,7 @@ packages:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
 
   bip32-ed25519@https://codeload.github.com/Zondax/bip32-ed25519/tar.gz/0949df01b5c93885339bc28116690292088f6134:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Zondax/bip32-ed25519/tar.gz/0949df01b5c93885339bc28116690292088f6134}
+    resolution: {tarball: https://codeload.github.com/Zondax/bip32-ed25519/tar.gz/0949df01b5c93885339bc28116690292088f6134}
     version: 0.0.4
 
   bip32@5.0.1:
@@ -2346,6 +2340,11 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  semver@7.8.5:
+    resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
     engines: {node: '>= 0.4'}
@@ -3199,14 +3198,7 @@ snapshots:
 
   '@ledgerhq/devices@8.14.2':
     dependencies:
-      '@ledgerhq/errors': 6.35.0
-      '@ledgerhq/logs': 6.17.0
-      rxjs: 7.8.2
-      semver: 7.7.3
-
-  '@ledgerhq/devices@8.15.0':
-    dependencies:
-      '@ledgerhq/errors': 6.35.0
+      '@ledgerhq/errors': 6.36.0
       '@ledgerhq/logs': 6.17.0
       rxjs: 7.8.2
       semver: 7.7.3
@@ -3217,19 +3209,17 @@ snapshots:
       '@ledgerhq/logs': 6.17.0
       rxjs: 7.8.2
       semver: 7.7.3
-    optional: true
 
   '@ledgerhq/devices@8.5.0':
     dependencies:
-      '@ledgerhq/errors': 6.35.0
+      '@ledgerhq/errors': 6.36.0
       '@ledgerhq/logs': 6.17.0
       rxjs: 7.8.2
-      semver: 7.8.1
+      semver: 7.8.5
 
   '@ledgerhq/errors@6.35.0': {}
 
-  '@ledgerhq/errors@6.36.0':
-    optional: true
+  '@ledgerhq/errors@6.36.0': {}
 
   '@ledgerhq/hw-transport-mocker@6.34.2':
     dependencies:
@@ -3261,7 +3251,7 @@ snapshots:
   '@ledgerhq/hw-transport@6.31.9':
     dependencies:
       '@ledgerhq/devices': 8.5.0
-      '@ledgerhq/errors': 6.35.0
+      '@ledgerhq/errors': 6.36.0
       '@ledgerhq/logs': 6.17.0
       events: 3.3.0
 
@@ -3272,20 +3262,12 @@ snapshots:
       '@ledgerhq/logs': 6.17.0
       events: 3.3.0
 
-  '@ledgerhq/hw-transport@6.35.3':
-    dependencies:
-      '@ledgerhq/devices': 8.15.0
-      '@ledgerhq/errors': 6.35.0
-      '@ledgerhq/logs': 6.17.0
-      events: 3.3.0
-
   '@ledgerhq/hw-transport@6.35.4':
     dependencies:
       '@ledgerhq/devices': 8.15.1
       '@ledgerhq/errors': 6.36.0
       '@ledgerhq/logs': 6.17.0
       events: 3.3.0
-    optional: true
 
   '@ledgerhq/logs@6.17.0': {}
 
@@ -3510,7 +3492,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.56.1
       debug: 4.4.3
       minimatch: 10.2.5
-      semver: 7.8.1
+      semver: 7.8.5
       tinyglobby: 0.2.16
       ts-api-utils: 2.5.0(typescript@5.9.3)
       typescript: 5.9.3
@@ -3525,7 +3507,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.60.0
       debug: 4.4.3
       minimatch: 10.2.5
-      semver: 7.8.1
+      semver: 7.8.5
       tinyglobby: 0.2.16
       ts-api-utils: 2.5.0(typescript@5.9.3)
       typescript: 5.9.3
@@ -4725,7 +4707,7 @@ snapshots:
       '@babel/parser': 7.29.7
       '@istanbuljs/schema': 0.1.6
       istanbul-lib-coverage: 3.2.2
-      semver: 7.8.1
+      semver: 7.8.5
     transitivePeerDependencies:
       - supports-color
 
@@ -5016,7 +4998,7 @@ snapshots:
       jest-message-util: 30.4.1
       jest-util: 30.4.1
       pretty-format: 30.4.1
-      semver: 7.8.1
+      semver: 7.8.5
       synckit: 0.11.12
     transitivePeerDependencies:
       - supports-color
@@ -5140,7 +5122,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.8.1
+      semver: 7.8.5
 
   make-error@1.3.6: {}
 
@@ -5199,7 +5181,7 @@ snapshots:
 
   node-abi@3.92.0:
     dependencies:
-      semver: 7.8.1
+      semver: 7.8.5
     optional: true
 
   node-addon-api@3.2.1:
@@ -5501,6 +5483,8 @@ snapshots:
   semver@7.8.1: {}
 
   semver@7.8.4: {}
+
+  semver@7.8.5: {}
 
   set-function-length@1.2.2:
     dependencies:
