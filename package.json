@@ -47,7 +47,7 @@
     "@ledgerhq/hw-transport-mocker": "^6.30.0",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/jest": "30.0.0",
-    "@types/node": "^25.0.8",
+    "@types/node": "^26.0.0",
     "@typescript-eslint/eslint-plugin": "^8.53.0",
     "@typescript-eslint/parser": "^8.61.1",
     "bip32": "^5.0.0",
