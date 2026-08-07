@@ -23,7 +23,7 @@ importers:
     devDependencies:
       '@ledgerhq/hw-transport-mocker':
         specifier: ^6.34.6
-        version: 6.34.6
+        version: 6.34.7
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^6.0.2
         version: 6.0.2(prettier@3.9.6)
@@ -451,8 +451,11 @@ packages:
   '@ledgerhq/errors@6.37.0':
     resolution: {integrity: sha512-T5yiKI5UX7ugeocdTF3TUsCIN2BH41Bio4ZeN410YFjFOf3es08n/5JyMzzKwzRgP0blG3HfBf7s7vJKqCSAeg==}
 
-  '@ledgerhq/hw-transport-mocker@6.34.6':
-    resolution: {integrity: sha512-1gR21yOTMox/lPhp5dNzAXyl7R/lQpSGfS+/KI61CT6VAoJ6uMQmzC2rR+GMiOKXBPDDZlx3riZ8S7zl7ImxHg==}
+  '@ledgerhq/errors@7.0.0':
+    resolution: {integrity: sha512-+Q/vykUlNeIxiM+I3cu1B660WLkzlmIsHLTV9QNV5D2/Ocplx3QMg52NYq2X7OAfGQnfH1rQvhn/NrjT+t9wBA==}
+
+  '@ledgerhq/hw-transport-mocker@6.34.7':
+    resolution: {integrity: sha512-AyaO4unEHhZbyyo9y16z36uOi9pqY6kqVtWhTAp1PLZuQhXR/Y0m+Yd3yJrjUvlNpIOrrVN1rA+gHlmewl43Og==}
 
   '@ledgerhq/hw-transport-node-hid-noevents@6.36.0':
     resolution: {integrity: sha512-hsqybDCDtpNWeWVY2b/emrsFDqVfc3Rkv4+2b6h5ubPGsKWFd+7t0u6oy0sJEl5v6C+V/uxl03shBjWEcSoxgw==}
@@ -468,6 +471,9 @@ packages:
 
   '@ledgerhq/hw-transport@6.35.6':
     resolution: {integrity: sha512-Eg1SsOgY9jAVPTBfhCVzj5WvzqlYS08Ip+DMX33tG6rjcCibDVjwjU2LuxYmTawd4Jo83bYm+Fpg8hIwN+bBNw==}
+
+  '@ledgerhq/hw-transport@6.35.7':
+    resolution: {integrity: sha512-vVhAVQ56+7A5FY5Mr09HY+bmf3H6TXpwsj+/xbadNkjl//e/YzTWfpXk4eBnj3hwk1PQ9Mn6pKFH0BHjS2BKlg==}
 
   '@ledgerhq/logs@6.17.0':
     resolution: {integrity: sha512-yra33g5q/AU7+PwAws+GaVpQGUuxnDREjVBnviJjcaJLVKuLzI4pnj8Bd3nY3fypM5k1yZEYKEXfUuGFUjP2+w==}
@@ -2252,8 +2258,8 @@ packages:
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
 
-  react-is@19.2.7:
-    resolution: {integrity: sha512-kZFnouyVv7eP/Phmrlo9FK+zcAdriZJvzxXHF1Sl1P377WSGe2G/JxVolhTrB/jeV47lKImhNUsijjHAAbcl/A==}
+  react-is@19.2.8:
+    resolution: {integrity: sha512-s5un28nYxKJw5gvUHyW5PCC28CvBqLu9r3cWgzHT4Vo/5fqqkFcdRYsGcKf50WMPpjjFZS5d76fn3YCo2njKwQ==}
 
   readable-stream@3.6.2:
     resolution: {integrity: sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==}
@@ -3213,9 +3219,11 @@ snapshots:
 
   '@ledgerhq/errors@6.37.0': {}
 
-  '@ledgerhq/hw-transport-mocker@6.34.6':
+  '@ledgerhq/errors@7.0.0': {}
+
+  '@ledgerhq/hw-transport-mocker@6.34.7':
     dependencies:
-      '@ledgerhq/hw-transport': 6.35.6
+      '@ledgerhq/hw-transport': 6.35.7
       '@ledgerhq/logs': 6.17.0
       rxjs: 7.8.2
 
@@ -3259,6 +3267,13 @@ snapshots:
     dependencies:
       '@ledgerhq/devices': 8.17.0
       '@ledgerhq/errors': 6.37.0
+      '@ledgerhq/logs': 6.17.0
+      events: 3.3.0
+
+  '@ledgerhq/hw-transport@6.35.7':
+    dependencies:
+      '@ledgerhq/devices': 8.17.0
+      '@ledgerhq/errors': 7.0.0
       '@ledgerhq/logs': 6.17.0
       events: 3.3.0
 
@@ -5363,7 +5378,7 @@ snapshots:
       '@jest/schemas': 30.4.1
       ansi-styles: 5.2.0
       react-is-18: react-is@18.3.1
-      react-is-19: react-is@19.2.7
+      react-is-19: react-is@19.2.8
 
   proxy-from-env@2.1.0: {}
 
@@ -5387,7 +5402,7 @@ snapshots:
 
   react-is@18.3.1: {}
 
-  react-is@19.2.7: {}
+  react-is@19.2.8: {}
 
   readable-stream@3.6.2:
     dependencies:
