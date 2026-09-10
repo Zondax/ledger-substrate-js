@@ -1,4 +1,5 @@
 allowBuilds:
+  '@zondax/ledger-js': true
   node-hid: false
   unrs-resolver: false
   usb: false
