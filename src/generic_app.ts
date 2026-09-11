@@ -15,8 +15,15 @@
  ******************************************************************************* */
 import axios from 'axios'
 
-import type Transport from '@ledgerhq/hw-transport'
-import BaseApp, { BIP32Path, INSGeneric, LedgerError, ResponseError, processErrorResponse, processResponse } from '@zondax/ledger-js'
+import BaseApp, {
+  BIP32Path,
+  INSGeneric,
+  LedgerError,
+  type LedgerTransport,
+  ResponseError,
+  processErrorResponse,
+  processResponse,
+} from '@zondax/ledger-js'
 
 import {
   ECDSA_PUBKEY_LEN,
@@ -60,7 +67,7 @@ export class PolkadotGenericApp extends BaseApp {
    * @param txMetadataSrvUrl - The optional transaction metadata service URL.
    * @throws {Error} - If the transport is not defined.
    */
-  constructor(transport: Transport, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
+  constructor(transport: LedgerTransport, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
     super(transport, PolkadotGenericApp._params)
     this.txMetadataSrvUrl = txMetadataSrvUrl
     this.txMetadataChainId = txMetadataChainId
