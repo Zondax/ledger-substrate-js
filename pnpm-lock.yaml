@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@zondax/ledger-js':
-        specifier: github:Zondax/ledger-js#feat/dmk-transport
-        version: https://codeload.github.com/Zondax/ledger-js/tar.gz/4e9cb4ced4c94de3ee036c2e60d23e152739682b
+        specifier: ^2.0.0
+        version: 2.0.0
       axios:
         specifier: ^1.18.1
         version: 1.18.1
@@ -782,9 +782,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@zondax/ledger-js@https://codeload.github.com/Zondax/ledger-js/tar.gz/4e9cb4ced4c94de3ee036c2e60d23e152739682b':
-    resolution: {gitHosted: true, integrity: sha512-mdLZKSD6glgzaqjET05pgbBhEblkkdfJQEN2hIYByfvghf9xrpduhoBuQyZX0zod2PZYAu5EjhrPkwwVby2FsQ==, tarball: https://codeload.github.com/Zondax/ledger-js/tar.gz/4e9cb4ced4c94de3ee036c2e60d23e152739682b}
-    version: 0.0.0
+  '@zondax/ledger-js@2.0.0':
+    resolution: {integrity: sha512-22dCyTbU38bZxRl7HpC2z1tQTfrbzOMy37PyzftBBK739GR2uBJ/EJy38gvuwwVHmX29e5tUa4MmJTsvUKQ2mg==}
     engines: {node: '>=20'}
 
   acorn-jsx@5.3.2:
@@ -3393,7 +3392,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@zondax/ledger-js@https://codeload.github.com/Zondax/ledger-js/tar.gz/4e9cb4ced4c94de3ee036c2e60d23e152739682b': {}
+  '@zondax/ledger-js@2.0.0': {}
 
   acorn-jsx@5.3.2(acorn@8.16.0):
     dependencies:
