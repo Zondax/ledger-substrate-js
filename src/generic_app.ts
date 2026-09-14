@@ -41,7 +41,17 @@ import {
   toBuffer,
 } from './common'
 
-export class PolkadotGenericApp extends BaseApp {
+/**
+ * Generic in the transport so `app.transport` keeps the caller's own type.
+ *
+ * `BaseApp` declares `readonly transport: LedgerTransport`, so without this the widened
+ * constructor would narrow the inherited field as a side effect and `app.transport.close()`
+ * — fine today — would stop compiling. Re-declaring it as `T`, inferred from the argument,
+ * keeps every member of whatever was passed in: hw-transport's and a DMK transport's alike.
+ */
+export class PolkadotGenericApp<T extends LedgerTransport = LedgerTransport> extends BaseApp {
+  declare readonly transport: T
+
   static _INS = {
     GET_VERSION: 0x00 as number,
     GET_ADDR: 0x01 as number,
@@ -67,7 +77,7 @@ export class PolkadotGenericApp extends BaseApp {
    * @param txMetadataSrvUrl - The optional transaction metadata service URL.
    * @throws {Error} - If the transport is not defined.
    */
-  constructor(transport: LedgerTransport, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
+  constructor(transport: T, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
     super(transport, PolkadotGenericApp._params)
     this.txMetadataSrvUrl = txMetadataSrvUrl
     this.txMetadataChainId = txMetadataChainId
