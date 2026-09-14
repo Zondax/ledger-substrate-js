@@ -44,10 +44,18 @@ import {
 /**
  * Generic in the transport so `app.transport` keeps the caller's own type.
  *
- * `BaseApp` declares `readonly transport: LedgerTransport`, so without this the widened
- * constructor would narrow the inherited field as a side effect and `app.transport.close()`
- * — fine today — would stop compiling. Re-declaring it as `T`, inferred from the argument,
- * keeps every member of whatever was passed in: hw-transport's and a DMK transport's alike.
+ * `BaseApp` declares `readonly transport: LedgerTransport` — `send` and nothing else — so
+ * re-declaring the field as `T` is what lets `app.transport.close()` keep working: `T` is
+ * inferred from the constructor argument, and `new PolkadotGenericApp(hwTransport)` carries
+ * every member of whatever was passed in, hw-transport's and a DMK transport's alike.
+ *
+ * BREAKING: that inference only fires where there is an argument to infer from. Written out
+ * as a bare type — a class field (`app: PolkadotGenericApp`) or a parameter
+ * (`function f(a: PolkadotGenericApp)`) — `T` falls back to the `LedgerTransport` default,
+ * `app.transport` narrows to `send`, and `close` / `exchange` / `on` stop typechecking where
+ * they compiled on main. A wallet class holding an `app` field and closing the transport in
+ * its own `disconnect()` is the common shape that hits this. Name the transport —
+ * `PolkadotGenericApp<Transport>` — to keep those members.
  */
 export class PolkadotGenericApp<T extends LedgerTransport = LedgerTransport> extends BaseApp {
   declare readonly transport: T
