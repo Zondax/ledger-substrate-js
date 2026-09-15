@@ -11,6 +11,51 @@ Additionally, it provides a hd_key_derivation function to retrieve the keys that
 BIP32-ED25519. Warning: the hd_key_derivation function is not audited and depends on external packages. We recommend
 using the official Substrate Ledger apps in recovery mode.
 
+# Transports
+
+`PolkadotGenericApp` accepts any transport that can send an APDU: a legacy `Transport` from
+`@ledgerhq/hw-transport`, or a [Device Management Kit](https://www.ledger.com/blog-dmk-rollout)
+session wrapped in `DMKTransport` from `@zondax/ledger-js`.
+
+```ts
+import { DMKTransport } from '@zondax/ledger-js'
+import { PolkadotGenericApp } from '@zondax/ledger-substrate'
+
+const sessionId = await dmk.connect({
+  device,
+  // A DMK session polls the device roughly once a second over the same queue your APDUs
+  // leave on, and signing sends an awaited sequence of chunks. Disable it, as Ledger Live
+  // does in its own DMK transport.
+  sessionRefresherOptions: { isRefresherDisabled: true },
+})
+
+const app = new PolkadotGenericApp(new DMKTransport(dmk, sessionId))
+```
+
+## Breaking change: the transport type parameter
+
+The class is now generic in its transport —
+`PolkadotGenericApp<T extends LedgerTransport = LedgerTransport>` — so that `app.transport`
+keeps the type you constructed it with. `T` is inferred from the constructor argument, so
+`new PolkadotGenericApp(transport)` is unaffected.
+
+Writing the type out is not. A bare `PolkadotGenericApp` falls back to the `LedgerTransport`
+default, which describes `send` and nothing else, so hw-transport members reached through it
+(`close`, `exchange`, `on`) stop typechecking. Name the transport type to keep them:
+
+```diff
+ class Wallet {
+-  app: PolkadotGenericApp
++  app: PolkadotGenericApp<Transport>
+
+   async disconnect() {
+     await this.app.transport.close()
+   }
+ }
+```
+
+The same applies to a function parameter (`function f(a: PolkadotGenericApp<Transport>)`).
+
 # Generic app Available commands
 
 ## Address Operations

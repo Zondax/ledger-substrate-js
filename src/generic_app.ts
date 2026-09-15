@@ -15,8 +15,15 @@
  ******************************************************************************* */
 import axios from 'axios'
 
-import type Transport from '@ledgerhq/hw-transport'
-import BaseApp, { BIP32Path, INSGeneric, LedgerError, ResponseError, processErrorResponse, processResponse } from '@zondax/ledger-js'
+import BaseApp, {
+  BIP32Path,
+  INSGeneric,
+  LedgerError,
+  type LedgerTransport,
+  ResponseError,
+  processErrorResponse,
+  processResponse,
+} from '@zondax/ledger-js'
 
 import {
   ECDSA_PUBKEY_LEN,
@@ -34,7 +41,25 @@ import {
   toBuffer,
 } from './common'
 
-export class PolkadotGenericApp extends BaseApp {
+/**
+ * Generic in the transport so `app.transport` keeps the caller's own type.
+ *
+ * `BaseApp` declares `readonly transport: LedgerTransport` — `send` and nothing else — so
+ * re-declaring the field as `T` is what lets `app.transport.close()` keep working: `T` is
+ * inferred from the constructor argument, and `new PolkadotGenericApp(hwTransport)` carries
+ * every member of whatever was passed in, hw-transport's and a DMK transport's alike.
+ *
+ * BREAKING: that inference only fires where there is an argument to infer from. Written out
+ * as a bare type — a class field (`app: PolkadotGenericApp`) or a parameter
+ * (`function f(a: PolkadotGenericApp)`) — `T` falls back to the `LedgerTransport` default,
+ * `app.transport` narrows to `send`, and `close` / `exchange` / `on` stop typechecking where
+ * they compiled on main. A wallet class holding an `app` field and closing the transport in
+ * its own `disconnect()` is the common shape that hits this. Name the transport —
+ * `PolkadotGenericApp<Transport>` — to keep those members.
+ */
+export class PolkadotGenericApp<T extends LedgerTransport = LedgerTransport> extends BaseApp {
+  declare readonly transport: T
+
   static _INS = {
     GET_VERSION: 0x00 as number,
     GET_ADDR: 0x01 as number,
@@ -60,7 +85,7 @@ export class PolkadotGenericApp extends BaseApp {
    * @param txMetadataSrvUrl - The optional transaction metadata service URL.
    * @throws {Error} - If the transport is not defined.
    */
-  constructor(transport: Transport, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
+  constructor(transport: T, txMetadataChainId?: string, txMetadataSrvUrl?: string) {
     super(transport, PolkadotGenericApp._params)
     this.txMetadataSrvUrl = txMetadataSrvUrl
     this.txMetadataChainId = txMetadataChainId

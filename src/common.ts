@@ -1,6 +1,6 @@
 import { Buffer as BufferPolyfill } from 'buffer/'
 
-import type Transport from '@ledgerhq/hw-transport'
+import type { LedgerTransport } from '@zondax/ledger-js'
 
 /** ******************************************************************************
  *  (c) 2019 - 2022 Zondax AG
@@ -264,7 +264,7 @@ export function processErrorResponse(response: any) {
   }
 }
 
-export async function getVersion(transport: Transport, cla: number) {
+export async function getVersion(transport: LedgerTransport, cla: number) {
   try {
     const response = await transport.send(cla, INS.GET_VERSION, 0, 0)
     const errorCodeData = response.subarray(-2)
