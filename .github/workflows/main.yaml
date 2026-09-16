@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   ts-checks:
-    uses: zondax/_workflows/.github/workflows/_checks-ts.yaml@v11
+    uses: zondax/_workflows/.github/workflows/_checks-ts.yaml@v12
     permissions:
       contents: read
       pull-requests: write
